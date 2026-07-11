@@ -178,6 +178,11 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Added Simple Icons brand marks for Ferrari/McLaren and a lightweight inline Mercedes three-point star
 - Iteration 27 passed Ferrari default, all three color modes, persistence, desktop/mobile layout, state preservation, navigation, and error checks
 
+## Silverstone Hub Heading Clearance — 2026-07-11
+- Reduced and repositioned the Silverstone heading while slightly scaling/shifting the overview track
+- Preserved all camera coordinates, marker positions, and chapter navigation behavior
+- Verified zero heading/track overlap and zero horizontal overflow at 1920×800 and 390×844
+
 ## Prioritized Backlog
 ### P0
 - None; the post-Legacy overlap, lag, and first-route framing regressions are resolved and verified
