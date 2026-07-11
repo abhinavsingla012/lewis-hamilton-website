@@ -1,0 +1,87 @@
+{
+  "summary": "Frontend-only final verification executed on public URL. Marker click routing remains broken: timeline/legacy/cars dot clicks stay on circuit in repeated desktop and mobile loops, while keyboard (Enter/Space) and direct programmatic navigation route correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "SilverstoneMap markers",
+        "issue": "Timeline marker dot click failed 5/5 on desktop; state remained circuit.",
+        "selector": "[data-testid='chapter-marker-timeline']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "SilverstoneMap markers",
+        "issue": "Timeline marker dot click failed 5/5 on mobile; state remained circuit.",
+        "selector": "[data-testid='chapter-marker-timeline']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "SilverstoneMap markers",
+        "issue": "Legacy marker dot click did not open legacy chapter; remained circuit.",
+        "selector": "[data-testid='chapter-marker-legacy']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "SilverstoneMap markers",
+        "issue": "Cars marker dot click did not open cars chapter; remained circuit.",
+        "selector": "[data-testid='chapter-marker-cars']",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Timeline marker click reliability loops",
+        "issue": "Required 5 consecutive opens failed on both desktop and mobile (0/5 each).",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-timeline']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      },
+      {
+        "flow": "Legacy marker open + Back to Circuit preserve overview",
+        "issue": "Could not verify back-preserve behavior because legacy marker click never transitioned out of circuit.",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-legacy']",
+          "[data-testid='back-to-circuit-button']",
+          "[data-testid='circuit-coverage-label']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/SilverstoneMap.jsx",
+    "/app/frontend/src/CircuitExperience.css",
+    "/app/frontend/src/TeamThemes.css",
+    "/app/frontend/src/LegacyChapter.css",
+    "/app/test_reports/artifacts_iteration_30_frontend",
+    "/app/test_reports/artifacts_iteration_30_frontend_rerun"
+  ],
+  "action_items": [
+    "Fix marker dot click routing so timeline/legacy/cars clicks deterministically open their own chapters.",
+    "Investigate why keyboard activation routes correctly but pointer click activation settles to circuit.",
+    "After fix, re-run strict loop criteria: timeline click 5/5 desktop + 5/5 mobile, plus legacy/cars click routing regression.",
+    "Re-verify Legacy -> Back to Circuit path preserves progress overview once legacy click routing works."
+  ],
+  "critical_code_review_comments": [
+    "Programmatic navigation lock/settle path appears functional (window.__spatialGo to timeline/cars/legacy settles correctly).",
+    "Failure is isolated to marker dot click path despite visible marker cards and non-blocking label pointer-events.",
+    "No console/page errors and no horizontal overflow detected in tested desktop/mobile viewports."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_30.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "40%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Observed results in rerun: desktop timeline click loops ['circuit','circuit','circuit','circuit','circuit']; mobile timeline click loops ['circuit','circuit','circuit','circuit','circuit']; keyboard timeline Enter='timeline' and Space='timeline'; marker clicks for legacy/cars also stayed at circuit. Direct __spatialGo('timeline'|'cars'|'legacy') settled correctly to target. No console errors, no horizontal overflow.",
+  "rca of the issue": "Reproduction: force-open circuit overview, click marker dots (timeline/legacy/cars), wait >2.4s; viewport data-active remains 'circuit'. Keyboard activation on the same timeline marker opens timeline correctly, and direct __spatialGo settles correctly. Likely RCA: pointer-click marker path is not driving the same deterministic settle path as keyboard/programmatic route (or is being canceled/overridden before lock completion), causing click-triggered navigation to fall back to circuit state. Mitigation: instrument activate/onSelect click branch vs keydown branch, confirm onSelect invocation and token/lock lifecycle for click events, and enforce identical settle path for pointer and keyboard activations."
+}

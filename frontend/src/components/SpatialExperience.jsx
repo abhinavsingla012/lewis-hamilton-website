@@ -42,6 +42,8 @@ export const SpatialExperience = ({ archive }) => {
   const activeRef = useRef("top");
   const overviewRef = useRef(false);
   const coverageRef = useRef(0);
+  const navigationLockRef = useRef(null);
+  const navigationTokenRef = useRef(0);
   const [activeKey, setActiveKey] = useState("top");
   const [isCircuitOverview, setIsCircuitOverview] = useState(false);
   const [coverage, setCoverage] = useState(0);
@@ -97,7 +99,7 @@ export const SpatialExperience = ({ archive }) => {
       coverageRef.current = nextCoverage;
       setCoverage(nextCoverage);
     }
-    const next = getActiveKey(value);
+    const next = navigationLockRef.current ? "transit" : getActiveKey(value);
     if (next !== activeRef.current) {
       activeRef.current = next;
       setActiveKey(next);
@@ -116,8 +118,33 @@ export const SpatialExperience = ({ archive }) => {
       }
       const top = runway.current.offsetTop + item.stop * (runway.current.offsetHeight - window.innerHeight);
       const shouldJump = options.immediate || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (window.__hamiltonLenis) window.__hamiltonLenis.scrollTo(top, shouldJump ? { immediate: true, force: true } : { duration: 1.65, force: true });
-      else window.scrollTo({ top, behavior: shouldJump ? "auto" : "smooth" });
+      const token = navigationTokenRef.current + 1;
+      navigationTokenRef.current = token;
+      navigationLockRef.current = { key, token };
+      activeRef.current = "transit";
+      setActiveKey("transit");
+      let settleTimer;
+      const settle = () => {
+        if (navigationLockRef.current?.token !== token) return;
+        window.clearTimeout(settleTimer);
+        navigationLockRef.current = null;
+        activeRef.current = key;
+        setActiveKey(key);
+        requestAnimationFrame(() => updateCamera(scrollYProgress.get()));
+      };
+      if (window.__hamiltonLenis) {
+        if (shouldJump || Math.abs(window.scrollY - top) < 2) {
+          window.__hamiltonLenis.scrollTo(top, { immediate: true, force: true });
+          requestAnimationFrame(settle);
+        } else {
+          window.__hamiltonLenis.scrollTo(top, { duration: 1.65, force: true, lock: true, onComplete: settle });
+          settleTimer = window.setTimeout(settle, 1850);
+        }
+      } else {
+        window.scrollTo({ top, behavior: shouldJump ? "auto" : "smooth" });
+        if (shouldJump) requestAnimationFrame(settle);
+        else window.setTimeout(settle, 1700);
+      }
     };
     const handleHash = () => {
       const key = window.location.hash.replace("#route-", "");
@@ -163,6 +190,7 @@ export const SpatialExperience = ({ archive }) => {
       requestAnimationFrame(() => updateCamera(scrollYProgress.get()));
     };
     const resumeWithKey = (event) => {
+      if (event.target?.closest?.(".chapter-marker")) return;
       if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", " "].includes(event.key)) resume();
     };
     window.addEventListener("wheel", resume, { once: true, passive: true });
@@ -180,10 +208,6 @@ export const SpatialExperience = ({ archive }) => {
     setIsCircuitOverview(false);
     requestAnimationFrame(() => updateCamera(scrollYProgress.get()));
     window.history.replaceState(null, "", `#route-${key}`);
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      activeRef.current = key;
-      setActiveKey(key);
-    }
     window.__spatialGo?.(key);
   };
   const openCircuitOverview = () => {
