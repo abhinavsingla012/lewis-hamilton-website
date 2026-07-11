@@ -1,0 +1,9 @@
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowDownRight } from "lucide-react";
+import { IMAGES } from "../data/content";
+export const Hero = ({ stats }) => {
+  const { scrollY } = useScroll();
+  const imageY = useTransform(scrollY, [0, 900], [0, 130]);
+  const textY = useTransform(scrollY, [0, 900], [0, -90]);
+  return <section id="top" className="hero" data-testid="hero-section"><div className="hero-grid" aria-hidden="true" /><motion.div className="hero-type" style={{ y: textY }} data-testid="hero-title"><span>STILL</span><span className="outline">WE</span><span>RISE</span></motion.div><motion.div className="hero-image-wrap" style={{ y: imageY }}><img src={IMAGES.hero} alt="Lewis Hamilton at the 2024 British Grand Prix" className="hero-image" data-testid="hero-image" /><div className="hero-image-shade" /></motion.div><div className="hero-kicker" data-testid="hero-introduction"><span>THE DEFINITIVE FAN ARCHIVE</span><p>One driver. Seven titles.<br />A legacy measured beyond numbers.</p></div><div className="hero-number" data-testid="hero-car-number">44</div><div className="hero-stats" data-testid="hero-statistics"><div><strong>{stats?.wins ?? 105}</strong><span>GRAND PRIX WINS</span></div><div><strong>{stats?.titles ?? 7}</strong><span>WORLD TITLES</span></div><div><strong>{stats?.poles ?? 104}</strong><span>POLE POSITIONS</span></div></div><button className="scroll-cue" onClick={() => document.getElementById("legacy")?.scrollIntoView({ behavior: "smooth" })} data-testid="explore-legacy-button"><ArrowDownRight /> EXPLORE THE LEGACY</button></section>;
+};
