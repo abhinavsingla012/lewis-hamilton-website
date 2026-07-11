@@ -39,6 +39,15 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Added Timeline to the main navigation and hardened the home-logo return-to-top behavior
 - Verified desktop/mobile overflow, image loading, timeline behavior, gallery controls, and expanded API contract
 
+## Timeline Interaction Correction
+- Replaced the stacked 19-card right column with one persistent season data component
+- Scroll progress now changes a single synchronized active season from 2007 through 2025
+- Added previous/next season buttons and left/right keyboard navigation
+- Left-side year, image, championship badge, team, and car now update with the active season
+- Added a 19-step progress indicator and boundary-disabled controls
+- Removed delayed exit transitions that caused mobile image/data desynchronization during fast scrolling
+- Verified the 2025 mobile boundary shows one matching Ferrari image, 2025 card, `19 / 19` counter, and disabled next control
+
 ## Prioritized Backlog
 ### P0
 - None; the requested core experience is complete
