@@ -1,0 +1,77 @@
+{
+  "summary": "Frontend-only mandatory retest executed on public preview. Core menu/hash routing regression is resolved for pointer and keyboard flows, but gallery and victory filter controls remain non-interactable due to being rendered outside viewport under transformed spatial canvas state.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "VisualGallery",
+        "issue": "gallery-next-button is outside viewport when routed to victories context (bounding y around -2487), so click fails and gallery strip does not move.",
+        "selector": "[data-testid='gallery-next-button']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "Victory year filter",
+        "issue": "Year chip buttons intermittently outside viewport in same transformed state; click action fails with out-of-viewport error.",
+        "selector": "[data-testid^='filter-year-'][data-testid$='-button']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "Quote carousel",
+        "issue": "Next quote button click did not change featured quote in diagnostic run (content remained same).",
+        "selector": "[data-testid='next-quote-button']",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Gallery/quote/victory interactions after #route-victories navigation",
+        "issue": "Unified spatial transform/camera state can leave target controls detached from viewport hit area, blocking pointer actions despite visible sections.",
+        "affected_selectors": [
+          "[data-testid='visual-gallery-section']",
+          "[data-testid='gallery-next-button']",
+          "[data-testid='quote-section']",
+          "[data-testid='next-quote-button']",
+          "[data-testid='victory-archive-section']",
+          "[data-testid^='filter-year-'][data-testid$='-button']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/test_reports/artifacts_iteration_19_frontend",
+    "/app/test_reports/artifacts_iteration_19_targeted",
+    "/app/test_reports/artifacts_iteration_19_diag"
+  ],
+  "action_items": [
+    "Fix transformed/camera coordinate state so gallery controls stay in viewport and clickable after route-victories navigation.",
+    "Fix victory year filter chip hit targets under unified spatial routing state.",
+    "Validate quote next control updates content deterministically in the same state.",
+    "After fixes, rerun mandatory set with emphasis on Gallery/quote/victory block."
+  ],
+  "critical_code_review_comments": [
+    "Nav pointer matrix path appears stabilized; hash and HUD labels now match across fresh, sequential, quick-click, Enter, and Space flows.",
+    "Issue scope shifted from menu routing to deep-section interaction geometry: controls become non-actionable due to off-viewport layout coordinates while still logically present.",
+    "Single-line compressed component structure (Nav/SpatialExperience/StorySections) continues to reduce debuggability for spatial transform and interaction-boundary regressions."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_19.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "78%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Run-1 passed all menu/hash/timeline/home/error-overflow checks; gallery click failed out-of-viewport and blocked quote/victory assertions in that script. Targeted run and diagnostic run reproduced out-of-viewport failures for gallery and year-filter controls. Diagnostic captured gallery-next bounding box with negative y, confirming viewport detachment under spatial transform state.",
+  "rca of the issue": "Repro: load preview -> navigate to #route-victories (or via menu) -> attempt gallery-next / victory year chip click. Observed: Playwright reports element outside viewport; gallery button rect y is strongly negative despite section visibility. Likely RCA: transformed unified spatial canvas/route camera creates mismatch between visual position and actual hit-test coordinates for deep-section controls. Mitigation: normalize transform/hit-area for interactive descendants (or place controls in non-transformed overlay layer), then retest quote/gallery/victory interactions."
+}
