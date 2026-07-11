@@ -168,6 +168,16 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Clears stale overview state when navigating through hashes or the main menu
 - Iteration 26 passed all requested desktop/mobile coverage, navigation, accessibility, and overflow checks
 
+## Hamilton Team Color Themes — 2026-07-11
+- Added three persistent top-navigation color modes representing Hamilton's Formula 1 teams
+- Ferrari is the first-visit default with Ferrari red (`#E10600`), Mercedes uses cyan (`#00D2BE`), and McLaren uses papaya orange (`#FF8700`)
+- Added named logo buttons for McLaren, Mercedes, and Ferrari with accessible `aria-pressed` selection state
+- Replaced the former yellow accent system across the Hero, Silverstone track, markers, HUD, progress indicators, controls, menu, Gallery, and footer
+- Preserves current chapter, scroll, circuit overview, and interaction state when switching themes
+- Persists the selected team through reloads using the `hamilton-team-theme` localStorage key
+- Added Simple Icons brand marks for Ferrari/McLaren and a lightweight inline Mercedes three-point star
+- Iteration 27 passed Ferrari default, all three color modes, persistence, desktop/mobile layout, state preservation, navigation, and error checks
+
 ## Prioritized Backlog
 ### P0
 - None; the post-Legacy overlap, lag, and first-route framing regressions are resolved and verified
