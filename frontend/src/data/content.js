@@ -19,6 +19,11 @@ export const IMAGES = {
   season2009: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/r65f0kdu_639d17e00a09bb7f3ecac192ad4ac67f.jpg",
   season2010: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/af0jzucx_afc9607b5086701b755117b9ca071975.jpg",
   season2011: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/10ik0nkb_b3d4edd270d9d2008a0a208065d3ebe0%20%281%29.jpg",
+  season2014: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/f480vr1r_gettyimages-459457572-612x612.jpg",
+  season2015: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/ietsytyp_lewis-hamilton-mercedes.jpg",
+  season2016: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/y25lvb32_f1-abu-dhabi-gp-2016-world-champion-nico-rosberg-mercedes-amg-f1-shakes-hands-with-team-ma.jpg",
+  season2017: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/3xzktj6t_a63254a388aeca74ba9597ee530e0f5b.jpg",
+  season2018: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/9zjt96ee_TELEMMGLPICT000179258478_trans_NvBQzQNjv4BqihVibxPbOwKDCDIL8LViR-Tc6I2BHiBRNjiHpw-yH5I.jpeg",
 };
 export const gallery = [
   { image: IMAGES.hero, label: "HOME KING", meta: "SILVERSTONE / HISTORY", shape: "portrait" },

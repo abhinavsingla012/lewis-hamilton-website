@@ -5,8 +5,8 @@ import { IMAGES } from "../data/content";
 
 const seasonImages = {
   2007: IMAGES.season2007, 2008: IMAGES.season2008, 2009: IMAGES.season2009, 2010: IMAGES.season2010,
-  2011: IMAGES.season2011, 2012: IMAGES.night, 2013: IMAGES.china, 2014: IMAGES.podium,
-  2015: IMAGES.garage, 2016: IMAGES.trophies, 2017: IMAGES.china, 2018: IMAGES.silverstone,
+  2011: IMAGES.season2011, 2012: IMAGES.night, 2013: IMAGES.china, 2014: IMAGES.season2014,
+  2015: IMAGES.season2015, 2016: IMAGES.season2016, 2017: IMAGES.season2017, 2018: IMAGES.season2018,
   2019: IMAGES.night, 2020: IMAGES.w11, 2021: IMAGES.podium, 2022: IMAGES.garage,
   2023: IMAGES.helmet, 2024: IMAGES.silverstone, 2025: IMAGES.ferrari,
 };

@@ -72,6 +72,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Added the next five user-supplied historical photos exclusively to the season timeline
 - Mapped the images in the displayed order: first→2007, second→2008, third→2009, fourth→2010, fifth→2011
 - Verified timeline arrow navigation preserves the exact year/image sequence and loads every asset successfully
+- Added the next historical batch using the user’s requested non-sequential mapping: first→2016, second→2014, third→2015, fourth→2017, fifth→2018
+- Verified 2014, 2015, 2016, 2017, and 2018 individually through the timeline controls
 
 ## Prioritized Backlog
 ### P0
