@@ -1,0 +1,60 @@
+{
+  "summary": "Frontend-only retest completed for iteration 24 scope. Mobile CTA and reduced-motion flows now pass. One critical desktop regression remains: marker click does not open chapter in standard motion at 1920x1080.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "SilverstoneMap markers (desktop standard motion)",
+        "issue": "Clicking chapter marker (cars) does not trigger route/chapter open; viewport stays on circuit and Back to Circuit never appears.",
+        "selector": "[data-testid='chapter-marker-cars']",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Desktop CTA -> Circuit -> marker click -> chapter open",
+        "issue": "Marker click handler is not effectively activating chapter on desktop standard motion (hash unchanged, active state remains circuit).",
+        "affected_selectors": [
+          "[data-testid='explore-legacy-button']",
+          "[data-testid='circuit-spatial-viewport']",
+          "[data-testid='chapter-marker-cars']",
+          "[data-testid='back-to-circuit-button']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/HeroStage.jsx",
+    "/app/frontend/src/components/SilverstoneMap.jsx",
+    "/app/frontend/src/CircuitExperience.css",
+    "/app/test_reports/artifacts_iteration_24_frontend",
+    "/app/test_reports/artifacts_iteration_24_desktop_recheck",
+    "/app/test_reports/artifacts_iteration_24_desktop_keyboard"
+  ],
+  "action_items": [
+    "Fix desktop pointer/click activation for chapter markers in standard motion mode.",
+    "Re-verify that marker click updates hash (#route-*) and sets viewport data-active to selected chapter on desktop.",
+    "Confirm Back to Circuit appears after desktop marker click opens chapter."
+  ],
+  "critical_code_review_comments": [
+    "Current marker activation works via keyboard and reduced-motion paths but fails on desktop click path, suggesting pointer/click interaction mismatch rather than route-state logic failure.",
+    "Route update path should stay functionally equivalent across input modes (click/keyboard) and motion preferences."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_24.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "86%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Validated fixes from iteration 23: mobile 390x844 Hero CTA is visible/in-viewport/clickable and reaches circuit; reduced-motion marker click + keyboard activation + Back to Circuit all pass. Remaining blocker is desktop standard-motion marker click (cars marker) not opening chapter despite circuit state.",
+  "rca of the issue": "Repro: Desktop 1920x1080 -> click Explore Legacy CTA -> wait until data-active=circuit -> click [data-testid='chapter-marker-cars']. Observed: hash remains empty and data-active remains circuit. Keyboard activation on desktop and marker click in reduced motion both work, indicating route/chapter plumbing is functional but desktop pointer click path is not reliably invoking marker activation (likely event interception or SVG click-target behavior issue in standard-motion state)."
+}

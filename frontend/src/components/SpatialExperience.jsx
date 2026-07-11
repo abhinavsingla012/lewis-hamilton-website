@@ -99,8 +99,9 @@ export const SpatialExperience = ({ archive }) => {
       const item = SPATIAL_ROUTE.find((route) => route.key === key);
       if (!item || !runway.current) return;
       const top = runway.current.offsetTop + item.stop * (runway.current.offsetHeight - window.innerHeight);
-      if (window.__hamiltonLenis) window.__hamiltonLenis.scrollTo(top, options.immediate ? { immediate: true, force: true } : { duration: 1.65, force: true });
-      else window.scrollTo({ top, behavior: options.immediate ? "auto" : "smooth" });
+      const shouldJump = options.immediate || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (window.__hamiltonLenis) window.__hamiltonLenis.scrollTo(top, shouldJump ? { immediate: true, force: true } : { duration: 1.65, force: true });
+      else window.scrollTo({ top, behavior: shouldJump ? "auto" : "smooth" });
     };
     const handleHash = () => {
       const key = window.location.hash.replace("#route-", "");
@@ -140,6 +141,10 @@ export const SpatialExperience = ({ archive }) => {
 
   const navigate = (key) => {
     window.history.replaceState(null, "", `#route-${key}`);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      activeRef.current = key;
+      setActiveKey(key);
+    }
     window.__spatialGo?.(key);
   };
   const routeIndex = Math.max(0, SPATIAL_ROUTE.findIndex(({ key }) => key === activeKey));
