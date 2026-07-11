@@ -35,20 +35,20 @@ export const SilverstoneMap = ({ activeKey, cameraRef, onSelect, pathProgress, p
         if (!point) return null;
         const cardY = index % 2 ? 18 : -52;
         const lineY = index % 2 ? 18 : -18;
-        return <g
-          key={chapter.key}
-          className={`chapter-marker ${activeKey === chapter.key ? "is-active" : ""}`}
-          transform={`translate(${point.x} ${point.y})`}
-          role="button"
-          tabIndex={0}
-          aria-label={`Open ${chapter.label} chapter`}
-          onClick={(event) => activate(event, chapter.key)}
-          onKeyDown={(event) => activate(event, chapter.key)}
-          data-testid={`chapter-marker-${chapter.key}`}
-        >
-          <circle className="marker-hit" r="20" />
-          <circle className="marker-pulse" r="8" />
-          <circle className="marker-core" r="3.2" />
+        return <g key={chapter.key} className="marker-cluster" transform={`translate(${point.x} ${point.y})`}>
+          <g
+            className={`chapter-marker ${activeKey === chapter.key ? "is-active" : ""}`}
+            role="button"
+            tabIndex={0}
+            aria-label={`Open ${chapter.label} chapter`}
+            onClick={(event) => activate(event, chapter.key)}
+            onKeyDown={(event) => activate(event, chapter.key)}
+            data-testid={`chapter-marker-${chapter.key}`}
+          >
+            <circle className="marker-hit" r="20" />
+            <circle className="marker-pulse" r="8" />
+            <circle className="marker-core" r="3.2" />
+          </g>
           <g className="marker-label" transform="rotate(90)">
             <line x1="0" y1="0" x2="0" y2={lineY} />
             <foreignObject x="-58" y={cardY} width="116" height="36" className="marker-foreign-object">

@@ -1,0 +1,93 @@
+{
+  "summary": "Frontend-only regression retest completed on public URL for marker routing and Legacy redesign stability. Legacy chapter visuals/content remain intact when opened, but marker routing is still flaky across desktop and mobile, including Timeline and neighboring markers.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "SilverstoneMap markers",
+        "issue": "Timeline marker is non-deterministic in repeated loops; click frequently leaves state at circuit instead of opening timeline.",
+        "selector": "[data-testid='chapter-marker-timeline']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "SilverstoneMap markers",
+        "issue": "Legacy marker intermittently fails to open Legacy (mixed results: circuit/legacy).",
+        "selector": "[data-testid='chapter-marker-legacy']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "SilverstoneMap markers",
+        "issue": "Cars marker intermittently misroutes to other chapter/circuit instead of Cars.",
+        "selector": "[data-testid='chapter-marker-cars']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "SilverstoneMap keyboard interaction",
+        "issue": "Timeline marker keyboard Enter route is unstable (observed transit instead of timeline in probe).",
+        "selector": "[data-testid='chapter-marker-timeline']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Circuit overview marker navigation and back-loop",
+        "issue": "In >=5 consecutive Timeline loops, route result is inconsistent on both desktop and mobile.",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-timeline']",
+          "[data-testid='back-to-circuit-button']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      },
+      {
+        "flow": "Back to Circuit state context",
+        "issue": "Coverage label remains progress-aware, but resulting chapter context after marker click can mismatch intended marker due to routing instability.",
+        "affected_selectors": [
+          "[data-testid='circuit-coverage-label']",
+          "[data-testid='chapter-marker-legacy']",
+          "[data-testid='chapter-marker-timeline']",
+          "[data-testid='chapter-marker-cars']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SilverstoneMap.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/CircuitExperience.css",
+    "/app/frontend/src/TeamThemes.css",
+    "/app/frontend/src/LegacyChapter.css",
+    "/app/test_reports/artifacts_iteration_29_desktop",
+    "/app/test_reports/artifacts_iteration_29_desktop_probe",
+    "/app/test_reports/artifacts_iteration_29_settle_probe",
+    "/app/test_reports/artifacts_iteration_29_mobile",
+    "/app/test_reports/artifacts_iteration_29_mobile_probe"
+  ],
+  "action_items": [
+    "Fix marker click determinism so each marker dot always routes to its own chapter (legacy/timeline/cars) from circuit overview.",
+    "Fix keyboard parity for timeline marker so both Enter and Space consistently open timeline.",
+    "Re-verify with explicit 5/5 pass criteria for Timeline loop on desktop and mobile after fix.",
+    "Review interaction timing between navigate(), hash updates, and activeKey/transit thresholds in SpatialExperience for marker-triggered navigation."
+  ],
+  "critical_code_review_comments": [
+    "Pointer-event split for labels is correct: marker label cards are visible and computed as pointer-events:none, so label interception is not the remaining blocker.",
+    "Root instability appears in state selection timing/thresholds: getActiveKey() transit window and scroll-driven active updates can override marker-driven navigate() results.",
+    "Legacy redesign content and structure remain intact when legacy is opened (title/statement/stat rail and values rendered as expected)."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_29.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "55%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Use public URL and real marker clicks from circuit overview. Observed desktop timeline loop results: ['circuit','circuit','timeline','circuit','timeline']; mobile loop results: ['circuit','circuit','timeline','circuit','timeline']. Legacy marker and Cars marker also showed intermittent misroutes. Label cards remained visible and non-blocking (pointer-events:none). No horizontal overflow and no console errors seen during this run.",
+  "rca of the issue": "Reproduction: enter circuit overview, click timeline marker repeatedly with Back-to-Circuit loops; expected timeline each time, actual mixed outcomes including staying on circuit. Similar nondeterminism also seen for legacy/cars markers and Enter key on timeline marker. Likely cause: marker-triggered navigation (navigate->__spatialGo->hash update) races with scrollYProgress-driven getActiveKey/transit assignment, causing activeKey/displayKey to settle to non-target states. Mitigation: add deterministic marker navigation lock/settle (or immediate activeKey pin) until target chapter is reached, and reduce/guard transit override during marker-initiated navigation."
+}
