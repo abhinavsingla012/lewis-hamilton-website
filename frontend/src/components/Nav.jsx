@@ -18,7 +18,13 @@ export const Nav = ({ open, setOpen }) => {
       const route = button.dataset.spatialRoute;
       if (window.__spatialGo) window.__spatialGo(route, { immediate: true });
       else window.dispatchEvent(new CustomEvent("hamilton-spatial-route", { detail: { key: route, options: { immediate: true } } }));
-      window.setTimeout(() => setOpen(false), 0);
+      const onLanded = (landedEvent) => {
+        if (landedEvent.detail.key !== route) return;
+        window.removeEventListener("hamilton-spatial-landed", onLanded);
+        setOpen(false);
+      };
+      window.addEventListener("hamilton-spatial-landed", onLanded);
+      window.setTimeout(() => { window.removeEventListener("hamilton-spatial-landed", onLanded); setOpen(false); }, 700);
     };
     document.addEventListener("click", routeFromNativeClick, true);
     return () => document.removeEventListener("click", routeFromNativeClick, true);

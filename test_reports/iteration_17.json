@@ -1,0 +1,77 @@
+{
+  "summary": "Frontend-only mandatory retest completed on public preview. Serialized menu route transaction remains broken for pointer-based navigation: fresh matrix and sequential matrix fail heavily, and quick open-click still lands at ORIGIN. Keyboard routing, home origin, direct timeline lock behavior, gallery/quote/victory interactions, and no error/overflow checks pass.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Fresh pointer matrix all links",
+        "issue": "Failed 5/5 in this run. Legacy/Timeline/Cars/Tracks/Victories clicks each landed at ORIGIN instead of target route.",
+        "selector": "[data-testid='navigation-legacy-button'], [data-testid='navigation-timeline-button'], [data-testid='navigation-cars-button'], [data-testid='navigation-tracks-button'], [data-testid='navigation-victories-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Sequential matrix",
+        "issue": "Failed 4/5 in one session. Only Timeline passed; Legacy remained ORIGIN and Cars/Tracks/Victories stayed at TIMELINE.",
+        "selector": "[data-testid='navigation-menu-panel'], [data-testid^='navigation-']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Quick open-click",
+        "issue": "Open menu and immediate Timeline click still lands at ORIGIN.",
+        "selector": "[data-testid='menu-toggle-button'], [data-testid='navigation-timeline-button']",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Menu route click -> native capture handler -> spatial route dispatch/landed ack",
+        "issue": "Menu-driven pointer routing remains non-deterministic. In contrast, direct router invocation (window.__spatialGo) consistently lands routes and preserves timeline lock behavior, isolating failure to menu route transaction path.",
+        "affected_selectors": [
+          "[data-testid='navigation-menu-panel']",
+          "[data-testid='navigation-legacy-button']",
+          "[data-testid='navigation-timeline-button']",
+          "[data-testid='navigation-cars-button']",
+          "[data-testid='navigation-tracks-button']",
+          "[data-testid='navigation-victories-button']",
+          ".unified-spatial-viewport"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx",
+    "/app/test_reports/artifacts_iteration_17_frontend",
+    "/app/test_reports/artifacts_iteration_17_targeted"
+  ],
+  "action_items": [
+    "Fix serialized pointer route transaction in menu flow so each pointer click deterministically commits target route before panel close/unmount.",
+    "Resolve quick open-click race where first click after opening menu falls back to ORIGIN.",
+    "Align menu pointer path with keyboard/direct path behavior (keyboard and direct __spatialGo currently pass consistently).",
+    "Retest full mandatory set after fix: fresh matrix, sequential matrix, quick open-click, keyboard, home origin, timeline lock, gallery/quote/victory, no errors/overflow."
+  ],
+  "critical_code_review_comments": [
+    "Nav component still combines critical interaction logic into compressed one-line JSX/handlers, making race debugging difficult and increasing regression risk.",
+    "Menu close sequencing depends on landed event + timeout but pointer transaction still shows stale route commit; event ordering between capture handler and panel lifecycle is not deterministic.",
+    "Spatial router itself appears healthy (direct route calls pass), so bug scope is menu dispatch/ack transaction rather than core spatial math or timeline controls."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_17.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "63%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Two UI runs were executed. Run A (menu-driven) failed mandatory pointer criteria: fresh 0/5, sequential 1/5, quick open-click failed; keyboard/home passed; no error selectors and no horizontal overflow. Run B (targeted direct routing) passed timeline lock and gallery/quote/victory interactions, indicating route core works when bypassing menu click transaction.",
+  "rca of the issue": "Repro: (1) Reload page. (2) Open menu and click Legacy/Timeline/Cars/Tracks/Victories; expected respective node labels, observed ORIGIN or stale prior node. (3) Quick open then immediate Timeline click lands ORIGIN. (4) Keyboard Enter/Space and direct window.__spatialGo route transitions pass. RCA: failure is localized to menu pointer transaction sequencing (capture click -> route dispatch -> landed ack -> panel close), with unresolved race leading to dropped or stale route commits before/while menu transition occurs. Mitigation: enforce single deterministic state machine for pointer route commit and defer close until confirmed commit for the exact route key."
+}
