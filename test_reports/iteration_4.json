@@ -1,0 +1,46 @@
+{
+  "summary": "Completed frontend-only hero regression on public preview URL covering desktop and 390px mobile behaviors, motion interactions, CTA, and accessibility-related reduced-motion behavior.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Hero scroll/parallax instrumentation",
+        "issue": "Framer Motion emits repeated runtime warning: 'Please ensure that the container has a non-static position...' during hero render/scroll checks.",
+        "affected_selectors": [
+          "[data-testid='hero-section']",
+          ".hero-v2"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Hero.jsx",
+    "/app/frontend/src/HeroV2.css",
+    "/app/frontend/src/App.js"
+  ],
+  "action_items": [
+    "Resolve the Framer Motion container-position warning for the hero scroll target so console remains clean during production interaction.",
+    "Add explicit data-testid for helmet card/image (and other critical hero visual primitives) to improve deterministic regression coverage for required entrance elements."
+  ],
+  "critical_code_review_comments": [
+    "HeroV2.css is minified into a single compressed line, reducing maintainability and making targeted debugging/reviews harder.",
+    "Hero pointer/parallax relies on heroRef geometry; keep explicit positioned ancestor contracts for all motion containers to avoid scroll-offset calculation drift and warnings."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_4.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "92%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Validated on https://lewis-victories.preview.emergentagent.com. Passed: desktop/mobile no horizontal overflow, entrance reveal elements (title/portrait/helmet/44/stats/intro), hero+helmet naturalWidth > 0, desktop pointer/parallax transforms, scroll fade (hero title opacity 1->0), stat count settle (105/7/104), CTA to legacy, decorative elements present, mobile hides CTA+telemetry+pointer while preserving key content, reduced-motion disables looping animations. Remaining issue: repeated Framer Motion warning in console about non-static container position.",
+  "rca of the issue": "Repro: load page and interact/scroll around hero section; console repeatedly logs Framer Motion warning about container position for scroll offset calculations. Likely cause is useScroll target/container position contract mismatch (target interpreted relative to a static-position context in runtime). Mitigation: ensure explicit non-static positioning on the intended scroll container/target chain used by useScroll or adjust useScroll configuration to avoid ambiguous container context."
+}
