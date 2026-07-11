@@ -48,6 +48,18 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Removed delayed exit transitions that caused mobile image/data desynchronization during fast scrolling
 - Verified the 2025 mobile boundary shows one matching Ferrari image, 2025 card, `19 / 19` counter, and disabled next control
 
+## Hero Motion Upgrade
+- Rebuilt the opening area as a layered reactive scene rather than a static composition
+- Added staggered kinetic typography for `STILL / WE / RISE`
+- Added pointer-responsive portrait tilt, title parallax, floating helmet depth, and custom cursor tracking
+- Added scroll-linked portrait depth, title travel, and hero fade transition
+- Added animated circuit path, scanning overlay, framing marks, telemetry rail, live-status pulse, and orbital `44`
+- Added count-up animation for 105 wins, 7 titles, and 104 poles with animated stat rails
+- Preserved CTA behavior while adding magnetic hover and pulse feedback
+- Added responsive mobile composition and reduced-motion safeguards
+- Added direct test selectors for helmet, track line, scan line, orbit rings, and count-up statistics
+- Resolved the Framer Motion positioned-container warning and verified pointer/scroll interactions on the public experience
+
 ## Prioritized Backlog
 ### P0
 - None; the requested core experience is complete
