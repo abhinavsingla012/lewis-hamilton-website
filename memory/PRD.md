@@ -94,6 +94,18 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Stabilized arrow-only timeline keyboard controls with a single lifecycle-bound listener and functional state updates
 - Mandatory iteration 9 retest passed keyboard, wheel isolation, spatial hero smoke, and navigation checks
 
+## Unified Spatial Website Architecture
+- Replaced separate normal-flow pages with one 1500vh camera runway and one sticky spatial viewport
+- Mounted the real Hero, Legacy, Timeline, Cars, Gallery, Records, Milestones, Tracks, Silverstone, Quotes, Victories, and Footer inside the same 500vw × 1035vh racetrack canvas
+- Preserved the exact current chapter order while assigning every chapter a distinct map coordinate
+- Active chapter becomes full-screen; distant chapters remain visible as small 3D cards during camera zoom-outs
+- Hero remains full-screen for the opening viewport, then minimizes while `LEWIS` and `HAMILTON` enter simultaneously
+- Added continuous camera pan/zoom, animated racing line, active chapter HUD, and global journey progress
+- Retained all chapter interactions: timeline arrows/keyboard, car selector, gallery navigation, quote carousel, victory filters, archive expansion, and back-to-origin journey
+- Added native hash-anchor menu routing to make pointer, quick-click, Enter, and Space navigation deterministic
+- Timeline holds normal wheel gestures and changes years only through arrows; deliberate sustained scroll continues the spatial journey
+- Iteration 20 verified Gallery, Quotes, and Victories controls at their active camera stops, menu/hash routing, timeline behavior, console health, and overflow
+
 ## Timeline Arrow-Only Correction
 - Removed scroll-progress year updates and the 19-year vertical runway
 - Timeline now remains one viewport-height carousel that users can scroll past normally
