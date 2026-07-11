@@ -84,6 +84,6 @@ export const StorySections = ({ archive }) => {
       {filtered.length > 12 && <button className="archive-expand" onClick={() => setShowAll(!showAll)} data-testid="toggle-full-archive-button">{showAll ? "COLLAPSE ARCHIVE" : `OPEN ALL ${filtered.length} VICTORIES`}<ArrowUpRight /></button>}
     </section>
 
-    <footer data-testid="site-footer"><div className="footer-title"><span>STILL</span><span>WE RISE</span></div><div className="footer-bottom"><p data-testid="fan-site-disclaimer">An independent, fan-made celebration of Sir Lewis Hamilton. Not affiliated with Lewis Hamilton, Formula 1, Mercedes-AMG Petronas, McLaren, or Ferrari.</p><button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} data-testid="back-to-top-button">BACK TO TOP <ArrowUpRight /></button></div></footer>
+    <footer data-testid="site-footer"><div className="footer-title"><span>STILL</span><span>WE RISE</span></div><div className="footer-bottom"><p data-testid="fan-site-disclaimer">An independent, fan-made celebration of Sir Lewis Hamilton. Not affiliated with Lewis Hamilton, Formula 1, Mercedes-AMG Petronas, McLaren, or Ferrari.</p><button onClick={() => window.__spatialGo?.("top")} data-testid="back-to-top-button">BACK TO TOP <ArrowUpRight /></button></div></footer>
   </>;
 };

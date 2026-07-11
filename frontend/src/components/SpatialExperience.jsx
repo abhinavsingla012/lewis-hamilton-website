@@ -1,18 +1,166 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { BackToCircuitButton } from "./BackToCircuitButton";
 import { HeroStage } from "./HeroStage";
+import { SilverstoneMap } from "./SilverstoneMap";
 import { StorySections } from "./StorySections";
+import { CIRCUIT_CHAPTERS, CIRCUIT_HUB, SPATIAL_ROUTE } from "../data/circuitRoute";
 
-const ROUTE=[{key:"top",label:"ORIGIN",x:200,y:0,stop:0},{key:"legacy",label:"LEGACY",x:285,y:85,stop:.22},{key:"timeline",label:"TIMELINE",x:150,y:170,stop:.30},{key:"cars",label:"CARS",x:275,y:255,stop:.38},{key:"gallery",label:"GALLERY",x:355,y:340,stop:.46},{key:"records",label:"RECORDS",x:210,y:425,stop:.54},{key:"milestones",label:"MILESTONES",x:90,y:510,stop:.62},{key:"tracks",label:"TRACKS",x:170,y:595,stop:.70},{key:"moment",label:"SILVERSTONE",x:300,y:680,stop:.78},{key:"quotes",label:"VOICES",x:360,y:765,stop:.86},{key:"victories",label:"VICTORIES",x:220,y:850,stop:.94},{key:"footer",label:"STILL WE RISE",x:110,y:935,stop:.99}];
-const stops=[0,.18,...ROUTE.slice(1).map(i=>i.stop)];
-const xs=[-200,-200,...ROUTE.slice(1).map(i=>-i.x)].map(v=>`${v}vw`);
-const ys=[0,0,...ROUTE.slice(1).map(i=>-i.y)].map(v=>`${v}vh`);
-const zoomStops=[0,.07,.18,.22,.26,.30,.34,.38,.42,.46,.50,.54,.58,.62,.66,.70,.74,.78,.82,.86,.90,.94,.965,.99];
-const zoomValues=[1,1,.70,1,.62,1,.62,1,.62,1,.62,1,.62,1,.62,1,.62,1,.62,1,.62,1,.7,1];
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+const chapterKeys = new Set(CIRCUIT_CHAPTERS.map(({ key }) => key));
 
-export const SpatialExperience=({archive})=>{ const runway=useRef(null); const[active,setActive]=useState(0); const{scrollYProgress}=useScroll({target:runway,offset:["start start","end end"]}); const x=useTransform(scrollYProgress,stops,xs),y=useTransform(scrollYProgress,stops,ys),scale=useTransform(scrollYProgress,zoomStops,zoomValues); const heroScale=useTransform(scrollYProgress,[0,.07,.15,.19],[1,1,.26,.18]); const namesOpacity=useTransform(scrollYProgress,[.07,.075,.17,.20],[0,1,1,0]); const lewisX=useTransform(scrollYProgress,[.07,.145,.20],["-115vw","-3vw","15vw"]),hamiltonX=useTransform(scrollYProgress,[.07,.145,.20],["115vw","3vw","-15vw"]); const pathLength=useTransform(scrollYProgress,[.18,.94],[0,1]);
-  useMotionValueEvent(scrollYProgress,"change",value=>{let next=0,best=99;ROUTE.forEach((item,index)=>{const delta=Math.abs(item.stop-value);if(delta<best){best=delta;next=index;}});setActive(next);});
-  useLayoutEffect(()=>{window.__spatialGo=(key,options={})=>{const item=ROUTE.find(i=>i.key===key);if(!item||!runway.current)return;const top=runway.current.offsetTop+item.stop*(runway.current.offsetHeight-window.innerHeight);if(window.__hamiltonLenis)window.__hamiltonLenis.scrollTo(top,options.immediate?{immediate:true,force:true}:{duration:1.35,force:true});else window.scrollTo({top,behavior:options.immediate?"auto":"smooth"});};const handleHash=()=>{const key=window.location.hash.replace("#route-","");if(ROUTE.some(item=>item.key===key))window.__spatialGo(key,{immediate:true});};window.addEventListener("hashchange",handleHash);handleHash();return()=>{window.removeEventListener("hashchange",handleHash);delete window.__spatialGo;};},[]);
-  useEffect(()=>{if(active!==2)return;let total=0,reset;const hold=(event)=>{event.preventDefault();event.stopPropagation();total+=event.deltaY;clearTimeout(reset);reset=setTimeout(()=>{total=0;},650);if(Math.abs(total)>520){const target=total>0?"cars":"legacy";total=0;window.__spatialGo?.(target);}};window.addEventListener("wheel",hold,{passive:false,capture:true});return()=>{clearTimeout(reset);window.removeEventListener("wheel",hold,{capture:true});};},[active]);
-  return <section ref={runway} className="unified-spatial-runway" data-testid="unified-spatial-experience"><div className={`unified-spatial-viewport active-node-${active}`}><motion.div className="unified-spatial-camera" style={{x,y,scale}}><motion.svg className="unified-route" viewBox="0 0 5000 10500" preserveAspectRatio="none" aria-hidden="true"><path d="M2500 500 C2900 700 3350 900 3350 1350 C3000 1700 2300 1900 2000 2200 C2300 2550 3000 2700 3250 3050 C3600 3450 4000 3500 4050 3900 C3800 4300 2900 4400 2600 4750 C2200 5100 1700 5250 1400 5600 C1550 6000 2000 6100 2200 6450 C2600 6800 3250 6900 3500 7300 C3900 7600 4250 7800 4100 8150 C3800 8550 3000 8600 2700 9000 C2400 9450 1900 9600 1600 9850"/><motion.path className="live" d="M2500 500 C2900 700 3350 900 3350 1350 C3000 1700 2300 1900 2000 2200 C2300 2550 3000 2700 3250 3050 C3600 3450 4000 3500 4050 3900 C3800 4300 2900 4400 2600 4750 C2200 5100 1700 5250 1400 5600 C1550 6000 2000 6100 2200 6450 C2600 6800 3250 6900 3500 7300 C3900 7600 4250 7800 4100 8150 C3800 8550 3000 8600 2700 9000 C2400 9450 1900 9600 1600 9850" style={{pathLength}}/></motion.svg><motion.div className="spatial-hero-shell" style={{scale:heroScale}}><HeroStage stats={archive?.stats}/></motion.div><StorySections archive={archive}/></motion.div><motion.div className="unified-name-transition" style={{opacity:namesOpacity}}><motion.span style={{x:lewisX}}>LEWIS</motion.span><motion.span style={{x:hamiltonX}}>HAMILTON</motion.span></motion.div><div className="unified-hud"><span>{String(active+1).padStart(2,"0")} / {String(ROUTE.length).padStart(2,"0")}</span><strong>{ROUTE[active].label}</strong><small>FOLLOW THE RACING LINE</small></div><div className="unified-progress"><motion.span style={{scaleX:scrollYProgress}}/></div></div></section>;
+const getPathProgress = (value) => {
+  const points = [{ stop: CIRCUIT_HUB.stop, path: CIRCUIT_CHAPTERS[0].path }, ...CIRCUIT_CHAPTERS];
+  if (value <= points[0].stop) return points[0].path;
+  for (let index = 1; index < points.length; index += 1) {
+    if (value <= points[index].stop) {
+      const previous = points[index - 1];
+      const local = (value - previous.stop) / (points[index].stop - previous.stop);
+      return previous.path + (points[index].path - previous.path) * local;
+    }
+  }
+  return points[points.length - 1].path;
+};
+
+const getActiveKey = (value) => {
+  if (value < 0.105) return "top";
+  if (value < 0.205) return "circuit";
+  let nearest = CIRCUIT_CHAPTERS[0];
+  CIRCUIT_CHAPTERS.forEach((chapter) => {
+    if (Math.abs(chapter.stop - value) < Math.abs(nearest.stop - value)) nearest = chapter;
+  });
+  return Math.abs(nearest.stop - value) <= 0.029 ? nearest.key : "transit";
+};
+
+export const SpatialExperience = ({ archive }) => {
+  const runway = useRef(null);
+  const pathRef = useRef(null);
+  const cameraRef = useRef(null);
+  const racerRef = useRef(null);
+  const racerCoreRef = useRef(null);
+  const activeRef = useRef("top");
+  const [activeKey, setActiveKey] = useState("top");
+  const { scrollYProgress } = useScroll({ target: runway, offset: ["start start", "end end"] });
+  const heroScale = useTransform(scrollYProgress, [0, 0.06, 0.135, 0.17], [1, 1, 0.28, 0.18]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.105, 0.155, 0.18], [1, 1, 0.72, 0]);
+  const mapOpacity = useTransform(scrollYProgress, [0.085, 0.135], [0, 1]);
+  const pathProgress = useTransform(scrollYProgress, [CIRCUIT_HUB.stop, CIRCUIT_CHAPTERS.at(-1).stop], [0, 1]);
+  const hubCopyOpacity = useTransform(scrollYProgress, [0.105, 0.14, 0.185, 0.21], [0, 1, 1, 0]);
+
+  const updateCamera = useCallback((value) => {
+    const path = pathRef.current;
+    const camera = cameraRef.current;
+    if (!path || !camera) return;
+    const total = path.getTotalLength();
+    const progress = getPathProgress(value);
+    const distance = total * progress;
+    const point = path.getPointAtLength(distance);
+    const ahead = path.getPointAtLength(Math.min(total, distance + 2));
+    const angle = Math.atan2(ahead.y - point.y, ahead.x - point.x);
+    const follow = clamp((value - CIRCUIT_HUB.stop) / 0.045, 0, 1);
+    const scale = 1 + follow * 2.15;
+    const cosine = Math.cos(-angle);
+    const sine = Math.sin(-angle);
+    const desired = {
+      a: scale * cosine,
+      b: scale * sine,
+      c: -scale * sine,
+      d: scale * cosine,
+      e: 250 - scale * (cosine * point.x - sine * point.y),
+      f: 250 - scale * (sine * point.x + cosine * point.y),
+    };
+    const matrix = {
+      a: 1 + (desired.a - 1) * follow,
+      b: desired.b * follow,
+      c: desired.c * follow,
+      d: 1 + (desired.d - 1) * follow,
+      e: desired.e * follow,
+      f: desired.f * follow,
+    };
+    camera.setAttribute("transform", `matrix(${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f})`);
+    [racerRef.current, racerCoreRef.current].forEach((racer) => {
+      racer?.setAttribute("cx", point.x);
+      racer?.setAttribute("cy", point.y);
+    });
+  }, []);
+
+  useMotionValueEvent(scrollYProgress, "change", (value) => {
+    const next = getActiveKey(value);
+    if (next !== activeRef.current) {
+      activeRef.current = next;
+      setActiveKey(next);
+    }
+    updateCamera(value);
+  });
+
+  useLayoutEffect(() => {
+    const frame = requestAnimationFrame(() => updateCamera(scrollYProgress.get()));
+    window.__spatialGo = (key, options = {}) => {
+      const item = SPATIAL_ROUTE.find((route) => route.key === key);
+      if (!item || !runway.current) return;
+      const top = runway.current.offsetTop + item.stop * (runway.current.offsetHeight - window.innerHeight);
+      if (window.__hamiltonLenis) window.__hamiltonLenis.scrollTo(top, options.immediate ? { immediate: true, force: true } : { duration: 1.65, force: true });
+      else window.scrollTo({ top, behavior: options.immediate ? "auto" : "smooth" });
+    };
+    const handleHash = () => {
+      const key = window.location.hash.replace("#route-", "");
+      if (SPATIAL_ROUTE.some((route) => route.key === key)) window.__spatialGo(key, { immediate: true });
+    };
+    window.addEventListener("hashchange", handleHash);
+    handleHash();
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", handleHash);
+      delete window.__spatialGo;
+    };
+  }, [scrollYProgress, updateCamera]);
+
+  useEffect(() => {
+    if (activeKey !== "timeline") return undefined;
+    let total = 0;
+    let reset;
+    const hold = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      total += event.deltaY;
+      clearTimeout(reset);
+      reset = setTimeout(() => { total = 0; }, 650);
+      if (Math.abs(total) > 520) {
+        const target = total > 0 ? "cars" : "legacy";
+        total = 0;
+        window.__spatialGo?.(target);
+      }
+    };
+    window.addEventListener("wheel", hold, { passive: false, capture: true });
+    return () => {
+      clearTimeout(reset);
+      window.removeEventListener("wheel", hold, { capture: true });
+    };
+  }, [activeKey]);
+
+  const navigate = (key) => {
+    window.history.replaceState(null, "", `#route-${key}`);
+    window.__spatialGo?.(key);
+  };
+  const routeIndex = Math.max(0, SPATIAL_ROUTE.findIndex(({ key }) => key === activeKey));
+  const hudLabel = activeKey === "transit" ? "RACING LINE" : (SPATIAL_ROUTE[routeIndex]?.label || "RACING LINE");
+
+  return <section ref={runway} className="circuit-runway" data-testid="unified-spatial-experience">
+    <div className="circuit-viewport" data-active={activeKey} data-testid="circuit-spatial-viewport">
+      <motion.div className="circuit-map-layer" style={{ opacity: mapOpacity }} data-testid="circuit-map-layer">
+        <SilverstoneMap activeKey={activeKey} cameraRef={cameraRef} onSelect={navigate} pathProgress={pathProgress} pathRef={pathRef} racerCoreRef={racerCoreRef} racerRef={racerRef} />
+        <motion.div className="circuit-hub-copy" style={{ opacity: hubCopyOpacity }} data-testid="circuit-hub-copy">
+          <span>THE HOME CIRCUIT / 52.0786° N</span>
+          <h2>SILVERSTONE</h2>
+          <p>Choose a chapter on the circuit or keep scrolling.</p>
+        </motion.div>
+        <a className="circuit-attribution" href="https://github.com/julesr0y/f1-circuits-svg" target="_blank" rel="noreferrer" data-testid="circuit-map-attribution-link">Circuit geometry: Jules Roy / CC BY 4.0 · adapted</a>
+      </motion.div>
+      <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} /></motion.div>
+      <div className="circuit-chapters"><StorySections archive={archive} /></div>
+      {chapterKeys.has(activeKey) && <BackToCircuitButton onClick={() => navigate("circuit")} />}
+      <div className="circuit-hud" data-testid="circuit-journey-hud"><span>{String(routeIndex + 1).padStart(2, "0")} / {String(SPATIAL_ROUTE.length).padStart(2, "0")}</span><strong>{hudLabel}</strong><small>{activeKey === "circuit" ? "SELECT A GLOWING MARKER" : "FOLLOW THE RACING LINE"}</small></div>
+      <div className="circuit-progress" data-testid="circuit-journey-progress"><motion.span style={{ scaleX: scrollYProgress }} /></div>
+    </div>
+  </section>;
 };

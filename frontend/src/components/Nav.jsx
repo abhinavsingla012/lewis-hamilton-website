@@ -4,8 +4,8 @@ export const Nav = ({ open, setOpen }) => {
   const links = ["Legacy", "Timeline", "Cars", "Tracks", "Victories"];
   const go = (id) => {
     const route = id.toLowerCase();
-    window.location.hash = `route-${route}`;
-    window.__spatialGo?.(route, { immediate: true });
+    window.history.replaceState(null, "", `#route-${route}`);
+    window.__spatialGo?.(route);
     setOpen(false);
   };
   useEffect(() => { const close = () => setOpen(false); window.addEventListener("hashchange", close); return () => window.removeEventListener("hashchange", close); }, [setOpen]);

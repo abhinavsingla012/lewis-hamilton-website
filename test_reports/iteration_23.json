@@ -1,0 +1,76 @@
+{
+  "summary": "Frontend-only validation completed on public preview. Desktop circuit/chapter flows largely pass, but two critical regressions remain: Hero CTA is not visible on mobile initial load and reduced-motion fallback is not usable for chapter navigation.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "HeroStage (mobile 390x844)",
+        "issue": "Hero CTA (data-testid=explore-legacy-button) is present in DOM but not visible/usable on initial load, leaving a critical primary control inaccessible.",
+        "selector": "[data-testid='explore-legacy-button']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "Reduced-motion flow",
+        "issue": "With prefers-reduced-motion enabled, clicking circuit markers does not transition to chapters (active route remains circuit), and Back to Circuit is unavailable because chapter never opens.",
+        "selector": "[data-testid='chapter-marker-cars'], [data-testid='back-to-circuit-button']",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Reduced-motion marker click -> chapter open",
+        "issue": "Route activation via marker click fails under reduced motion, breaking required fallback usability.",
+        "affected_selectors": [
+          "[data-testid='silverstone-circuit-map']",
+          "[data-testid='chapter-marker-cars']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "Hero mobile (390x844)",
+        "issues": [
+          "Primary CTA is not visible in viewport at initial load, causing a clipped/missing critical action."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/HeroStage.jsx",
+    "/app/frontend/src/components/SilverstoneMap.jsx",
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/CircuitExperience.css",
+    "/app/test_reports/artifacts_iteration_23_frontend_desktop_rerun",
+    "/app/test_reports/artifacts_iteration_23_targeted_desktop",
+    "/app/test_reports/artifacts_iteration_23_frontend_mobile",
+    "/app/test_reports/artifacts_iteration_23_mobile_cta_diag",
+    "/app/test_reports/artifacts_iteration_23_reduced_motion"
+  ],
+  "action_items": [
+    "Fix mobile Hero layout so explore-legacy CTA is visible and reachable at 390x844 initial load.",
+    "Implement/repair reduced-motion fallback so marker click and route changes still open chapters and preserve Back to Circuit flow.",
+    "Retest reduced-motion for marker click, menu navigation, and chapter controls after fix."
+  ],
+  "critical_code_review_comments": [
+    "Reduced-motion CSS currently removes animation/transform effects but does not guarantee functional chapter activation flow; fallback behavior is not equivalent to standard navigation.",
+    "Desktop deep-link coverage for circuit + all 11 chapters passed with full-frame chapter sizing and no horizontal overflow in this run."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_23.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "85%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Verified desktop 1920x800 core requirements: 11 circuit markers rendered, marker click/keyboard opens chapters, back-to-circuit present on chapter screens, deep links (#route-circuit and all chapter routes) load correctly, no horizontal overflow, no page error selectors. Mobile and reduced-motion are the remaining blockers.",
+  "rca of the issue": "RCA hypothesis: (1) Mobile CTA invisibility is due to Hero composition scaling/positioning on 390x844 causing CTA to render outside visible viewport despite being mounted. (2) Reduced-motion mode likely leaves visual layers and route activation out of sync, so marker interaction does not produce expected active chapter transition (active key remains circuit), which blocks Back to Circuit and chapter-level flow."
+}
