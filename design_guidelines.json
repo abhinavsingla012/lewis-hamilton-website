@@ -1,60 +1,80 @@
 {
-  "theme": "dark",
+  "project_context": {
+    "scope": "Legacy chapter redesign only",
+    "theme": "Historic cultural and sporting legacy - Editorial feel",
+    "persona": "Lewis Hamilton - F1 Legend",
+    "vibe": "Cinematic, monumental, luxury performance (E1 Archetype: Luxury & The Performance Pro)"
+  },
   "typography": {
-    "headings": "Cabinet Grotesk or Oswald (display sans), tracking-tight, uppercase styling. DO NOT use Inter or generic defaults.",
-    "body": "Manrope or existing body font. Clean and highly readable at small sizes.",
-    "hierarchy": "H1: text-5xl to text-6xl, H2: text-3xl to text-4xl, H3: text-xl to text-2xl. Adhere to a strict hierarchy gap."
+    "headings": {
+      "font": "Oswald, Bebas Neue, or Cabinet Grotesk (DO NOT use Inter, Roboto, or generic sans for headings)",
+      "style": "uppercase, tracking-tighter, leading-none, font-black",
+      "usage": "Massive typographic storytelling (e.g., text-[10vw] or text-8xl+ for massive stats like '7', '103')",
+      "guidance": "Headings must break the grid. Let huge numbers overlap slightly with image or other text."
+    },
+    "body": {
+      "font": "Inter, IBM Plex Sans, or similar geometric sans",
+      "style": "tracking-wide, text-sm to text-base, text-neutral-400, leading-relaxed",
+      "usage": "Data labels, story text, metadata, overlines"
+    },
+    "overlines": {
+      "style": "uppercase, text-xs, tracking-[0.2em], text-white/60"
+    }
   },
   "colors": {
-    "background": "Deep Obsidian (#0A0A0A) to Pure Black (#000000). Never pure flat black without texture.",
-    "primary": "Neon Cyan (#00FFE0) - Mercedes AMG Petronas vibe.",
-    "secondary": "Neon Purple (#B026FF) - Lewis Hamilton signature helmet vibe.",
-    "accent": "Electric Blaze Red (#FF3B30) for high-impact micro-interactions.",
-    "text_primary": "Off-white with slight cool tint (#F3F4F6).",
-    "text_muted": "Tinted Grey (#A1A1AA)."
+    "background": "Deepest Obsidian (#050505) - NEVER use flat generic grays. Must feel like a premium dark room.",
+    "text_primary": "Off-White (#F5F5F5)",
+    "text_secondary": "Neutral Gray (#A3A3A3)",
+    "team_themes": {
+      "ferrari": "Red (#EF1A2D)",
+      "mercedes": "Cyan (#00D2BE)",
+      "mclaren": "Papaya (#FF8000)"
+    },
+    "guidance": "Color is Function and Emotion. The UI should be almost entirely monochrome (Obsidian/White), using the team colors strictly as vivid kinetic accents (e.g., a 1px glowing line, a text gradient on a specific stat, or a hover state glow). Do not flood the screen with team colors."
   },
-  "layouts": {
-    "hero": "Preserve the existing full-screen Hero exactly as it is. Do not modify its structure or aesthetic.",
-    "circuit_hub": "A top-down immersive track map that appears *only after* scrolling past the Hero. The SVG track should scale to fill the viewport bounds dynamically. Uses an absolute or fixed layout within a massive scroll container.",
-    "full_screen_chapter": "When a chapter marker is clicked, the camera pans to the marker, and a glassmorphic/dark panel expands to full screen to show the chapter. Normal scroll within the chapter. Must include a sticky 'Back to Circuit' button."
-  },
-  "motion": {
-    "scroll_camera_pan": "Use Framer Motion `useScroll` tied to a tall scroll container (e.g., 500vh). Map the `scrollYProgress` to the total length of the SVG path. Use `SVGPathElement.getPointAtLength()` to calculate the exact X/Y. Translate the SVG container negatively to keep the glowing dot centered (acting as a dynamic racing-camera).",
-    "path_drawing": "Use `motion.path` with `pathLength` mapped to scroll progress. Draw a glowing cyan racing line over a faint white/10 base stroke.",
-    "marker_click": "Trigger a Lenis `scrollTo` to the exact scroll offset of the marker's path percentage, followed by an expansion animation for the chapter UI.",
-    "reduced_motion": "Provide a standard sequential vertical scroll fallback for users with `prefers-reduced-motion`."
-  },
-  "visual_enhancers": {
-    "glowing_markers": "Interactive circuit markers should have a pulsing drop-shadow: `drop-shadow-[0_0_15px_rgba(0,255,224,0.8)]`.",
-    "glassmorphism": "Use high-end glass for the 'Back to Circuit' control and chapter overlay panels. `backdrop-blur-xl bg-black/60 border border-white/10`.",
-    "grain_texture": "Apply a subtle noise/grain SVG overlay across the entire app with pointer-events-none to give an editorial, high-end film feel."
+  "grids_and_layouts": {
+    "overall_strategy": "The Editorial Monolith. Avoid standard symmetrical dashboards, equal-sized grid cards, or 'Bootstrap' columns. Use extreme asymmetry and optical alignment.",
+    "desktop_1920x800": "Two-column asymmetrical split. Left: massive typographic storytelling and dynamic stats overlapping on a dark void. Right: 100vh height cinematic portrait image taking exactly 45% of the viewport width. Leave massive negative space (gap-24 to gap-32) between stats clusters.",
+    "mobile_390x844": "Vertical stack. Image fixed at top 50vh with a hard bottom gradient fade (mask-image) into absolute black. Stats and typography scroll over the faded portion of the image. Text aligned left, never centered.",
+    "components": {
+      "back_to_circuit_button": "Keep existing logic and position. Style as a premium glassmorphic pill: backdrop-blur-xl bg-white/10 border border-white/20, text-white, uppercase, tracking-wider, text-xs. Must remain at z-50 to ensure compatibility with overlays.",
+      "stats_block": "No cards. Flat on the background. A massive number (text-8xl+) paired tightly with a tracking-wide label. Use 1px left borders in team colors to denote which team the stat belongs to."
+    }
   },
   "media": {
-    "reference_map": "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/jwbv9vj8_Silverstone_Circuit_vector_map.webp",
-    "instruction": "Manually recreate the Silverstone SVG path (a single continuous `<path>`) matching the shape from the reference image, omitting all buildings and arrows. The path should be clean, scalable, and unbroken to ensure `getPointAtLength()` works flawlessly."
+    "image_treatment": "Use the provided portrait. Apply a high-contrast treatment. On desktop, use a CSS mask-image (linear-gradient) on the left edge so the image fades seamlessly into the #050505 background. The hero image is a premium asset—let it breathe, do NOT cover the face with heavy dark overlays, only use gradients where text MUST sit."
   },
-  "component_instructions": {
-    "Hero": "Leave untouched.",
-    "CircuitExperience": "Wrapper component handling Lenis smooth scroll and Framer Motion logic. Tall height (e.g., 800vh) to allow long scrolling.",
-    "SilverstoneMap": "SVG component containing the base track path, the glowing progress path (`pathLength`), and the chapter markers positioned explicitly along the path's length.",
-    "ChapterMarker": "A glowing dot with a title label. Uses `data-testid='chapter-marker-{id}'`.",
-    "BackToCircuitButton": "Sticky pill button. Glassmorphic. Left-aligned or centered at top. `data-testid='back-to-circuit-btn'`."
+  "image_urls": {
+    "portrait": {
+      "url": "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/kipbg3qv_fe4ba72207ea649069d5d83e636a20f7.jpg",
+      "description": "Authentic portrait image to be used as the hero/background anchor for the legacy page."
+    }
+  },
+  "motion": {
+    "entrance": "Cinematic and weighty. 1.5s slow ease-out scale on the image (from 1.05 to 1). Staggered fade-up (Y: 30px -> 0, opacity 0 -> 1) on the typographic stats, staggered by 0.1s. Elements should feel heavy and deliberate.",
+    "interactions": "Hover states on data points should slightly dim siblings (opacity 50%) and reveal a team-colored subtle glow or translation (x: 4px) on the hovered item."
+  },
+  "accessibility": {
+    "contrast": "Ensure all stat numbers and labels meet 4.5:1 against the #050505 background.",
+    "attributes": "All interactive and key informational elements MUST include a 'data-testid' attribute (e.g., data-testid='back-to-circuit-btn', data-testid='legacy-stat-value')."
   },
   "instructions_to_main_agent": [
-    "Do NOT alter the existing Hero component. The new logic must strictly happen *after* the Hero scroll.",
-    "Recreate the Silverstone track as an SVG `<path>` matching the provided reference image shape.",
-    "Calculate marker positions dynamically using `getPointAtLength(totalLength * percentage)` or hardcode exact x/y coordinates that perfectly intersect the SVG track.",
-    "Implement a dynamic racing camera: as the user scrolls, translate the SVG wrapper using `useTransform` so that the current path position remains in the center of the viewport.",
-    "Ensure 'Back to Circuit' button smooth-scrolls or collapses the full-screen view back to the map hub.",
-    "Ensure all markers are clickable. Clicking one uses Lenis to scroll to that segment, then expands.",
-    "All interactive and key informational elements MUST include a `data-testid` attribute (e.g., `data-testid='chapter-marker-1'`)."
+    "Modify ONLY the Legacy chapter component (.js files).",
+    "Keep the overlay mechanics (Silverstone camera, back to circuit) fully intact without altering their logical flow.",
+    "Do NOT turn the stats into a generic table or equal-sized grid. Use massive typographic numbers combined with small overlines.",
+    "Apply 'mask-image' fading to the portrait to blend it seamlessly into the dark UI.",
+    "Map the team colors (Ferrari red, Mercedes cyan, McLaren papaya) dynamically to the specific stats/era they represent.",
+    "Enforce extreme negative space. Cramped designs kill the luxury editorial vibe."
   ],
-  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
-    "Do not use generic centered layouts or simplistic gradients.",
-    "Create depth with z-index hierarchy and layered glassmorphism.",
-    "Never apply `transition: all` as it breaks Framer Motion transforms.",
-    "Do not center align the app container. Respect optical alignment.",
-    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
-    "Include hover states and micro-interactions on all clickable elements."
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "Do not use generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) instead of flat transparent colors.",
+    "You MUST NOT apply universal transition (transition: all). Always specify properties to prevent breaking transforms.",
+    "You MUST NOT center align the app container in CSS. Respect human reading flow.",
+    "Always use modern button styles (pill-shaped) with interaction animations and explicit hover/focus states.",
+    "Every interaction needs micro-animations - hover states, transitions, entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "All interactive and key informational elements MUST include a data-testid attribute."
   ]
 }
