@@ -24,6 +24,8 @@ export const IMAGES = {
   season2016: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/y25lvb32_f1-abu-dhabi-gp-2016-world-champion-nico-rosberg-mercedes-amg-f1-shakes-hands-with-team-ma.jpg",
   season2017: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/3xzktj6t_a63254a388aeca74ba9597ee530e0f5b.jpg",
   season2018: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/9zjt96ee_TELEMMGLPICT000179258478_trans_NvBQzQNjv4BqihVibxPbOwKDCDIL8LViR-Tc6I2BHiBRNjiHpw-yH5I.jpeg",
+  season2019: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/aawcrcj1_skysports-lewis-hamilton-f1_4859045.webp",
+  season2020: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/pfeqcsqs_imago49236444-1536x1024.jpg",
 };
 export const gallery = [
   { image: IMAGES.hero, label: "HOME KING", meta: "SILVERSTONE / HISTORY", shape: "portrait" },

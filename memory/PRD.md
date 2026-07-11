@@ -74,6 +74,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Verified timeline arrow navigation preserves the exact year/image sequence and loads every asset successfully
 - Added the next historical batch using the user’s requested non-sequential mapping: first→2016, second→2014, third→2015, fourth→2017, fifth→2018
 - Verified 2014, 2015, 2016, 2017, and 2018 individually through the timeline controls
+- Added the two-image batch with first→2020 and second→2019
+- Verified both 2019 and 2020 through timeline controls, including successful image loading
 
 ## Prioritized Backlog
 ### P0
