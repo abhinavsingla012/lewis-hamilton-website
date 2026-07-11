@@ -1,0 +1,65 @@
+{
+  "summary": "Frontend-only mandatory retest executed on public preview URL. Core interactions were revalidated, but required menu routing behavior is still broken and timeline wheel lock regressed at camera level.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Nav menu routing",
+        "issue": "Menu link clicks do not reliably move camera to target node; Timeline/Cars/Victories repeatedly stay off-target (often ORIGIN).",
+        "selector": "[data-testid='navigation-timeline-button'], [data-testid='navigation-cars-button'], [data-testid='navigation-victories-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Timeline section lock",
+        "issue": "Mouse wheel while on TIMELINE moves spatial camera to CARS (active-node-2 -> active-node-3), so timeline camera lock requirement is not met.",
+        "selector": "[data-testid='season-timeline-section'], [data-testid='timeline-active-year']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Fresh menu matrix + sequential menu matrix",
+        "issue": "Mandatory routing matrix still fails from menu interactions despite direct window.__spatialGo('timeline', { immediate: true }) succeeding in same session.",
+        "affected_selectors": [
+          "[data-testid='menu-toggle-button']",
+          "[data-testid='navigation-menu-panel']",
+          "[data-testid^='navigation-']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx",
+    "/app/frontend/src/UnifiedSpatial.css"
+  ],
+  "action_items": [
+    "Fix menu click-to-route determinism so Legacy/Timeline/Cars/Tracks/Victories always activate the intended spatial node on both fresh and sequential runs.",
+    "Ensure menu route invocation is guaranteed after panel interaction (avoid race/no-op path where HUD remains ORIGIN after click).",
+    "Keep TIMELINE camera locked against wheel-based camera movement while preserving timeline next/previous arrow functionality.",
+    "Re-run mandatory matrix after fixes: fresh-per-link + sequential + gallery buttons + timeline lock + quote/victory regression."
+  ],
+  "critical_code_review_comments": [
+    "Nav routing still exhibits non-deterministic behavior under real interaction timing; current delayed invocation approach is not sufficient in production preview behavior.",
+    "Observed state mismatch: after menu Timeline click, viewport class remains active-node-0 (HUD ORIGIN), while direct __spatialGo immediately sets active-node-2. This indicates menu-path invocation failure/race rather than route-stop mapping failure.",
+    "Timeline wheel currently changes spatial node even when timeline year itself stays unchanged; camera-lock expectation is violated."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_11.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "62%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "PASS: direct spatial routing to gallery/timeline/quotes/victories works; gallery next/previous now moves strip (0 -> 1155 -> 0); home logo returns to origin; quote next updates text; victories year filter updates count; no console errors; no horizontal overflow. FAIL: mandatory menu matrix still fails for multiple links from actual menu clicks; timeline wheel moves camera from TIMELINE to CARS.",
+  "rca of the issue": "Reproduction (menu): load page, open menu, click Timeline (or Cars/Victories). Expected target node full-screen, but HUD often remains ORIGIN and viewport class stays active-node-0. In same run, direct window.__spatialGo('timeline', {immediate:true}) correctly sets active-node-2 and centers timeline, indicating the route map itself is valid. Reproduction (timeline lock): go to timeline via direct route, wheel down once; HUD changes TIMELINE -> CARS while timeline year text remains unchanged. Mitigation direction: enforce a single deterministic menu routing path that confirms node activation post-click, and gate/consume wheel input while timeline node is active so camera state cannot advance to adjacent sections."
+}
