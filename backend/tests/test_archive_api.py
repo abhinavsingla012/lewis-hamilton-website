@@ -50,6 +50,29 @@ def test_archive_seasons_include_latest_finished_season(archive_payload):
     assert any(item["year"] == 2025 for item in seasons)
 
 
+def test_archive_seasons_span_2007_to_2025_and_include_required_fields(archive_payload):
+    seasons = archive_payload["seasons"]
+    assert len(seasons) == 19
+    years = [season["year"] for season in seasons]
+    assert years == list(range(2007, 2026))
+
+    required = {"year", "wins", "podiums", "poles", "races", "points", "position", "team", "car", "champion"}
+    for season in seasons:
+        assert required.issubset(set(season.keys()))
+
+
+def test_archive_2020_season_values_exact(archive_payload):
+    season_2020 = next((s for s in archive_payload["seasons"] if s["year"] == 2020), None)
+    assert season_2020 is not None
+    assert season_2020["wins"] == 11
+    assert season_2020["podiums"] == 14
+    assert season_2020["poles"] == 10
+    assert season_2020["points"] == 347
+    assert season_2020["position"] == 1
+    assert season_2020["team"] == "Mercedes"
+    assert season_2020["car"] == "W11 EQ Performance"
+
+
 def test_archive_tracks_include_silverstone_record(archive_payload):
     tracks = archive_payload["tracks"]
     silverstone = next((t for t in tracks if t["circuit"] == "Silverstone Circuit"), None)
@@ -62,3 +85,32 @@ def test_archive_victories_total_count(archive_payload):
     victories = archive_payload["victories"]
     assert isinstance(victories, list)
     assert len(victories) == 105
+
+
+def test_archive_victory_fields_and_numbering(archive_payload):
+    victories = archive_payload["victories"]
+    required = {
+        "number", "year", "race", "circuit", "country", "date", "constructor",
+        "grid", "points", "laps", "round", "status", "time", "fastest_lap", "from_pole",
+    }
+    assert required.issubset(set(victories[0].keys()))
+
+    numbers = sorted(v["number"] for v in victories)
+    assert numbers == list(range(1, 106))
+
+
+def test_archive_latest_victory_is_number_105_belgian_2024(archive_payload):
+    victories = archive_payload["victories"]
+    belgian = next(
+        (
+            v for v in victories
+            if v["number"] == 105 and v["year"] == 2024 and "Belgian" in v["race"]
+        ),
+        None,
+    )
+    assert belgian is not None
+    assert isinstance(belgian["grid"], int)
+    assert isinstance(belgian["laps"], int)
+    assert isinstance(belgian["points"], float)
+    assert isinstance(belgian["from_pole"], bool)
+    assert isinstance(belgian["fastest_lap"], bool)

@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 export const Nav = ({ open, setOpen }) => {
-  const links = ["Legacy", "Cars", "Tracks", "Victories"];
+  const links = ["Legacy", "Timeline", "Cars", "Tracks", "Victories"];
   const go = (id) => { document.getElementById(id.toLowerCase())?.scrollIntoView({ behavior: "smooth" }); setOpen(false); };
   return <>
     <header className="site-nav" data-testid="site-navigation"><button className="wordmark" onClick={() => go("top")} data-testid="home-logo-button" aria-label="Back to top"><span>LEWIS</span><strong>HAMILTON</strong></button><div className="nav-right"><span className="nav-stat" data-testid="navigation-career-stat">7× WORLD CHAMPION</span><button className="menu-button" onClick={() => setOpen(!open)} data-testid="menu-toggle-button" aria-label="Toggle navigation">{open ? <X size={22} /> : <Menu size={22} />}<span>{open ? "CLOSE" : "EXPLORE"}</span></button></div></header>

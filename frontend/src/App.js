@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "@/App.css";
+import "@/Upgrade.css";
 import axios from "axios";
 import Lenis from "lenis";
 import { Nav } from "@/components/Nav";
