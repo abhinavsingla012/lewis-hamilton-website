@@ -4,6 +4,7 @@ import "@/Upgrade.css";
 import "@/TimelineV2.css";
 import "@/HeroV3.css";
 import "@/TransitionV4.css";
+import "@/SpatialV5.css";
 import axios from "axios";
 import Lenis from "lenis";
 import { Nav } from "@/components/Nav";
@@ -20,6 +21,8 @@ function App() {
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     window.__hamiltonLenis = lenis;
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    lenis.scrollTo(0, { immediate: true, force: true });
     let frame;
     const raf = (time) => { lenis.raf(time); frame = requestAnimationFrame(raf); };
     frame = requestAnimationFrame(raf);

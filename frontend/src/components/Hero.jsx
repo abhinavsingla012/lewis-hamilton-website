@@ -34,18 +34,23 @@ export const Hero = ({ stats }) => {
   const tokenX = useTransform(smoothX, [-.5, .5], [18, -18]);
   const tokenY = useTransform(smoothY, [-.5, .5], [-12, 12]);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const imageY = useTransform(scrollYProgress, [0, 1], [0, 105]);
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.07]);
-  const titleY = useTransform(scrollYProgress, [0, 1], [0, -82]);
-  const heroOpacity = useTransform(scrollYProgress, [.68, 1], [1, 0]);
-  const numberY = useTransform(scrollYProgress, [0, 1], [0, -42]);
-  const sceneScale = useTransform(scrollYProgress, [0, .2, .68, .92], [1, 1, .43, .34]);
-  const sceneRadius = useTransform(scrollYProgress, [0, .2, .68], [0, 0, 54]);
-  const sceneOpacity = useTransform(scrollYProgress, [0, .72, .91, 1], [1, 1, .48, 0]);
-  const leftNameX = useTransform(scrollYProgress, [.27, .52, .82], ["-115vw", "-3vw", "10vw"]);
-  const rightNameX = useTransform(scrollYProgress, [.27, .52, .82], ["115vw", "3vw", "-10vw"]);
-  const transitionOpacity = useTransform(scrollYProgress, [.25, .4, .82, .96], [0, 1, 1, 0]);
-  const transitionScale = useTransform(scrollYProgress, [.3, .58, .88], [1.16, 1, .92]);
+  const imageY = useTransform(scrollYProgress, [0, .25, 1], [0, 0, 105]);
+  const imageScale = useTransform(scrollYProgress, [0, .25, 1], [1, 1, 1.07]);
+  const titleY = useTransform(scrollYProgress, [0, .25, 1], [0, 0, -82]);
+  const heroOpacity = useTransform(scrollYProgress, [0, .25, .7, .8], [1, 1, 1, 0]);
+  const numberY = useTransform(scrollYProgress, [0, .25, 1], [0, 0, -42]);
+  const sceneScale = useTransform(scrollYProgress, [0, .25, .48, .6], [1, 1, .36, .28]);
+  const sceneRadius = useTransform(scrollYProgress, [0, .25, .48], [0, 0, 54]);
+  const sceneOpacity = useTransform(scrollYProgress, [0, .52, .66, .76], [1, 1, .32, 0]);
+  const leftNameX = useTransform(scrollYProgress, [.49, .63, .77], ["-120vw", "-4vw", "12vw"]);
+  const rightNameX = useTransform(scrollYProgress, [.49, .63, .77], ["120vw", "4vw", "-12vw"]);
+  const transitionOpacity = useTransform(scrollYProgress, [.47, .53, .72, .8], [0, 1, 1, 0]);
+  const transitionScale = useTransform(scrollYProgress, [.49, .62, .78], [1.15, 1, .94]);
+  const chartOpacity = useTransform(scrollYProgress, [.64, .7, .94, 1], [0, 1, 1, 0]);
+  const chartScale = useTransform(scrollYProgress, [.65, .72, .94, 1], [.43, .52, 1.5, 1.8]);
+  const chartX = useTransform(scrollYProgress, [.67, .8, .96], ["0vw", "-14vw", "-52vw"]);
+  const chartY = useTransform(scrollYProgress, [.67, .8, .96], ["0vh", "-6vh", "-23vh"]);
+  const mapPathLength = useTransform(scrollYProgress, [.65, .87], [0, 1]);
 
   const trackPointer = (event) => {
     pointerX.set(event.clientX / window.innerWidth - .5);
@@ -92,6 +97,18 @@ export const Hero = ({ stats }) => {
     <motion.button className="hero-v3-cta" whileHover={{ y: -4 }} whileTap={{ scale: .96 }} onClick={() => document.getElementById("legacy")?.scrollIntoView({ behavior: "smooth" })} data-testid="explore-legacy-button"><span><ArrowDownRight/></span><div><small>SCROLL TO DISCOVER</small><strong>EXPLORE THE LEGACY</strong></div></motion.button>
     <div className="hero-v3-telemetry" data-testid="hero-telemetry"><span>HAM / GBR</span><span>51.5072° N</span><span>2007—2025</span><span><Crosshair size={12}/> PRECISION / PURPOSE / PACE</span></div>
     <motion.div className="hero-v3-pointer" style={{ x: cursorX, y: cursorY }} aria-hidden="true"><span/></motion.div>
+    </motion.div>
+    <motion.div className="spatial-chart-shell" style={{ opacity: chartOpacity }} data-testid="spatial-racetrack-map">
+      <motion.div className="spatial-chart" style={{ scale: chartScale, x: chartX, y: chartY }}>
+        <motion.svg className="spatial-route" viewBox="0 0 1800 1100" preserveAspectRatio="none" aria-hidden="true"><path className="route-ghost" d="M900 550 C680 420 570 275 430 250 C700 80 1190 70 1440 205 C1580 350 1480 520 1260 660 C1030 760 690 810 350 850 C690 1060 1150 1030 1440 900"/><motion.path className="route-live" d="M900 550 C680 420 570 275 430 250 C700 80 1190 70 1440 205 C1580 350 1480 520 1260 660 C1030 760 690 810 350 850 C690 1060 1150 1030 1440 900" style={{ pathLength: mapPathLength }}/></motion.svg>
+        <div className="map-origin" data-testid="map-origin-node"><span>44</span><small>ORIGIN</small></div>
+        <article className="map-node node-timeline" data-testid="map-timeline-node"><img src={IMAGES.season2020} alt="Timeline preview"/><span>02 / TIMELINE</span><strong>19 SEASONS</strong></article>
+        <article className="map-node node-cars" data-testid="map-cars-node"><img src={IMAGES.season2008} alt="Cars chapter preview"/><span>03 / CARS</span><strong>MACHINES</strong></article>
+        <article className="map-node node-legacy featured" data-testid="map-legacy-node"><img src={IMAGES.portrait} alt="Legacy chapter preview"/><div><span>01 / NEXT CHAPTER</span><strong>LEGACY</strong><small>THE NUMBERS ONLY TELL HALF THE STORY</small></div></article>
+        <article className="map-node node-tracks" data-testid="map-tracks-node"><img src={IMAGES.silverstone} alt="Tracks chapter preview"/><span>04 / TRACKS</span><strong>DOMINANCE</strong></article>
+        <article className="map-node node-victories" data-testid="map-victories-node"><img src={IMAGES.podium} alt="Victories chapter preview"/><span>05 / VICTORIES</span><strong>105 WINS</strong></article>
+      </motion.div>
+      <div className="spatial-map-label"><span>THE HAMILTON ARCHIVE</span><small>SCROLLING THE RACING LINE</small></div>
     </motion.div>
     <motion.div className="hero-transition-type" style={{ opacity: transitionOpacity, scale: transitionScale }} data-testid="hero-legacy-transition">
       <motion.span className="transition-lewis" style={{ x: leftNameX }}>LEWIS</motion.span>

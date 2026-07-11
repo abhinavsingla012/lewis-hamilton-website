@@ -1,0 +1,49 @@
+{
+  "summary": "Completed frontend-only validation on public preview for Hero V3 cinematic transition, spatial map sequence, menu determinism, and timeline controls across desktop (1920x800) and mobile (390x844). Most requested behaviors pass; timeline keyboard year-change failed reproducibly in this run.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "SeasonTimeline",
+        "issue": "Keyboard arrows did not change year during repeated desktop checks, while next button worked (2007 -> 2008).",
+        "selector": "[data-testid='season-timeline-section']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Hero.jsx",
+    "/app/frontend/src/HeroV3.css",
+    "/app/frontend/src/TransitionV4.css",
+    "/app/frontend/src/SpatialV5.css",
+    "/app/frontend/src/App.js",
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx"
+  ],
+  "action_items": [
+    "Fix timeline keyboard handling so ArrowRight/ArrowLeft deterministically changes year whenever timeline is in viewport.",
+    "Re-verify keyboard behavior after fix on desktop with menu-open/menu-closed states and after mouse-wheel interactions.",
+    "Keep current passing behavior unchanged: full Hero V3 first viewport, central shrink then names, spatial map sequence, and menu deterministic section jumps."
+  ],
+  "critical_code_review_comments": [
+    "SeasonTimeline keydown effect has no dependency array and rebinds each render; this can cause unstable keyboard behavior and should be stabilized.",
+    "Global CSS rule in HeroV3.css (`html,body,#root,.app-shell,.hero-v3{position:relative!important}`) is high-risk and may cause future cross-section layout regressions."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_8.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "92%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "PASS verified on desktop+mobile: fresh load starts at top with full-width Hero V3, hero remains full in early phase, central shrink occurs before LEWIS/HAMILTON opposite-side transition, no blank frame at tested transition point, spatial map with origin+five nodes appears, Legacy node emphasized, map camera transform changes across scroll, Legacy section reachable, menu navigation deterministic to Legacy/Timeline/Cars/Tracks/Victories, no horizontal overflow on 1920x800 and 390x844, stats settle to 105/7/104, key images load. FAIL in this run: timeline keyboard arrows did not advance years while timeline next button did.",
+  "rca of the issue": "Repro steps: navigate to Timeline (menu or direct scroll), confirm active year 2007, click next button -> year becomes 2008, then press ArrowRight/ArrowLeft -> year remains 2008. Wheel scroll correctly does not change year. Probable root cause: unstable keydown listener lifecycle/focus gating in SeasonTimeline (`useEffect` without dependency array and viewport-bound checks) causing keyboard events not consistently applying state updates. Mitigation: stabilize listener with dependency array + functional state updates and re-test keyboard path in viewport-focused timeline state."
+}
