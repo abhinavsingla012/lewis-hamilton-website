@@ -33,7 +33,8 @@ export const SilverstoneMap = ({ activeKey, cameraRef, onSelect, pathProgress, p
       {CIRCUIT_CHAPTERS.map((chapter, index) => {
         const point = points[index];
         if (!point) return null;
-        const labelY = index % 2 ? 29 : -24;
+        const cardY = index % 2 ? 18 : -52;
+        const lineY = index % 2 ? 18 : -18;
         return <g
           key={chapter.key}
           className={`chapter-marker ${activeKey === chapter.key ? "is-active" : ""}`}
@@ -49,9 +50,13 @@ export const SilverstoneMap = ({ activeKey, cameraRef, onSelect, pathProgress, p
           <circle className="marker-pulse" r="8" />
           <circle className="marker-core" r="3.2" />
           <g className="marker-label" transform="rotate(90)">
-            <line x1="0" y1="0" x2="0" y2={labelY > 0 ? labelY - 9 : labelY + 8} />
-            <rect x="-49" y={labelY - 10} width="98" height="20" rx="2" />
-            <text x="0" y={labelY + 3} textAnchor="middle">{String(index + 1).padStart(2, "0")} · {chapter.label}</text>
+            <line x1="0" y1="0" x2="0" y2={lineY} />
+            <foreignObject x="-58" y={cardY} width="116" height="36" className="marker-foreign-object">
+              <div xmlns="http://www.w3.org/1999/xhtml" className="marker-card" data-testid={`chapter-marker-${chapter.key}-content`}>
+                <b>{String(index + 1).padStart(2, "0")}</b>
+                <span><strong>{chapter.label}</strong><small>{chapter.teaser}</small></span>
+              </div>
+            </foreignObject>
           </g>
         </g>;
       })}

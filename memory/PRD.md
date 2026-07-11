@@ -152,6 +152,13 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Stabilized desktop SVG marker click targets with dedicated 40px hit areas while retaining keyboard activation
 - Production build, JavaScript lint, desktop marker travel, mobile CTA, reduced-motion marker navigation, and Back to Circuit flows passed
 
+## Circuit Marker Content Cards — 2026-07-11
+- Replaced empty SVG marker boxes with always-visible HTML content cards for all 11 chapters
+- Each pointer now shows its chapter number, chapter name, and a concise page-specific teaser
+- Preserved hover/focus highlighting, keyboard access, and animated track navigation
+- Disabled pointer interception on the moving racing indicator so overlapping chapter markers remain clickable
+- Verified all 11 card contents render and a standard Legacy card click reaches the full-screen chapter
+
 ## Prioritized Backlog
 ### P0
 - None; the post-Legacy overlap, lag, and first-route framing regressions are resolved and verified

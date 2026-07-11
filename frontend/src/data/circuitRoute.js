@@ -3,17 +3,17 @@ export const SILVERSTONE_PATH = "M187.132 258.577c2.83-3.815 6.413-9.565 13.577-
 export const CIRCUIT_HUB = { key: "circuit", label: "SILVERSTONE", stop: 0.17 };
 
 export const CIRCUIT_CHAPTERS = [
-  { key: "legacy", label: "LEGACY", stop: 0.24, path: 0.02 },
-  { key: "timeline", label: "TIMELINE", stop: 0.305, path: 0.105 },
-  { key: "cars", label: "CARS", stop: 0.37, path: 0.19 },
-  { key: "gallery", label: "GALLERY", stop: 0.435, path: 0.275 },
-  { key: "records", label: "RECORDS", stop: 0.5, path: 0.36 },
-  { key: "milestones", label: "MILESTONES", stop: 0.565, path: 0.45 },
-  { key: "tracks", label: "TRACKS", stop: 0.63, path: 0.55 },
-  { key: "moment", label: "SILVERSTONE 2024", stop: 0.695, path: 0.65 },
-  { key: "quotes", label: "VOICES", stop: 0.76, path: 0.75 },
-  { key: "victories", label: "VICTORIES", stop: 0.825, path: 0.85 },
-  { key: "footer", label: "STILL WE RISE", stop: 0.94, path: 0.94 },
+  { key: "legacy", label: "LEGACY", teaser: "105 wins · 7 titles", stop: 0.24, path: 0.02 },
+  { key: "timeline", label: "TIMELINE", teaser: "2007—2025", stop: 0.305, path: 0.105 },
+  { key: "cars", label: "CARS", teaser: "Machines of dominance", stop: 0.37, path: 0.19 },
+  { key: "gallery", label: "GALLERY", teaser: "Frames from the journey", stop: 0.435, path: 0.275 },
+  { key: "records", label: "RECORDS", teaser: "The numbers rewritten", stop: 0.5, path: 0.36 },
+  { key: "milestones", label: "MILESTONES", teaser: "The defining victories", stop: 0.565, path: 0.45 },
+  { key: "tracks", label: "TRACKS", teaser: "Where greatness landed", stop: 0.63, path: 0.55 },
+  { key: "moment", label: "SILVERSTONE 2024", teaser: "The homecoming win", stop: 0.695, path: 0.65 },
+  { key: "quotes", label: "VOICES", teaser: "Words that moved millions", stop: 0.76, path: 0.75 },
+  { key: "victories", label: "VICTORIES", teaser: "The complete archive", stop: 0.825, path: 0.85 },
+  { key: "footer", label: "STILL WE RISE", teaser: "The closing statement", stop: 0.94, path: 0.94 },
 ];
 
 export const SPATIAL_ROUTE = [
