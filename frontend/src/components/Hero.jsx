@@ -27,15 +27,18 @@ export const Hero = ({ stats }) => {
   const cursorY = useMotionValue(-100);
   const smoothX = useSpring(pointerX, { stiffness: 120, damping: 22 });
   const smoothY = useSpring(pointerY, { stiffness: 120, damping: 22 });
-  const rotateY = useTransform(smoothX, [-.5, .5], [-5, 5]);
-  const rotateX = useTransform(smoothY, [-.5, .5], [5, -5]);
-  const imageX = useTransform(smoothX, [-.5, .5], [-18, 18]);
-  const titleX = useTransform(smoothX, [-.5, .5], [12, -12]);
+  const rotateY = useTransform(smoothX, [-.5, .5], [-3.5, 3.5]);
+  const rotateX = useTransform(smoothY, [-.5, .5], [3.5, -3.5]);
+  const imageX = useTransform(smoothX, [-.5, .5], [-10, 10]);
+  const titleX = useTransform(smoothX, [-.5, .5], [7, -7]);
+  const tokenX = useTransform(smoothX, [-.5, .5], [18, -18]);
+  const tokenY = useTransform(smoothY, [-.5, .5], [-12, 12]);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const imageY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
-  const titleY = useTransform(scrollYProgress, [0, 1], [0, -120]);
-  const heroOpacity = useTransform(scrollYProgress, [.72, 1], [1, 0]);
+  const imageY = useTransform(scrollYProgress, [0, 1], [0, 105]);
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.07]);
+  const titleY = useTransform(scrollYProgress, [0, 1], [0, -82]);
+  const heroOpacity = useTransform(scrollYProgress, [.68, 1], [1, 0]);
+  const numberY = useTransform(scrollYProgress, [0, 1], [0, -42]);
 
   const trackPointer = (event) => {
     const rect = heroRef.current.getBoundingClientRect();
@@ -45,25 +48,41 @@ export const Hero = ({ stats }) => {
     cursorY.set(event.clientY - rect.top);
   };
 
-  return <section ref={heroRef} id="top" className="hero hero-v2" onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); cursorX.set(-100); cursorY.set(-100); }} data-testid="hero-section">
-    <div className="hero-grid" aria-hidden="true" />
-    <motion.svg className="hero-trackline" viewBox="0 0 1000 700" aria-hidden="true" data-testid="hero-animated-track"><motion.path d="M-30 560 C130 420 235 520 348 355 S610 88 1030 156" initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: .28 }} transition={{ duration: 2.1, delay: .35, ease: "easeInOut" }}/></motion.svg>
-    <motion.div className="hero-v2-title" style={{ x: titleX, y: titleY, opacity: heroOpacity }} data-testid="hero-title">
-      {["STILL", "WE", "RISE"].map((word, index) => <motion.span key={word} className={word === "WE" ? "stroke" : ""} initial={{ x: index % 2 ? 120 : -120, clipPath: "inset(0 100% 0 0)" }} animate={{ x: 0, clipPath: "inset(0 0% 0 0)" }} transition={{ duration: .95, delay: .18 + index * .13, ease: [0.22, 1, 0.36, 1] }}>{word}</motion.span>)}
+  return <section ref={heroRef} id="top" className="hero hero-v3" onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); cursorX.set(-100); cursorY.set(-100); }} data-testid="hero-section">
+    <div className="hero-v3-ambient" aria-hidden="true"><span/><span/><span/></div>
+    <div className="hero-grid hero-v3-grid" aria-hidden="true" />
+    <div className="hero-v3-floor" aria-hidden="true" />
+    <motion.svg className="hero-v3-track" viewBox="0 0 1000 700" aria-hidden="true" data-testid="hero-animated-track"><motion.path d="M-40 540 C170 390 250 515 386 335 S710 75 1040 180" initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: .34 }} transition={{ duration: 2.2, delay: .25, ease: "easeInOut" }}/></motion.svg>
+    <div className="hero-v3-marquee" aria-hidden="true"><span>LEWIS HAMILTON · STILL WE RISE · </span><span>LEWIS HAMILTON · STILL WE RISE · </span></div>
+
+    <motion.div className="hero-v3-title" style={{ x: titleX, y: titleY, opacity: heroOpacity }} data-testid="hero-title">
+      <motion.span initial={{ x: -130, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: .9, ease: [0.22, 1, 0.36, 1] }}>STILL</motion.span>
+      <motion.span initial={{ x: 130, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: .9, delay: .12, ease: [0.22, 1, 0.36, 1] }}><i>WE</i> RISE</motion.span>
     </motion.div>
-    <motion.div className="hero-v2-portrait" style={{ x: imageX, y: imageY, scale: imageScale, rotateX, rotateY, opacity: heroOpacity }} initial={{ opacity: 0, scale: .88, rotate: 3 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: 1.15, delay: .25, ease: [0.22, 1, 0.36, 1] }}>
-      <img src={IMAGES.hero} alt="Lewis Hamilton kissing a victory trophy under the British flag" className="hero-image" data-testid="hero-image" />
-      <div className="hero-v2-scan" data-testid="hero-scan-line"/><span className="frame-corner corner-a"/><span className="frame-corner corner-b"/>
-      <div className="hero-live-tag" data-testid="hero-era-label"><span/> LEGACY MODE / ACTIVE</div>
+
+    <motion.div className="hero-v3-stage" style={{ x: imageX, y: imageY, scale: imageScale, rotateX, rotateY, opacity: heroOpacity }}>
+      <span className="hero-v3-depth depth-a"/><span className="hero-v3-depth depth-b"/>
+      <motion.div className="hero-v3-card" initial={{ opacity: 0, y: 70, rotateY: -8 }} animate={{ opacity: 1, y: 0, rotateY: 0 }} transition={{ duration: 1.05, delay: .18, ease: [0.22, 1, 0.36, 1] }}>
+        <div className="hero-v3-cardbar"><span>LH / 44</span><span className="hero-v3-live" data-testid="hero-era-label"><i/> ARCHIVE LIVE</span></div>
+        <div className="hero-v3-window">
+          <img src={IMAGES.hero} alt="Lewis Hamilton kissing a victory trophy under the British flag" className="hero-image" data-testid="hero-image" />
+          <div className="hero-v3-scan" data-testid="hero-scan-line"/><div className="hero-v3-shine"/>
+          <span className="hero-v3-image-index">01 / LEGACY</span>
+        </div>
+        <div className="hero-v3-cardfoot"><span>THE DEFINITIVE FAN ARCHIVE</span><strong>2007—2025</strong></div>
+      </motion.div>
     </motion.div>
-    <motion.figure className="hero-float-card helmet-card" style={{ x: useTransform(smoothX, [-.5, .5], [28, -28]), y: useTransform(smoothY, [-.5, .5], [-18, 18]) }} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: .7 }} data-testid="hero-helmet-card"><img src={IMAGES.helmet} alt="Lewis Hamilton saluting in his race helmet" data-testid="hero-helmet-image"/><figcaption>44 / SALUTE</figcaption></motion.figure>
-    <motion.div className="hero-v2-number" style={{ y: useTransform(scrollYProgress, [0, 1], [0, -55]) }} data-testid="hero-car-number"><span>44</span><i data-testid="hero-outer-orbit"/><i data-testid="hero-inner-orbit"/></motion.div>
-    <motion.div className="hero-kicker hero-v2-kicker" initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.05, duration: .65 }} data-testid="hero-introduction"><span>THE DEFINITIVE FAN ARCHIVE</span><p>One driver. Seven titles.<br/>A legacy measured beyond numbers.</p></motion.div>
-    <motion.div className="hero-stat-rail" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: .14, delayChildren: .8 } } }} data-testid="hero-statistics">
-      {[[stats?.wins ?? 105, "GRAND PRIX WINS", "hero-wins-stat"], [stats?.titles ?? 7, "WORLD TITLES", "hero-titles-stat"], [stats?.poles ?? 104, "POLE POSITIONS", "hero-poles-stat"]].map(([value, label, testId]) => <motion.div key={label} variants={{ hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } }}><AnimatedNumber value={value} testId={testId}/><span>{label}</span><b/></motion.div>)}
+
+    <motion.figure className="hero-v3-token" style={{ x: tokenX, y: tokenY }} initial={{ opacity: 0, scale: .8, rotate: 8 }} animate={{ opacity: 1, scale: 1, rotate: 3 }} transition={{ delay: .85, duration: .7 }} data-testid="hero-helmet-card"><img src={IMAGES.helmet} alt="Lewis Hamilton saluting in his race helmet" data-testid="hero-helmet-image"/><figcaption><span>SECOND PLANE</span><strong>44 / SALUTE</strong></figcaption></motion.figure>
+
+    <motion.div className="hero-v3-number" style={{ y: numberY }} data-testid="hero-car-number"><div><span>44</span><small>HAM</small></div><i data-testid="hero-outer-orbit"/><i data-testid="hero-inner-orbit"/></motion.div>
+
+    <motion.div className="hero-v3-kicker" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .9, duration: .65 }} data-testid="hero-introduction"><span>THE RECORD BEYOND RECORDS</span><p>One driver. Seven titles.<br/>A legacy measured beyond numbers.</p></motion.div>
+    <motion.div className="hero-v3-stats" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: .12, delayChildren: .72 } } }} data-testid="hero-statistics">
+      {[[stats?.wins ?? 105, "GRAND PRIX WINS", "hero-wins-stat"], [stats?.titles ?? 7, "WORLD TITLES", "hero-titles-stat"], [stats?.poles ?? 104, "POLE POSITIONS", "hero-poles-stat"]].map(([value, label, testId], index) => <motion.div key={label} variants={{ hidden: { opacity: 0, x: 28 }, show: { opacity: 1, x: 0 } }}><span>0{index + 1}</span><AnimatedNumber value={value} testId={testId}/><small>{label}</small></motion.div>)}
     </motion.div>
-    <motion.button className="scroll-cue hero-v2-cta" whileHover={{ x: 7 }} whileTap={{ scale: .96 }} onClick={() => document.getElementById("legacy")?.scrollIntoView({ behavior: "smooth" })} data-testid="explore-legacy-button"><span><ArrowDownRight/></span> EXPLORE THE LEGACY</motion.button>
-    <div className="hero-telemetry" data-testid="hero-telemetry"><span>HAM / GBR</span><span>51.5072° N</span><span>2007—2025</span><span><Crosshair size={12}/> PRECISION / PURPOSE / PACE</span></div>
-    <motion.div className="hero-pointer" style={{ x: cursorX, y: cursorY }} aria-hidden="true"><span/></motion.div>
+    <motion.button className="hero-v3-cta" whileHover={{ y: -4 }} whileTap={{ scale: .96 }} onClick={() => document.getElementById("legacy")?.scrollIntoView({ behavior: "smooth" })} data-testid="explore-legacy-button"><span><ArrowDownRight/></span><div><small>SCROLL TO DISCOVER</small><strong>EXPLORE THE LEGACY</strong></div></motion.button>
+    <div className="hero-v3-telemetry" data-testid="hero-telemetry"><span>HAM / GBR</span><span>51.5072° N</span><span>2007—2025</span><span><Crosshair size={12}/> PRECISION / PURPOSE / PACE</span></div>
+    <motion.div className="hero-v3-pointer" style={{ x: cursorX, y: cursorY }} aria-hidden="true"><span/></motion.div>
   </section>;
 };
