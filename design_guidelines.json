@@ -1,160 +1,167 @@
 {
-  "theme": {
-    "mode": "dark",
-    "description": "Immersive, cinematic dark mode. Inspired by Lando Norris' awwwards-winning site but tailored to Lewis Hamilton's legendary status. Think carbon fiber textures, stadium lights at dusk, depth-driven layouts, and vibrant high-performance accents."
-  },
-  "colors": {
-    "background": {
-      "primary": "#0A0A0A",
-      "secondary": "#121212",
-      "tertiary": "#1C1C1E"
-    },
-    "text": {
-      "primary": "#FFFFFF",
-      "secondary": "#A1A1AA",
-      "accent": "#EFFF00"
-    },
-    "accents": {
-      "neon_yellow": "#EFFF00",
-      "lh_purple": "#732BFA",
-      "petronas_teal": "#00A19B",
-      "ferrari_red": "#FF2800"
-    },
-    "gradients": {
-      "glow": "radial-gradient(circle at center, rgba(115, 43, 250, 0.4) 0%, transparent 70%)"
-    }
-  },
+  "project_name": "Lewis Hamilton Fan Archive - Immersive Upgrade",
+  "theme": "dark",
   "typography": {
     "headings": {
-      "family": "Unbounded, Cabinet Grotesk, or Clash Display",
-      "weight": "font-black",
-      "tracking": "tracking-tighter",
-      "transform": "uppercase",
-      "usage": "Use for massive, screen-spanning hero text and section titles. Never use Inter for headings."
+      "family": "Anton, Bebas Neue, sans-serif",
+      "style": "High-impact, condensed, uppercase, extremely tight tracking (-0.02em to -0.04em), leading-none.",
+      "sizes": "H1: text-[12vw] or clamp(4rem, 12vw, 10rem), H2: text-6xl to text-8xl"
+    },
+    "subheadings": {
+      "family": "Playfair Display, serif",
+      "style": "Editorial, italicized accents, adds luxury and legacy feel to the racing aggression."
     },
     "body": {
-      "family": "IBM Plex Sans or Manrope",
-      "weight": "font-light",
-      "tracking": "tracking-normal",
-      "usage": "Use for stats descriptions, quotes, and readable paragraphs."
-    },
-    "labels": {
-      "family": "Space Mono, or JetBrains Mono",
-      "weight": "font-bold",
-      "tracking": "tracking-[0.2em]",
-      "transform": "uppercase",
-      "usage": "Use for stats labels, years, track names, and overlines."
+      "family": "Outfit, Manrope, sans-serif",
+      "style": "Clean, geometric, highly legible for deep stats and career records.",
+      "sizes": "text-base to text-lg, leading-relaxed"
     }
   },
-  "layouts": {
-    "global": "Immersive one-page scroll. Use Lenis for momentum scrolling. High contrast. Section transitions should feel like cinematic cuts.",
-    "hero": "Cinematic hero with a large helmet or driver image, deep parallax, massive typography cutting behind/in front of the subject. Use optical alignment and avoid generic centering.",
-    "timeline": "Scroll-linked vertical or horizontal timeline showcasing championship years. Heavy use of staggered entrance animations.",
-    "stats_bento": "Bento grid for dominant cars, best tracks, wins, podiums. Tight gaps (gap-4) but internal padding p-8. 1px borders with subtle glow.",
-    "quotes_section": "Massive editorial typography. Slow marquee for background text, overlapping with static profound quotes."
+  "colors": {
+    "primary": "#0A0A0A",
+    "secondary": "#F4F4F0",
+    "accents": [
+      { "name": "LH Purple", "hex": "#7B2CBF", "usage": "Milestone chapters, royal legacy themes" },
+      { "name": "Ferrari Red", "hex": "#FF2800", "usage": "Future transition, aggressive stats, specific 2025 chapter" },
+      { "name": "Neon Yellow", "hex": "#CCFF00", "usage": "High-velocity metrics, hover states, kinetic typography" }
+    ],
+    "text": {
+      "light": "#FFFFFF",
+      "dark": "#0A0A0A",
+      "muted": "#8A8A8A"
+    },
+    "chapter_themes": {
+      "strategy": "Alternate backgrounds between Black, Off-White, Purple, Red, and Neon Yellow to create emotional pacing as the user scrolls through the 2007-2025 timeline."
+    }
   },
   "visual_enhancers": {
-    "surfaces": "Glassmorphism with heavy blur (backdrop-blur-xl) and high saturation. Never use fully transparent backgrounds for headers, dropdowns, or overlays over content. Add a 1px delicate inner stroke for premium feel.",
-    "borders": "Subtle 1px borders (border-white/10). Use the tracing beam effect for high-conversion stats cards.",
-    "backgrounds": "Grain/noise overlays mandatory to eliminate digital flatness. No flat full-screen gradients."
-  },
-  "motion": {
-    "libraries": [
-      "framer-motion",
-      "lenis",
-      "lucide-react",
-      "react-fast-marquee"
-    ],
-    "patterns": [
-      "Parallax scroll on background images to simulate depth.",
-      "Staggered text reveal on scroll.",
-      "Hover effects on cards: slight lift (-translate-y-2), shadow-2xl, border brightening.",
-      "Micro-animations for all interactive elements (hover, focus, click states)."
-    ]
-  },
-  "3d_libraries": {
-    "recommendation": "Use framer-motion 3D or GSAP/ScrollTrigger equivalents for 2.5D depth. Rely on layering high-res images with z-index manipulation (parallax and scaling) rather than heavy WebGL unless specifically optimizing for performance.",
-    "instructions": "Foreground subject scales up on scroll, background scales down."
+    "textures": "Heavy noise overlay (opacity 3-5%) across all dark sections to avoid flat digital look. Use SVG grain filters.",
+    "shapes": "Sharp angles, forward-leaning italics, diagonal clipping paths, and asymmetrical masking to simulate speed.",
+    "borders": "1px solid strokes with 10% opacity for separating dense data tables (stats).",
+    "glassmorphism": "Used ONLY for sticky nav and floating stat cards (bg-black/60 backdrop-blur-2xl border border-white/10) - NEVER fully transparent."
   },
   "components": [
     {
-      "name": "HeroSection",
-      "description": "Massive 'HAMILTON' text with the helmet image floating in the center. Immersive parallax effect.",
-      "data_testid": "hero-section"
+      "name": "Cinematic Hero",
+      "path": "custom/html",
+      "rules": "Full viewport height. Massive 'HAMILTON' kinetic text in background. Foreground helmet/driver image. Scroll down indicator. Dark overlay max bg-black/40."
     },
     {
-      "name": "CareerTimeline",
-      "description": "Scroll-linked timeline showing World Championships up to the latest season. Sticky year label on the left, scrolling images/stats on the right.",
-      "data_testid": "career-timeline"
+      "name": "Sticky Season Timeline (2007-2025)",
+      "path": "custom/html + GSAP",
+      "rules": "Left side pinned timeline (years). Right side scrolls through season data (Wins, Podiums, Poles, Points, Team, Car Image). Fast-paced scroll transition."
     },
     {
-      "name": "DominanceGrid",
-      "description": "Bento grid displaying best tracks (Silverstone, Hungaroring) and best cars (W11).",
-      "data_testid": "dominance-grid"
+      "name": "Horizontal Depth Gallery",
+      "path": "custom/html + Framer Motion",
+      "rules": "Scroll-triggered horizontal translation for race photography. Images overlap with parallax depth."
     },
     {
-      "name": "QuoteCarousel",
-      "description": "Fade in/out quotes describing Lewis. Large editorial text overlapping cinematic track imagery.",
-      "data_testid": "quote-carousel"
+      "name": "Editorial Collage Layout",
+      "path": "custom/html",
+      "rules": "Bento-style or asymmetrical grid. Overlapping text and images. High-end magazine feel (GQ / Vogue style F1)."
+    },
+    {
+      "name": "Expanded Victory List",
+      "path": "src/components/ui/table",
+      "rules": "Dense, high-contrast data table. Columns: Date, Grand Prix, Grid, Constructor, Points, Laps. Monospace fonts for numbers."
     }
   ],
+  "grids_and_layouts": {
+    "timeline": "grid-cols-12. Col 1-3 (sticky year/nav), Col 4-12 (scrolling content).",
+    "bento": "grid-cols-8 md:grid-cols-12 gap-8. Mix tall (row-span-2) and wide (col-span-4) cards.",
+    "spacing": "Extremely generous between chapters (py-32 to py-48). Tight within stats grids (gap-2 to gap-4)."
+  },
+  "motion_and_interactions": {
+    "scrolling": "MANDATORY: Lenis smooth scrolling for momentum and weight. GSAP ScrollTrigger for pinned sections and parallax.",
+    "transitions": "Section-to-section transform (opacity reduction, Y-translate, slight X-rotation) mimicking Lando Norris reference.",
+    "hover": "Images scale up 1.05x, convert from grayscale to color, or reveal elliptical clip-paths via cursor tracking. ALL interactive text MUST change color/opacity.",
+    "micro": "Magnetic buttons for primary CTAs. Marquee text for quotes."
+  },
+  "accessibility": {
+    "contrast": "Ensure text over images has subtle radial gradient or text-shadow. Minimum 4.5:1 ratio.",
+    "testing": "MANDATORY: All buttons, links, and forms must have data-testid (e.g., data-testid='timeline-year-2020').",
+    "motion": "Respect prefers-reduced-motion media query."
+  },
+  "media_and_3d": {
+    "libraries": "GSAP (ScrollTrigger), Lenis, Framer Motion.",
+    "3d_strategy": "If utilizing 3D, use React Three Fiber (R3F) for an abstract F1 wind-tunnel particle effect or rotating helmet, lazy loaded. Otherwise, rely on high-quality 2D assets with parallax depth.",
+    "image_treatment": "High contrast. Black and white for legacy/past stats. Full color for milestone victories. Never stretch."
+  },
   "image_urls": {
-    "hero_helmet": [
+    "hero_driver": [
       {
-        "url": "https://images.unsplash.com/photo-1761751237608-427f16f0a595?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzOTB8MHwxfHNlYXJjaHwyfHxsZXdpcyUyMGhhbWlsdG9uJTIwZjF8ZW58MHx8fHwxNzgyNjgyMDcxfDA&ixlib=rb-4.1.0&q=85",
-        "description": "Lewis Hamilton helmet, high contrast. Use as hero image floating over typography."
-      }
-    ],
-    "cars": [
-      {
-        "url": "https://images.pexels.com/photos/29252117/pexels-photo-29252117.jpeg",
-        "description": "F1 car sparking at finish line. Use for 'High Speed/Dominant Cars' bento grid."
+        "url": "https://images.unsplash.com/photo-1762234142252-44d3149002d0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwyfHxMZXdpcyUyMEhhbWlsdG9uJTIwRm9ybXVsYSUyMDElMjByYWNpbmd8ZW58MHx8fHwxNzgzNzU4Mjc2fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Lewis Hamilton leaning, cinematic portrait. Use for Hero or About.",
+        "category": "portrait"
       },
       {
-        "url": "https://images.unsplash.com/photo-1614949194403-9602bdc14a3a",
-        "description": "Dusk track red/black car. Use for timeline/championships section."
-      },
-      {
-        "url": "https://images.pexels.com/photos/34835674/pexels-photo-34835674.jpeg",
-        "description": "High-speed cornering at Interlagos. Use for 'Best Tracks/Locations' section."
+        "url": "https://images.unsplash.com/photo-1761751237608-427f16f0a595?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwxfHxMZXdpcyUyMEhhbWlsdG9uJTIwRm9ybXVsYSUyMDElMjByYWNpbmd8ZW58MHx8fHwxNzgzNzU4Mjc2fDA&ixlib=rb-4.1.0&q=85",
+        "description": "F1 Helmet close up. Use for Hero depth or 3D fallback.",
+        "category": "helmet"
       }
     ],
-    "driver_portraits": [
+    "mercedes_era": [
       {
-        "url": "https://images.unsplash.com/photo-1762234142252-44d3149002d0",
-        "description": "Driver in suit leaning. Use for 'The Legend' or Quotes section."
+        "url": "https://images.unsplash.com/photo-1758785479923-9471a3900bff?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwyfHxtZXJjZWRlcyUyMGZvcm11bGElMjAxJTIwcmFjZSUyMGNhcnxlbnwwfHx8fDE3ODM3NTgyOTF8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Silver Mercedes F1 car. Use in Mercedes dominant years.",
+        "category": "car"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1781281723358-facac81be3c6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwzfHxtZXJjZWRlcyUyMGZvcm11bGElMjAxJTIwcmFjZSUyMGNhcnxlbnwwfHx8fDE3ODM3NTgyOTF8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Black Mercedes F1 car. Use for 2020/2021 seasons.",
+        "category": "car"
+      }
+    ],
+    "ferrari_future": [
+      {
+        "url": "https://images.unsplash.com/photo-1767408906599-e4e3aa8698fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHw0fHxmZXJyYXJpJTIwZjElMjByYWNlJTIwY2FyfGVufDB8fHx8MTc4Mzc1ODI5MXww&ixlib=rb-4.1.0&q=85",
+        "description": "Red Ferrari racing. Use for 2025 chapter transition.",
+        "category": "car"
+      }
+    ],
+    "tracks_and_victories": [
+      {
+        "url": "https://images.unsplash.com/photo-1700770956452-8cae0a1f69f1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxmb3JtdWxhJTIwMSUyMHJhY2UlMjB0cmFjayUyMGFlcmlhbHxlbnwwfHx8fDE3ODM3NTgyNzV8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Track aerial view. Use for Best Tracks section.",
+        "category": "track"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1752884991461-8ac432ad9266?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwxfHxtb25hY28lMjBncmFuZCUyMHByaXglMjBhZXJpYWx8ZW58MHx8fHwxNzgzNzU4MjkxfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Monaco GP aerial. Use for Monaco specific stats.",
+        "category": "track"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1604900069714-97fd57e34934?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwyfHxGb3JtdWxhJTIwMSUyMHBvZGl1bSUyMGNoYW1wYWduZSUyMHZpY3Rvcnl8ZW58MHx8fHwxNzgzNzU4Mjc2fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Champagne victory splash. Use for Milestone Wins.",
+        "category": "podium"
       }
     ]
   },
-  "accessibility": {
-    "contrast": "Ensure minimum 4.5:1 ratio for normal text. Use heavy gradient overlays (bg-black/50) or text-shadow when placing text over images.",
-    "reduced_motion": "Wrap massive animations in a prefers-reduced-motion check if possible.",
-    "testing": "All interactive elements and informational elements MUST include a data-testid attribute in kebab-case format."
-  },
   "instructions_to_main_agent": [
-    "You are building a high-end, cinematic fan site for Lewis Hamilton.",
-    "Use JavaScript (.js or .jsx). Do not use TypeScript.",
-    "Do NOT use standard template layouts. Ensure heavy use of negative space, asymmetric layouts, and overlapping elements.",
-    "Integrate smooth momentum scrolling using Lenis.",
-    "Use Framer Motion to animate text, images, and layout blocks dynamically as they enter the viewport.",
-    "The design must be fully responsive, scaling gracefully from mobile to massive desktop displays.",
-    "Use the provided Unsplash and Pexels image URLs. NEVER use placeholder text or dummy image services."
+    "Install `@studio-freight/lenis`, `gsap`, and `framer-motion` for the core scroll momentum.",
+    "Implement the Sticky Season Timeline: Use a container with display: flex. The left side is position: sticky, the right side is the scrollable list of seasons 2007-2025.",
+    "Implement Alternating Chapters: Apply dynamic background colors (Black -> Off-White -> Purple -> Red -> Neon Yellow) as the user scrolls, matching the content's era or mood.",
+    "Do NOT use 'Inter' for headings. Use Anton or Bebas Neue with tight letter spacing for that motorsport speed feel.",
+    "Ensure the Expanded Victory List utilizes a monospace font for lap times, points, and grids to align columns perfectly.",
+    "Use data-testid on every interactive element (e.g., data-testid='season-btn-2020', data-testid='victory-row-silverstone').",
+    "Never use fully transparent backgrounds on elements that overlay text (like sticky navs). Use backdrop-blur and a semi-transparent color."
   ],
   "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
     "You tend to converge toward generic, 'on distribution' outputs. Avoid this: make creative, distinctive frontends that surprise and delight.",
     "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
     "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
     "Create depth through layered design elements with z-index hierarchy.",
-    "Use glass-morphism effects with backdrop filters (12-24px blur). DO NOT use complete transparent background in header, overlays, any surface that has content under it. Example: Dropdown with transparent background.",
-    "You MUST NOT apply universal transition. Eg: transition: all.",
-    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms.",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text.",
     "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
     "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc for icons.",
     "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
     "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
     "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
-    "Main agent relies on these image URLs. Missing categories = main agent will use placeholder text which is FORBIDDEN.",
-    "Prioritize using pre-existing components from src/components/ui when applicable.",
-    "Use sonner for toasts, located in /app/src/components/ui/sonner.jsx"
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN.",
+    "All interactive and key informational elements MUST include a data-testid attribute to facilitate robust automated testing.",
+    "Toasts: Use sonner for toasts. Sonner component are located in /app/frontend/src/components/ui/sonner.jsx."
   ]
 }
