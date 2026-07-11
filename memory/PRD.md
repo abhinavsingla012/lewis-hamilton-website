@@ -60,6 +60,14 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Added direct test selectors for helmet, track line, scan line, orbit rings, and count-up statistics
 - Resolved the Framer Motion positioned-container warning and verified pointer/scroll interactions on the public experience
 
+## Authentic Photography Replacement
+- Replaced the generated visual set with the first five user-supplied Lewis Hamilton photographs
+- Trophy-kiss image now leads the hero, Silverstone moment, trophy record section, and championship-era scenes
+- Helmet salute now appears in the hero floating card and relevant early Mercedes timeline years
+- Trophy-catch, champagne celebration, and raw podium celebration populate the editorial gallery and timeline
+- Updated alt text, gallery captions, object positioning, and crop behavior for the portrait-format originals
+- Confirmed supplied asset URLs and natural image dimensions across hero and gallery
+
 ## Prioritized Backlog
 ### P0
 - None; the requested core experience is complete
