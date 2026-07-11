@@ -43,7 +43,7 @@ export const SilverstoneMap = ({ activeKey, cameraRef, onSelect, pathProgress, p
           >
             <circle
               className="marker-hit"
-              r="14"
+              r="18"
               role="button"
               tabIndex={0}
               aria-label={`Open ${chapter.label} chapter`}

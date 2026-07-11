@@ -1,0 +1,58 @@
+{
+  "summary": "Frontend-only acceptance regression executed on public URL for iterations 28-32 targets. Core routing and marker interaction are stable, but strict exact-stop acceptance is not fully met (timeline exact 0.305 and desktop legacy six-stats visibility).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Legacy chapter stats rail (desktop)",
+        "issue": "All six legacy stat cards remain opacity: 0 on desktop after routing to legacy (active=legacy, traveling=false), making the six stats effectively hidden.",
+        "selector": "[data-testid='legacy-world-titles-stat'] ... [data-testid='legacy-seasons-stat']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Timeline marker exact-stop acceptance",
+        "issue": "Desktop 5/5 batch reached timeline each run, but one run landed at stop=0.3045679012 (not exact 0.305). Mobile 5/5 consistently landed at stop=0.3049850799 (approximate, not exact 0.305).",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-timeline']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SilverstoneMap.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/CircuitExperience.css",
+    "/app/frontend/src/LegacyChapter.css",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/test_reports/iteration_33.json"
+  ],
+  "action_items": [
+    "Fix desktop legacy stat visibility regression: ensure six legacy stat cards are visible (not opacity 0) when data-active='legacy' and data-traveling='false'.",
+    "Harden route settle math for strict exact stop targeting so timeline lands at exact 0.305 for both desktop and mobile acceptance batches (not approximate values).",
+    "Re-run strict uninterrupted acceptance batch after fixes: timeline desktop 5/5 exact 0.305 and mobile 5/5 exact 0.305."
+  ],
+  "critical_code_review_comments": [
+    "Pointer interception mitigation appears correct: marker-hit circle receives elementFromPoint and is directly clickable; decorative marker layers remain non-interactive.",
+    "Back-to-circuit flow preserves overview state correctly (data-overview='true') and retains chapter context label.",
+    "Current settle logic still yields fractional drift near target stops on some viewport/device combinations, indicating precision/normalization mismatch between computed top and resulting scroll progress."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_33.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "82%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "What passed: timeline marker route activation 5/5 desktop and 5/5 mobile by active-state checks; cars marker reached ~0.37 on desktop/mobile; Enter and Space on timeline marker route correctly; back-to-circuit kept overview state; no horizontal overflow; no in-page .error elements. What failed strict acceptance: timeline not numerically exact 0.305 in all runs/devices; desktop legacy six stats remain hidden via opacity 0.",
+  "rca of the issue": "RCA-1 (timeline exactness): Repro by jumping to circuit and clicking timeline marker in uninterrupted loops. Active route settles to timeline, but normalized stop can resolve to nearby fractional values (0.3045679 desktop run; 0.3049850 mobile), suggesting precision drift from runway/viewport math and settle synchronization. RCA-2 (legacy stats desktop): Repro by immediate route to legacy on desktop and waiting >3s; each legacy stat node exists but computed opacity remains 0 while container is active/visible. Likely animation/state gating conflict tied to legacy-enter timeline under desktop conditions."
+}
