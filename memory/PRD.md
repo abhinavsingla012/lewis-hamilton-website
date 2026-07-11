@@ -80,6 +80,20 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Legacy chapter follows naturally after the name reveal with a raised card and animated content entrance
 - Verified the hero scale progression, opposite-direction name motion, Legacy reachability, desktop/mobile overflow, and reduced-motion behavior
 
+## Spatial Racetrack Camera Model
+- Restored the complete Hero V3 at full width for the entire opening viewport with no early transformation
+- Hero begins central minimization only after the initial full-page hold
+- `LEWIS` and `HAMILTON` enter together from opposite sides only after the hero has visibly shrunk
+- Added a giant orbit-like spatial canvas containing Origin 44 and positioned Legacy, Timeline, Cars, Tracks, and Victories nodes
+- Added an animated winding racetrack route connecting all chapter nodes
+- Scroll progress now pans and zooms the camera across the map before arriving at the actual Legacy chapter
+- Legacy is emphasized as the next destination with a larger light editorial card
+- Fixed the disappearing-frontpage regression caused by a global `!important` positioning selector
+- Added manual scroll restoration so every fresh entry begins at the full Hero V3
+- Verified full hero, central shrink, delayed names, spatial map, mobile overflow, section navigation, and images through iteration 8
+- Stabilized arrow-only timeline keyboard controls with a single lifecycle-bound listener and functional state updates
+- Mandatory iteration 9 retest passed keyboard, wheel isolation, spatial hero smoke, and navigation checks
+
 ## Timeline Arrow-Only Correction
 - Removed scroll-progress year updates and the 19-year vertical runway
 - Timeline now remains one viewport-height carousel that users can scroll past normally
