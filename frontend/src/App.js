@@ -5,6 +5,7 @@ import "@/TimelineV2.css";
 import "@/HeroV3.css";
 import "@/CircuitExperience.css";
 import "@/TeamThemes.css";
+import "@/LegacyChapter.css";
 import axios from "axios";
 import Lenis from "lenis";
 import { Nav } from "@/components/Nav";

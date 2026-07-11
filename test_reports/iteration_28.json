@@ -1,0 +1,62 @@
+{
+  "summary": "Frontend-only Legacy redesign verification completed on public URL. Legacy chapter opens from circuit marker, full-screen layout remains stable across requested viewports, dynamic stats/heading/content render correctly, theme accents switch correctly for Ferrari/Mercedes/McLaren, reduced-motion view remains visible, and Back to Circuit returns to progress-aware circuit overview. One critical regression found: timeline marker selection from circuit map is unstable and can open wrong chapters.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "SilverstoneMap chapter markers",
+        "issue": "Clicking timeline marker does not reliably open timeline; observed misroutes to moment/tracks/transit in repeated attempts.",
+        "selector": "[data-testid='chapter-marker-timeline']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Circuit overview marker navigation",
+        "issue": "Marker-to-chapter routing is flaky for timeline marker after returning to circuit overview; first full test run also routed to milestones unexpectedly.",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-timeline']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/LegacyChapter.css",
+    "/app/frontend/src/CircuitExperience.css",
+    "/app/frontend/src/TeamThemes.css",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/SilverstoneMap.jsx",
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/test_reports/artifacts_iteration_28_frontend",
+    "/app/test_reports/artifacts_iteration_28_retest",
+    "/app/test_reports/artifacts_iteration_28_marker_probe"
+  ],
+  "action_items": [
+    "Fix timeline marker hit reliability in Silverstone map so marker click always resolves to intended chapter.",
+    "Validate marker hit areas/z-order/transform behavior under circuit overview state and after Back to Circuit transitions.",
+    "Re-run marker stability test (>=5 consecutive attempts per marker) for timeline and neighboring markers after fix."
+  ],
+  "critical_code_review_comments": [
+    "Legacy chapter CSS and content implementation matches requested redesign scope and preserves viewport stability across tested sizes.",
+    "Dynamic stat values and key informational/testable elements are correctly wired with data-testid attributes.",
+    "Chapter marker interaction reliability remains a critical UX/navigation risk; selector-level click on timeline marker is not deterministic in repeated runs."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_28.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "92%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Use real user flow (go to circuit overview -> click markers) rather than direct hash-only checks. Legacy itself passed at 1920x800, 1366x768, 1366x640, 390x844, and 390x844 reduced-motion with no horizontal overflow and correct values: 7/105/202/104/31/19. Back to Circuit returned to circuit with progress-aware label including CURRENT POSITION / LEGACY. Menu-based navigation to Timeline/Cars works. Marker stability probe (5 attempts) for timeline marker produced mixed data-active values: ['timeline', 'moment', 'moment', 'tracks', 'transit'].",
+  "rca of the issue": "Reproduction: from circuit overview, click timeline marker repeatedly after immediate route settle; active chapter intermittently resolves to non-timeline chapters. Likely root cause is marker interaction ambiguity in SVG map layer (hit targeting/z-order/transform timing around animated map state), not Legacy content rendering itself. Mitigation: tighten marker hit-target ownership and deterministic event target handling per marker, then retest repeated clicks across all nearby markers."
+}

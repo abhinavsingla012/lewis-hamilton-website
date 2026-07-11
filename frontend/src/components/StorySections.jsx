@@ -18,18 +18,38 @@ export const StorySections = ({ archive }) => {
   const wins = useMemo(() => archive?.victories || [], [archive?.victories]);
   const years = useMemo(() => ["All", ...Array.from(new Set(wins.map((win) => win.year))).sort((a, b) => b - a)], [wins]);
   const filtered = year === "All" ? wins : wins.filter((win) => win.year === Number(year));
+  const legacyStats = [
+    { value: archive?.stats?.titles || 7, label: "WORLD TITLES", note: "JOINT-MOST IN HISTORY", testId: "legacy-world-titles", featured: true },
+    { value: archive?.stats?.wins || 105, label: "RACE WINS", note: "FORMULA 1 RECORD", testId: "legacy-race-wins", featured: true },
+    { value: archive?.stats?.podiums || 202, label: "PODIUMS", note: "FORMULA 1 RECORD", testId: "legacy-podiums", featured: true },
+    { value: archive?.stats?.poles || 104, label: "POLE POSITIONS", note: "THE ULTIMATE PACE", testId: "legacy-pole-positions" },
+    { value: archive?.stats?.win_circuits || 31, label: "WINNING CIRCUITS", note: "ACROSS THE WORLD", testId: "legacy-winning-circuits" },
+    { value: 19, label: "SEASONS", note: "2007—2025", testId: "legacy-seasons" },
+  ];
 
   return <>
-    <section id="legacy" className="legacy-section" data-testid="legacy-section">
-      <Reveal><SectionHead index="01" label="Legacy" title="THE NUMBERS ONLY TELL HALF THE STORY." /></Reveal>
-      <div className="legacy-layout">
-        <Reveal className="legacy-image-card"><img src={IMAGES.portrait} alt="Lewis Hamilton portrait" data-testid="legacy-portrait-image" /><span className="vertical-copy">STEVENAGE → THE WORLD</span></Reveal>
-        <div className="legacy-copy">
-          <Reveal><p className="statement" data-testid="legacy-statement">From a council estate in Stevenage to the summit of motorsport. A career that changed what was possible — on the circuit and beyond it.</p></Reveal>
-          <div className="big-stats">
-            {[[archive?.stats?.wins || 105, "RACE WINS"], [archive?.stats?.podiums || 202, "PODIUMS"], [archive?.stats?.win_circuits || 31, "WINNING CIRCUITS"], [19, "SEASONS"]].map(([value, label]) => <Reveal key={label} className="big-stat"><strong data-testid={`legacy-${label.toLowerCase().replace(/ /g, "-")}`}>{value}</strong><span>{label}</span></Reveal>)}
-          </div>
-        </div>
+    <section id="legacy" className="legacy-section legacy-monument" aria-labelledby="legacy-monument-title" data-testid="legacy-section">
+      <div className="legacy-grid-field" aria-hidden="true" />
+      <div className="legacy-ghost-number" aria-hidden="true">44</div>
+      <figure className="legacy-portrait legacy-enter" style={{ "--legacy-delay": ".08s" }}>
+        <img src={IMAGES.portrait} alt="Lewis Hamilton celebrating a landmark achievement" data-testid="legacy-portrait-image" />
+        <figcaption data-testid="legacy-portrait-caption"><span>STEVENAGE</span><i>→</i><span>THE WORLD</span></figcaption>
+      </figure>
+      <div className="legacy-narrative">
+        <p className="legacy-overline legacy-enter" style={{ "--legacy-delay": ".12s" }} data-testid="legacy-section-label"><span>01 / THE LEGACY</span><span>2007—2025</span></p>
+        <h2 id="legacy-monument-title" className="legacy-title legacy-enter" style={{ "--legacy-delay": ".18s" }} data-testid="legacy-section-title"><span>THE RECORD</span><span>BEYOND</span><span>RECORDS.</span></h2>
+        <p className="legacy-statement legacy-enter" style={{ "--legacy-delay": ".28s" }} data-testid="legacy-statement">From Stevenage to seven world titles, Lewis Hamilton did more than redraw Formula 1’s limits. He expanded who could see themselves at the front of the grid—and what a champion could stand for beyond it.</p>
+      </div>
+      <div className="legacy-era-rail legacy-enter" style={{ "--legacy-delay": ".32s" }} data-testid="legacy-era-rail">
+        <div className="is-mclaren" data-testid="legacy-era-mclaren"><span>2007</span><strong>THE ARRIVAL</strong><small>McLAREN</small></div>
+        <div className="is-mercedes" data-testid="legacy-era-mercedes"><span>2013</span><strong>THE REINVENTION</strong><small>MERCEDES</small></div>
+        <div className="is-ferrari" data-testid="legacy-era-ferrari"><span>2025</span><strong>THE NEW CHAPTER</strong><small>FERRARI</small></div>
+      </div>
+      <aside className="legacy-cultural legacy-enter" style={{ "--legacy-delay": ".36s" }} data-testid="legacy-cultural-impact"><span>BEYOND THE GRID</span><p>A standard measured in speed, courage and visibility. The record book is only the beginning.</p></aside>
+      <div className="legacy-stat-rail" data-testid="legacy-stat-rail">
+        {legacyStats.map((stat, index) => <article key={stat.label} className={`legacy-stat legacy-enter ${stat.featured ? "is-featured" : ""}`} style={{ "--legacy-delay": `${.38 + index * .06}s` }} data-testid={`${stat.testId}-stat`}>
+          <strong data-testid={stat.testId}>{stat.value}</strong><span>{stat.label}</span><small>{stat.note}</small>
+        </article>)}
       </div>
     </section>
 
