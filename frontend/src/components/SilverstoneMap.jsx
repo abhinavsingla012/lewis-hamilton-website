@@ -14,7 +14,9 @@ export const SilverstoneMap = ({ activeKey, cameraRef, onSelect, pathProgress, p
 
   const activate = (event, key) => {
     if (event.type === "keydown" && !["Enter", " "].includes(event.key)) return;
+    if (event.type === "pointerdown" && event.button !== 0) return;
     event.preventDefault();
+    event.stopPropagation();
     onSelect(key);
   };
 
@@ -41,7 +43,7 @@ export const SilverstoneMap = ({ activeKey, cameraRef, onSelect, pathProgress, p
             role="button"
             tabIndex={0}
             aria-label={`Open ${chapter.label} chapter`}
-            onClick={(event) => activate(event, chapter.key)}
+            onPointerDown={(event) => activate(event, chapter.key)}
             onKeyDown={(event) => activate(event, chapter.key)}
             data-testid={`chapter-marker-${chapter.key}`}
           >

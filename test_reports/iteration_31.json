@@ -1,0 +1,81 @@
+{
+  "summary": "Frontend-only final verification completed on public URL. Keyboard and direct route behavior are stable, but pointer marker routing is still non-deterministic and fails strict 5/5 loop criteria on desktop and mobile.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "SilverstoneMap timeline marker",
+        "issue": "Desktop pointer click loop passed 1/5 only (required 5/5); 4 runs stayed on circuit (progress 0.17).",
+        "selector": "[data-testid='chapter-marker-timeline']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "SilverstoneMap timeline marker",
+        "issue": "Mobile pointer click loop passed 1/5 only (required 5/5); 4 runs stayed on circuit (progress 0.17).",
+        "selector": "[data-testid='chapter-marker-timeline']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "SilverstoneMap legacy/cars markers (mobile tap target)",
+        "issue": "Mobile clicks on marker group remained at circuit in initial pass; targeted '.marker-hit' clicks route correctly, indicating flaky/ambiguous tap-hit behavior on marker container.",
+        "selector": "[data-testid='chapter-marker-legacy'], [data-testid='chapter-marker-cars']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Timeline pointer click exact-stop verification",
+        "issue": "Exact progress 0.305 is achieved intermittently (1/5 desktop, 1/5 mobile), not deterministically 5/5.",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-timeline']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      },
+      {
+        "flow": "Mobile marker pointer routing",
+        "issue": "Marker group click path is unreliable while inner '.marker-hit' circle path routes correctly to legacy/cars/timeline exact stops.",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-legacy']",
+          "[data-testid='chapter-marker-cars']",
+          ".marker-hit"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/SilverstoneMap.jsx",
+    "/app/frontend/src/CircuitExperience.css",
+    "/app/frontend/src/LegacyChapter.css",
+    "/app/test_reports/artifacts_iteration_31_frontend",
+    "/app/test_reports/artifacts_iteration_31_mobile",
+    "/app/test_reports/artifacts_iteration_31_mobile_probe"
+  ],
+  "action_items": [
+    "Fix marker pointer activation so timeline click lands deterministically at stop 0.305 for 5/5 desktop and 5/5 mobile loops.",
+    "Unify mobile tap behavior between marker container and hit circle (same routing outcome for real user taps).",
+    "Re-run strict regression: timeline pointer loops, legacy pointer open + Back to Circuit preserve progress, cars pointer exact stop.",
+    "Keep existing working behavior: Enter/Space activation, travel-hide during navigation, and no-console/no-overflow state."
+  ],
+  "critical_code_review_comments": [
+    "Navigation lock/settle implementation works when route activation is actually triggered (keyboard and direct __spatialGo pass).",
+    "Observed instability is isolated to pointer marker activation path, likely hit-target/event-target reliability rather than settle logic.",
+    "No console errors and no horizontal overflow were observed on tested desktop/mobile viewports."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_31.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "78%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Desktop timeline pointer loops: [circuit, circuit, timeline, circuit, circuit]. Mobile timeline pointer loops: [circuit, circuit, circuit, timeline, circuit]. Enter/Space on timeline marker pass on both desktop/mobile with progress 0.305. Desktop legacy pointer click opens legacy with 6 stats, travel-hide snapshot true during travel, and Back to Circuit returns overview with coverage label visible. Desktop cars pointer click reaches 0.37 and remains cars after +2.1s. Mobile marker group clicks for legacy/cars stayed at circuit in initial run, but targeted '.marker-hit' clicks route correctly (legacy 0.24, cars 0.37, timeline 0.305).",
+  "rca of the issue": "Repro: force circuit overview, click marker group [data-testid='chapter-marker-*'], wait 2.3s. Timeline is intermittent and often stays at circuit, especially mobile. Contrast: keyboard Enter/Space and programmatic routes settle correctly; direct '.marker-hit' mobile taps also settle correctly. RCA points to pointer hit/target handling on marker group being unreliable under transformed SVG/mobile tap conditions. Mitigation: make pointer activation deterministic by aligning event binding and hit geometry (ensure consistent pointer target and identical routing branch), then rerun 5+5 strict loops."
+}

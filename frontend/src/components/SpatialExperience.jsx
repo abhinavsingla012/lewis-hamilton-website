@@ -46,6 +46,7 @@ export const SpatialExperience = ({ archive }) => {
   const navigationTokenRef = useRef(0);
   const [activeKey, setActiveKey] = useState("top");
   const [isCircuitOverview, setIsCircuitOverview] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [coverage, setCoverage] = useState(0);
   const { scrollYProgress } = useScroll({ target: runway, offset: ["start start", "end end"] });
   const heroScale = useTransform(scrollYProgress, [0, 0.06, 0.135, 0.17], [1, 1, 0.28, 0.18]);
@@ -99,7 +100,15 @@ export const SpatialExperience = ({ archive }) => {
       coverageRef.current = nextCoverage;
       setCoverage(nextCoverage);
     }
-    const next = navigationLockRef.current ? "transit" : getActiveKey(value);
+    const lockedRoute = navigationLockRef.current;
+    let next = getActiveKey(value);
+    if (lockedRoute) {
+      if (Math.abs(value - lockedRoute.stop) <= 0.003) {
+        navigationLockRef.current = null;
+        setIsNavigating(false);
+        next = lockedRoute.key;
+      } else next = lockedRoute.key;
+    }
     if (next !== activeRef.current) {
       activeRef.current = next;
       setActiveKey(next);
@@ -120,14 +129,25 @@ export const SpatialExperience = ({ archive }) => {
       const shouldJump = options.immediate || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const token = navigationTokenRef.current + 1;
       navigationTokenRef.current = token;
-      navigationLockRef.current = { key, token };
-      activeRef.current = "transit";
-      setActiveKey("transit");
+      navigationLockRef.current = { key, token, stop: item.stop };
+      const animatedTravel = !shouldJump && Math.abs(window.scrollY - top) >= 2;
+      activeRef.current = key;
+      setActiveKey(key);
+      setIsNavigating(animatedTravel);
       let settleTimer;
       const settle = () => {
         if (navigationLockRef.current?.token !== token) return;
         window.clearTimeout(settleTimer);
+        if (window.__hamiltonLenis) {
+          window.__hamiltonLenis.stop();
+          window.scrollTo({ top, behavior: "auto" });
+          window.__hamiltonLenis.scrollTo(top, { immediate: true, force: true });
+          window.__hamiltonLenis.start();
+        } else {
+          window.scrollTo({ top, behavior: "auto" });
+        }
         navigationLockRef.current = null;
+        setIsNavigating(false);
         activeRef.current = key;
         setActiveKey(key);
         requestAnimationFrame(() => updateCamera(scrollYProgress.get()));
@@ -221,7 +241,7 @@ export const SpatialExperience = ({ archive }) => {
   const hudLabel = isCircuitOverview ? `${coverage}% COMPLETE` : currentLabel;
 
   return <section ref={runway} className="circuit-runway" data-testid="unified-spatial-experience">
-    <div className="circuit-viewport" data-active={displayKey} data-overview={isCircuitOverview ? "true" : "false"} data-testid="circuit-spatial-viewport">
+    <div className="circuit-viewport" data-active={displayKey} data-overview={isCircuitOverview ? "true" : "false"} data-traveling={isNavigating ? "true" : "false"} data-testid="circuit-spatial-viewport">
       <motion.div className="circuit-map-layer" style={{ opacity: mapOpacity }} data-testid="circuit-map-layer">
         <SilverstoneMap activeKey={displayKey} cameraRef={cameraRef} onSelect={navigate} pathProgress={pathProgress} pathRef={pathRef} racerCoreRef={racerCoreRef} racerRef={racerRef} />
         <motion.div className="circuit-hub-copy" style={{ opacity: isCircuitOverview ? 1 : hubCopyOpacity }} data-testid="circuit-hub-copy">
@@ -233,7 +253,7 @@ export const SpatialExperience = ({ archive }) => {
       </motion.div>
       <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} /></motion.div>
       <div className="circuit-chapters"><StorySections archive={archive} /></div>
-      {chapterKeys.has(activeKey) && !isCircuitOverview && <BackToCircuitButton onClick={openCircuitOverview} />}
+      {chapterKeys.has(activeKey) && !isCircuitOverview && !isNavigating && <BackToCircuitButton onClick={openCircuitOverview} />}
       <div className="circuit-hud" data-testid="circuit-journey-hud"><span>{String(routeIndex + 1).padStart(2, "0")} / {String(SPATIAL_ROUTE.length).padStart(2, "0")}</span><strong>{hudLabel}</strong><small>{displayKey === "circuit" ? `CURRENT POSITION · ${currentLabel}` : "FOLLOW THE RACING LINE"}</small></div>
       <div className="circuit-progress" data-testid="circuit-journey-progress"><motion.span style={{ scaleX: scrollYProgress }} /></div>
     </div>
