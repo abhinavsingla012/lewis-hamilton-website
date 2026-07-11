@@ -139,6 +139,19 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Verified fresh direct links for all 11 content chapters, full-screen active framing, minimized inactive nodes, post-Legacy continuity, and transformed control hit areas
 - Iteration 22 independently passed desktop/mobile framing, timeline, Gallery, Quotes, Victories, overflow, console, and continuous spatial navigation checks
 
+## Silverstone Circuit Navigation Redesign — 2026-07-11
+- Preserved the existing cinematic Hero as the untouched opening experience
+- Replaced the abstract winding canvas with a recognizable top-down Silverstone circuit hub based on the current circuit geometry
+- Added all 11 content chapters as named, glowing, keyboard-accessible markers positioned along the racing line
+- Added dual navigation: users can select any marker or continue scrolling sequentially through the full circuit journey
+- Marker, menu, and scroll navigation now move the camera along the track before expanding the destination chapter full-screen
+- Added a persistent Back to Circuit control to every active chapter
+- Added a glowing racing pointer, circuit progress line, chapter HUD, grid texture, and responsive desktop/mobile map presentation
+- Added visible CC BY 4.0 attribution for the adapted Silverstone path geometry by Jules Roy
+- Added mobile Hero CTA placement and functional reduced-motion routing without animated travel
+- Stabilized desktop SVG marker click targets with dedicated 40px hit areas while retaining keyboard activation
+- Production build, JavaScript lint, desktop marker travel, mobile CTA, reduced-motion marker navigation, and Back to Circuit flows passed
+
 ## Prioritized Backlog
 ### P0
 - None; the post-Legacy overlap, lag, and first-route framing regressions are resolved and verified
@@ -146,6 +159,7 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 ### P1
 - Refactor the compressed spatial camera and story components into smaller modules without altering the verified coordinate model
 - Add a longer continuous navigation soak test for future spatial-camera changes
+- Fine-tune chapter-marker label spacing for exceptionally narrow mobile screens
 - Add an interactive world map connecting each victory to its circuit and country
 - Add individual victory detail panels with race story, starting grid, and finishing margin
 - Add a season-by-season points and championship battle visualization
@@ -156,7 +170,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Add image attribution and editorial source notes page
 
 ## Next Tasks
-1. Spatial camera performance profiling and modular refactor
-2. Interactive global victory map
-3. Rich race detail overlays for landmark wins
-4. Shareable fan-stat cards to improve organic reach
+1. Multi-minute Silverstone camera soak test and performance profiling
+2. Modularize the circuit camera calculations without altering the verified path
+3. Interactive global victory map
+4. Rich race detail overlays for landmark wins
+5. Shareable fan-stat cards to improve organic reach

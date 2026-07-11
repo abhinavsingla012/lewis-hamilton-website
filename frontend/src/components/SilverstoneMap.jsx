@@ -45,6 +45,7 @@ export const SilverstoneMap = ({ activeKey, cameraRef, onSelect, pathProgress, p
           onKeyDown={(event) => activate(event, chapter.key)}
           data-testid={`chapter-marker-${chapter.key}`}
         >
+          <circle className="marker-hit" r="20" />
           <circle className="marker-pulse" r="8" />
           <circle className="marker-core" r="3.2" />
           <g className="marker-label" transform="rotate(90)">
