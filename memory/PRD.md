@@ -28,6 +28,17 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Mobile-first responsive presentation and smooth interactions throughout
 - Automated backend regression suite and desktop/mobile browser verification
 
+## Major UI and Data Upgrade
+- Added a sticky, scroll-driven 2007–2025 season timeline with 19 complete season cards
+- Expanded each season with wins, podiums, poles, races, points, championship position, team, and car
+- Added eight new cinematic assets spanning helmet, rain, podium, night racing, Monaco, fans, trophies, and garage imagery
+- Added neon horizontal depth gallery with deterministic previous/next navigation
+- Added full-screen career records chapter and Ferrari-red landmark victory chapter
+- Expanded every victory row with career win number, date, circuit, team, grid, laps, points, pole-start and fastest-lap flags
+- Added all year filters rather than a shortened selection
+- Added Timeline to the main navigation and hardened the home-logo return-to-top behavior
+- Verified desktop/mobile overflow, image loading, timeline behavior, gallery controls, and expanded API contract
+
 ## Prioritized Backlog
 ### P0
 - None; the requested core experience is complete

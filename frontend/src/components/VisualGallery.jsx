@@ -13,7 +13,12 @@ const milestones = [
 
 export const VisualGallery = () => {
   const strip = useRef(null);
-  const move = (direction) => strip.current?.scrollBy({ left: direction * Math.min(window.innerWidth * .78, 900), behavior: "smooth" });
+  const move = (direction) => {
+    if (!strip.current) return;
+    const step = Math.min(strip.current.clientWidth * .78, 900);
+    const target = Math.max(0, Math.min(strip.current.scrollWidth - strip.current.clientWidth, strip.current.scrollLeft + direction * step));
+    strip.current.scrollLeft = target;
+  };
   return <>
     <section className="gallery-section" data-testid="visual-gallery-section"><div className="gallery-heading"><p className="eyebrow">BEYOND THE NUMBERS</p><h2>RACING<br/><i>in frames.</i></h2><div><button onClick={() => move(-1)} aria-label="Previous gallery images" data-testid="gallery-previous-button"><ArrowLeft/></button><button onClick={() => move(1)} aria-label="Next gallery images" data-testid="gallery-next-button"><ArrowRight/></button></div></div><div ref={strip} className="gallery-strip" data-testid="gallery-image-strip">{gallery.map((item, index) => <figure className={`gallery-card ${item.shape}`} key={item.label} data-testid={`gallery-card-${index + 1}`}><img src={item.image} alt={item.label} /><figcaption><strong>{item.label}</strong><span>{item.meta}</span></figcaption></figure>)}</div></section>
     <section className="records-section" data-testid="career-records-section"><img src={IMAGES.trophies} alt="Seven championship trophies" data-testid="records-trophy-image"/><div className="records-shade"/><div className="records-copy"><p className="eyebrow">THE RECORD BOOK</p><h2>NOT JUST<br/>IN HISTORY.<br/><i>Above it.</i></h2><div className="record-grid"><div data-testid="record-career-wins"><strong>105</strong><span>ALL-TIME GRAND PRIX WINS</span></div><div data-testid="record-career-poles"><strong>104</strong><span>ALL-TIME POLE POSITIONS</span></div><div data-testid="record-winning-circuits"><strong>31</strong><span>DIFFERENT WINNING CIRCUITS</span></div><div data-testid="record-world-titles"><strong>7</strong><span>WORLD CHAMPIONSHIPS</span></div></div></div></section>
