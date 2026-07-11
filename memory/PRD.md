@@ -72,6 +72,22 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Verified all five menu targets land at the section top in one continuous sequence
 - Verified desktop/mobile composition, authentic image load, 105/7/104 stats, CTA, reduced motion, and console health
 
+## Hero-to-Legacy Scroll Sequence
+- Extended the opening into a sticky cinematic scroll runway
+- Hero now scales from full viewport into a compact centered 3D object before fading
+- Giant `LEWIS` enters from the left while outlined neon `HAMILTON` enters from the right
+- Added Chapter 01 / The Legacy cue and a scroll-linked progress rail
+- Legacy chapter follows naturally after the name reveal with a raised card and animated content entrance
+- Verified the hero scale progression, opposite-direction name motion, Legacy reachability, desktop/mobile overflow, and reduced-motion behavior
+
+## Timeline Arrow-Only Correction
+- Removed scroll-progress year updates and the 19-year vertical runway
+- Timeline now remains one viewport-height carousel that users can scroll past normally
+- Years change only through previous/next controls or ArrowLeft/ArrowRight keyboard input
+- Active image, year, team, car, championship position, and statistics remain synchronized
+- Verified wheel scrolling keeps the active year fixed, arrows move exactly one year, and Cars remains reachable below
+- Updated menu navigation to fixed document coordinates through Lenis for deterministic deep-section links
+
 ## Authentic Photography Replacement
 - Replaced the generated visual set with the first five user-supplied Lewis Hamilton photographs
 - Trophy-kiss image now leads the hero, Silverstone moment, trophy record section, and championship-era scenes
