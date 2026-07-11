@@ -183,6 +183,11 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Preserved all camera coordinates, marker positions, and chapter navigation behavior
 - Verified zero heading/track overlap and zero horizontal overflow at 1920×800 and 390×844
 
+## Hero CTA/HUD Overlap Fix — 2026-07-11
+- Hid the circuit journey HUD and progress line while the Hero is active
+- Restores both controls automatically when the Silverstone circuit appears
+- Verified the Hero state is hidden and circuit state is visible during route handoff
+
 ## Prioritized Backlog
 ### P0
 - None; the post-Legacy overlap, lag, and first-route framing regressions are resolved and verified
