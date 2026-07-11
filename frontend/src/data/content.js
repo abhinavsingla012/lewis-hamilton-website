@@ -14,6 +14,11 @@ export const IMAGES = {
   trophies: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/nqahomzi_2a26c34e4880cbf1edab6fd441b6ab2c.webp",
   garage: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/whomjtdw_e67ba1613282310dcea74991fd72e3b2.jpg",
   rain: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/whomjtdw_e67ba1613282310dcea74991fd72e3b2.jpg",
+  season2007: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/ox4t6oej_1c90194d8eb597d8d167671416a9fc5b.jpg",
+  season2008: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/d87px7ms_2df69c03cfb037c115b0161ccc4e8c61.jpg",
+  season2009: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/r65f0kdu_639d17e00a09bb7f3ecac192ad4ac67f.jpg",
+  season2010: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/af0jzucx_afc9607b5086701b755117b9ca071975.jpg",
+  season2011: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/10ik0nkb_b3d4edd270d9d2008a0a208065d3ebe0%20%281%29.jpg",
 };
 export const gallery = [
   { image: IMAGES.hero, label: "HOME KING", meta: "SILVERSTONE / HISTORY", shape: "portrait" },

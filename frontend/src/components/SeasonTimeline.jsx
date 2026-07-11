@@ -4,8 +4,8 @@ import { ChevronLeft, ChevronRight, Crown } from "lucide-react";
 import { IMAGES } from "../data/content";
 
 const seasonImages = {
-  2007: IMAGES.mclaren, 2008: IMAGES.rain, 2009: IMAGES.helmet, 2010: IMAGES.garage,
-  2011: IMAGES.mclaren, 2012: IMAGES.night, 2013: IMAGES.china, 2014: IMAGES.podium,
+  2007: IMAGES.season2007, 2008: IMAGES.season2008, 2009: IMAGES.season2009, 2010: IMAGES.season2010,
+  2011: IMAGES.season2011, 2012: IMAGES.night, 2013: IMAGES.china, 2014: IMAGES.podium,
   2015: IMAGES.garage, 2016: IMAGES.trophies, 2017: IMAGES.china, 2018: IMAGES.silverstone,
   2019: IMAGES.night, 2020: IMAGES.w11, 2021: IMAGES.podium, 2022: IMAGES.garage,
   2023: IMAGES.helmet, 2024: IMAGES.silverstone, 2025: IMAGES.ferrari,
@@ -54,7 +54,7 @@ export const SeasonTimeline = ({ seasons = [] }) => {
         </aside>
         <motion.article key={active.year} className="season-single-card" initial={{ opacity: .72, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .22 }} data-testid={`season-card-${active.year}`}>
           <div className="season-card-head"><span>{active.year}</span><span>{active.team}</span>{active.champion && <Crown size={18}/>}</div>
-          <div className="season-result"><strong>{active.position === "—" ? "—" : ordinal(active.position)}</strong><span>DRIVERS' CHAMPIONSHIP</span></div>
+          <div className="season-result"><strong>{active.position === "—" ? "—" : ordinal(active.position)}</strong><span>DRIVERS&apos; CHAMPIONSHIP</span></div>
           <div className="season-data"><div data-testid="season-active-wins"><strong>{active.wins}</strong><span>WINS</span></div><div data-testid="season-active-podiums"><strong>{active.podiums}</strong><span>PODIUMS</span></div><div data-testid="season-active-poles"><strong>{active.poles}</strong><span>POLES</span></div><div data-testid="season-active-points"><strong>{active.points}</strong><span>POINTS</span></div></div>
           <div className="season-progress"><span style={{ width: `${Math.max(4, (active.wins / 11) * 100)}%` }} /></div>
           <div className="timeline-controls"><button onClick={() => moveTo(activeIndex - 1)} disabled={activeIndex === 0} data-testid="timeline-previous-year-button" aria-label="Previous season"><ChevronLeft/></button><span data-testid="timeline-year-counter">{String(activeIndex + 1).padStart(2, "0")} / {String(data.length).padStart(2, "0")}</span><button onClick={() => moveTo(activeIndex + 1)} disabled={activeIndex === data.length - 1} data-testid="timeline-next-year-button" aria-label="Next season"><ChevronRight/></button></div>

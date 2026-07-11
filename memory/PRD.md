@@ -68,6 +68,11 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Updated alt text, gallery captions, object positioning, and crop behavior for the portrait-format originals
 - Confirmed supplied asset URLs and natural image dimensions across hero and gallery
 
+## Season Photography Mapping
+- Added the next five user-supplied historical photos exclusively to the season timeline
+- Mapped the images in the displayed order: first→2007, second→2008, third→2009, fourth→2010, fifth→2011
+- Verified timeline arrow navigation preserves the exact year/image sequence and loads every asset successfully
+
 ## Prioritized Backlog
 ### P0
 - None; the requested core experience is complete
