@@ -40,14 +40,17 @@ export const SilverstoneMap = ({ activeKey, cameraRef, onSelect, pathProgress, p
         return <g key={chapter.key} className="marker-cluster" transform={`translate(${point.x} ${point.y})`}>
           <g
             className={`chapter-marker ${activeKey === chapter.key ? "is-active" : ""}`}
-            role="button"
-            tabIndex={0}
-            aria-label={`Open ${chapter.label} chapter`}
-            onPointerDown={(event) => activate(event, chapter.key)}
-            onKeyDown={(event) => activate(event, chapter.key)}
-            data-testid={`chapter-marker-${chapter.key}`}
           >
-            <circle className="marker-hit" r="20" />
+            <circle
+              className="marker-hit"
+              r="14"
+              role="button"
+              tabIndex={0}
+              aria-label={`Open ${chapter.label} chapter`}
+              onPointerDown={(event) => activate(event, chapter.key)}
+              onKeyDown={(event) => activate(event, chapter.key)}
+              data-testid={`chapter-marker-${chapter.key}`}
+            />
             <circle className="marker-pulse" r="8" />
             <circle className="marker-core" r="3.2" />
           </g>
