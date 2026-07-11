@@ -1,0 +1,75 @@
+{
+  "summary": "Frontend-only regression retest completed for final acceptance blockers. Legacy desktop stat opacity fix is verified, pointer interception protections hold, and back-to-circuit overview preservation works. Strict exact-stop acceptance remains failing due non-deterministic route settle positions, especially on mobile.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Timeline marker strict exact progress (desktop 5/5)",
+        "issue": "Desktop reached timeline active state 5/5 but exact stop failed 1/5 (run landed numerator=3647, denominator=12000, progress=0.3039166667 instead of exact 0.305).",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-timeline']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      },
+      {
+        "flow": "Timeline marker strict exact progress (mobile 5/5)",
+        "issue": "Mobile timeline marker failed strict exact stop 5/5. Runs landed between progress 0.3020833333 and 0.3039166667 (numerators 3625-3647) while denominator remained 12000.",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-timeline']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      },
+      {
+        "flow": "Legacy and Cars exact stops on mobile",
+        "issue": "Mobile marker route settle not exact: Legacy landed at numerator=2852/12000 (0.2376666667) vs expected 2880/12000; Cars landed at 4419/12000 (0.36825) vs expected 4440/12000.",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-legacy']",
+          "[data-testid='chapter-marker-cars']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      },
+      {
+        "flow": "Keyboard marker activation exact-stop consistency",
+        "issue": "Enter/Space keyboard activation correctly opens timeline, but Enter run on desktop still landed off exact stop (3655/12000, 0.3045833333).",
+        "affected_selectors": [
+          "[data-testid='chapter-marker-timeline']",
+          "[data-testid='circuit-spatial-viewport']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/SilverstoneMap.jsx",
+    "/app/frontend/src/CircuitExperience.css",
+    "/app/frontend/src/LegacyChapter.css",
+    "/app/test_reports/iteration_34.json"
+  ],
+  "action_items": [
+    "Remove timing-based settle drift in marker navigation so active-state lock only clears after scroll position is exactly target top for each route stop.",
+    "Ensure mobile marker navigation reaches strict stop numerators (timeline=3660, legacy=2880, cars=4440 with denominator=12000) before data-traveling flips to false.",
+    "Re-run strict acceptance batches after settle logic fix: timeline desktop 5/5 exact 0.305 and mobile 5/5 exact 0.305."
+  ],
+  "critical_code_review_comments": [
+    "Good: Legacy active stats now compute opacity='1' with transform reset and animationName='none' on desktop and mobile; previous hidden-stat regression is fixed.",
+    "Good: marker-hit receives elementFromPoint at timeline marker center, indicating decorative marker layers are not intercepting pointer events.",
+    "High-risk: navigation settle currently uses fixed timeout fallback (~1850ms), which can clear lock before reaching exact target position on some runs/devices, causing stop drift despite correct activeKey."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_34.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "72%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Verified passing: no .error elements before/after flows, no horizontal overflow, back-to-circuit preserves overview (data-overview='true'), timeline marker Enter/Space activation works functionally, and legacy six stats are visible with opacity 1. Outstanding blocker is strict exact-stop determinism: desktop timeline 4/5 exact, mobile timeline 0/5 exact, plus mobile legacy/cars exact-stop misses.",
+  "rca of the issue": "Reproduction: from circuit overview, activate markers (pointer/keyboard) and wait until data-traveling='false'. Observe active chapter is correct but scroll numerator often misses exact target (especially on mobile). Root cause hypothesis from code path in SpatialExperience: navigation lock can be released by fixed settle timeout fallback before the smooth Lenis travel fully converges to the computed top, then activeKey is forced to chapter regardless of exact scroll position. Mitigation: gate settle completion on numeric convergence to target top (or force immediate snap at settle) instead of pure timer fallback."
+}
