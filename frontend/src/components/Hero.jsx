@@ -39,16 +39,24 @@ export const Hero = ({ stats }) => {
   const titleY = useTransform(scrollYProgress, [0, 1], [0, -82]);
   const heroOpacity = useTransform(scrollYProgress, [.68, 1], [1, 0]);
   const numberY = useTransform(scrollYProgress, [0, 1], [0, -42]);
+  const sceneScale = useTransform(scrollYProgress, [0, .2, .68, .92], [1, 1, .43, .34]);
+  const sceneRadius = useTransform(scrollYProgress, [0, .2, .68], [0, 0, 54]);
+  const sceneOpacity = useTransform(scrollYProgress, [0, .72, .91, 1], [1, 1, .48, 0]);
+  const leftNameX = useTransform(scrollYProgress, [.27, .52, .82], ["-115vw", "-3vw", "10vw"]);
+  const rightNameX = useTransform(scrollYProgress, [.27, .52, .82], ["115vw", "3vw", "-10vw"]);
+  const transitionOpacity = useTransform(scrollYProgress, [.25, .4, .82, .96], [0, 1, 1, 0]);
+  const transitionScale = useTransform(scrollYProgress, [.3, .58, .88], [1.16, 1, .92]);
 
   const trackPointer = (event) => {
-    const rect = heroRef.current.getBoundingClientRect();
-    pointerX.set((event.clientX - rect.left) / rect.width - .5);
-    pointerY.set((event.clientY - rect.top) / rect.height - .5);
-    cursorX.set(event.clientX - rect.left);
-    cursorY.set(event.clientY - rect.top);
+    pointerX.set(event.clientX / window.innerWidth - .5);
+    pointerY.set(event.clientY / window.innerHeight - .5);
+    cursorX.set(event.clientX);
+    cursorY.set(event.clientY);
   };
 
-  return <section ref={heroRef} id="top" className="hero hero-v3" onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); cursorX.set(-100); cursorY.set(-100); }} data-testid="hero-section">
+  return <section ref={heroRef} id="top" className="hero-sequence-v4" onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); cursorX.set(-100); cursorY.set(-100); }} data-testid="hero-section">
+    <div className="hero-sequence-sticky">
+    <motion.div className="hero hero-v3" style={{ scale: sceneScale, borderRadius: sceneRadius, opacity: sceneOpacity }} data-testid="hero-3d-scene">
     <div className="hero-v3-ambient" aria-hidden="true"><span/><span/><span/></div>
     <div className="hero-grid hero-v3-grid" aria-hidden="true" />
     <div className="hero-v3-floor" aria-hidden="true" />
@@ -84,5 +92,13 @@ export const Hero = ({ stats }) => {
     <motion.button className="hero-v3-cta" whileHover={{ y: -4 }} whileTap={{ scale: .96 }} onClick={() => document.getElementById("legacy")?.scrollIntoView({ behavior: "smooth" })} data-testid="explore-legacy-button"><span><ArrowDownRight/></span><div><small>SCROLL TO DISCOVER</small><strong>EXPLORE THE LEGACY</strong></div></motion.button>
     <div className="hero-v3-telemetry" data-testid="hero-telemetry"><span>HAM / GBR</span><span>51.5072° N</span><span>2007—2025</span><span><Crosshair size={12}/> PRECISION / PURPOSE / PACE</span></div>
     <motion.div className="hero-v3-pointer" style={{ x: cursorX, y: cursorY }} aria-hidden="true"><span/></motion.div>
+    </motion.div>
+    <motion.div className="hero-transition-type" style={{ opacity: transitionOpacity, scale: transitionScale }} data-testid="hero-legacy-transition">
+      <motion.span className="transition-lewis" style={{ x: leftNameX }}>LEWIS</motion.span>
+      <motion.span className="transition-hamilton" style={{ x: rightNameX }}>HAMILTON</motion.span>
+      <motion.small style={{ opacity: transitionOpacity }}>CHAPTER 01 · THE LEGACY</motion.small>
+    </motion.div>
+    <div className="hero-transition-progress" aria-hidden="true"><motion.span style={{ scaleX: scrollYProgress }}/></div>
+    </div>
   </section>;
 };

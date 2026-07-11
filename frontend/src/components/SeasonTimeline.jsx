@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Crown } from "lucide-react";
 import { IMAGES } from "../data/content";
 
@@ -13,28 +13,19 @@ const seasonImages = {
 const ordinal = (value) => `${value}${value === 1 ? "ST" : value === 2 ? "ND" : value === 3 ? "RD" : "TH"}`;
 
 export const SeasonTimeline = ({ seasons = [] }) => {
-  const runwayRef = useRef(null);
+  const timelineRef = useRef(null);
   const fallback = useMemo(() => Array.from({ length: 19 }, (_, index) => ({ year: 2007 + index, wins: 0, podiums: 0, poles: 0, points: "—", position: "—", team: index < 6 ? "McLaren" : index < 18 ? "Mercedes" : "Ferrari", car: "Formula One" })), []);
   const data = seasons.length ? seasons : fallback;
   const [activeIndex, setActiveIndex] = useState(0);
   const active = data[Math.min(activeIndex, data.length - 1)];
-  const { scrollYProgress } = useScroll({ target: runwayRef, offset: ["start start", "end end"] });
-
-  useMotionValueEvent(scrollYProgress, "change", (progress) => {
-    setActiveIndex(Math.min(data.length - 1, Math.round(progress * (data.length - 1))));
-  });
-
   const moveTo = (nextIndex) => {
     const next = Math.max(0, Math.min(data.length - 1, nextIndex));
     setActiveIndex(next);
-    if (!runwayRef.current) return;
-    const travel = runwayRef.current.offsetHeight - window.innerHeight;
-    window.scrollTo({ top: runwayRef.current.offsetTop + (next / (data.length - 1)) * travel, behavior: "smooth" });
   };
 
   useEffect(() => {
     const handleKeys = (event) => {
-      const bounds = runwayRef.current?.getBoundingClientRect();
+      const bounds = timelineRef.current?.getBoundingClientRect();
       if (!bounds || bounds.top > window.innerHeight || bounds.bottom < 0) return;
       if (event.key === "ArrowRight") { event.preventDefault(); moveTo(activeIndex + 1); }
       if (event.key === "ArrowLeft") { event.preventDefault(); moveTo(activeIndex - 1); }
@@ -43,9 +34,9 @@ export const SeasonTimeline = ({ seasons = [] }) => {
     return () => window.removeEventListener("keydown", handleKeys);
   });
 
-  return <section id="timeline" className="timeline-section timeline-v2" data-testid="season-timeline-section">
+  return <section ref={timelineRef} id="timeline" className="timeline-section timeline-v2 timeline-arrow-only" data-testid="season-timeline-section">
     <div className="timeline-intro"><p className="eyebrow" data-testid="timeline-section-label">(02) / THE JOURNEY</p><h2 data-testid="timeline-section-title">NINETEEN<br/><i>seasons.</i><br/>ONE STANDARD.</h2></div>
-    <div ref={runwayRef} className="timeline-runway" style={{ height: `${data.length * 58}vh` }} data-testid="timeline-scroll-runway">
+    <div className="timeline-runway" data-testid="timeline-scroll-runway">
       <div className={`timeline-stage theme-${active.year === 2025 ? "red" : active.champion ? "purple" : "dark"}`} data-testid="timeline-active-panel">
         <aside className="timeline-visual">
           <div className="timeline-year" data-testid="timeline-active-year">{active.year}</div>
@@ -59,7 +50,7 @@ export const SeasonTimeline = ({ seasons = [] }) => {
           <div className="season-progress"><span style={{ width: `${Math.max(4, (active.wins / 11) * 100)}%` }} /></div>
           <div className="timeline-controls"><button onClick={() => moveTo(activeIndex - 1)} disabled={activeIndex === 0} data-testid="timeline-previous-year-button" aria-label="Previous season"><ChevronLeft/></button><span data-testid="timeline-year-counter">{String(activeIndex + 1).padStart(2, "0")} / {String(data.length).padStart(2, "0")}</span><button onClick={() => moveTo(activeIndex + 1)} disabled={activeIndex === data.length - 1} data-testid="timeline-next-year-button" aria-label="Next season"><ChevronRight/></button></div>
         </motion.article>
-        <div className="timeline-key-hint" data-testid="timeline-keyboard-hint">SCROLL OR USE ← →</div>
+        <div className="timeline-key-hint" data-testid="timeline-keyboard-hint">USE ← → TO CHANGE YEAR</div>
         <div className="timeline-master-progress"><span style={{ width: `${((activeIndex + 1) / data.length) * 100}%` }}/></div>
       </div>
     </div>
