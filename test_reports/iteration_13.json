@@ -1,0 +1,71 @@
+{
+  "summary": "Frontend-only mandatory menu-routing retest completed on public preview. Menu pointer-click routing is still non-deterministic and fails required fresh matrix; keyboard activation passes. Timeline lock/arrow behavior passes once timeline is successfully entered.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Nav menu routing (fresh per-link)",
+        "issue": "Fresh page matrix failed for all required links (Legacy/Timeline/Cars/Tracks/Victories); each click remained at active-node-0 (ORIGIN).",
+        "selector": "[data-testid='navigation-legacy-button'], [data-testid='navigation-timeline-button'], [data-testid='navigation-cars-button'], [data-testid='navigation-tracks-button'], [data-testid='navigation-victories-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Quick open + immediate click",
+        "issue": "Quick open then immediate Timeline click still lands at ORIGIN (active-node-0).",
+        "selector": "[data-testid='menu-toggle-button'], [data-testid='navigation-timeline-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Sequential menu matrix",
+        "issue": "Sequential run is still inconsistent: Legacy and Victories fail while Timeline/Cars/Tracks pass.",
+        "selector": "[data-testid='navigation-menu-panel'], [data-testid^='navigation-']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Menu -> spatial route readiness",
+        "issue": "Timeline via menu is non-deterministic (first click failed, second retry passed). Once landed on TIMELINE, wheel lock and arrow controls worked correctly.",
+        "affected_selectors": [
+          "[data-testid='navigation-timeline-button']",
+          ".unified-spatial-viewport",
+          "[data-testid='timeline-active-year']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx"
+  ],
+  "action_items": [
+    "Make menu pointer-click routing deterministic for all required links in fresh sessions.",
+    "Eliminate first-click menu no-op path (especially quick open -> immediate click).",
+    "Ensure fallback pending route is consumed when set after initial mount, not only during first useLayoutEffect run.",
+    "Re-run mandatory matrix: fresh-per-link, sequential, quick click, keyboard activation, timeline-through-menu lock behavior."
+  ],
+  "critical_code_review_comments": [
+    "Current fallback writes window.__pendingSpatialRoute when window.__spatialGo is unavailable, but SpatialExperience consumes pending route only once in mount-time useLayoutEffect; pending values set later can be stranded.",
+    "Observed behavior (fresh failures + retry success) indicates router-readiness/lifecycle timing race remains for pointer flow.",
+    "Keyboard path (onClick detail===0) is currently more reliable than pointer flow, suggesting event-path asymmetry between onPointerDown and routing readiness."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_13.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "72%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "PASS: Keyboard activation works (Enter on Cars -> active-node-3, Space on Tracks -> active-node-7). PASS: After menu timeline retry lands, wheel lock holds node active-node-2 on small wheel; ArrowRight and next button increment year (2007->2008->2009). PASS: Gallery buttons move strip (0->1155->0), quote next changes text, victories filter 2020 updates count (105->11), no '.error' selectors, no horizontal overflow. FAIL: Fresh matrix all five pointer clicks stayed ORIGIN; quick open immediate click stayed ORIGIN; sequential matrix still inconsistent (Legacy/Victories failed).",
+  "rca of the issue": "Repro: load page, open menu, click required link quickly/fresh -> viewport remains active-node-0. In same broader session, retry or later clicks can succeed. Likely cause is unresolved timing gap between pointer routing and spatial router readiness: Nav sets __pendingSpatialRoute when __spatialGo is missing, but SpatialExperience only consumes pending during initial mount, so late pending assignments are not guaranteed to execute."
+}
