@@ -1,0 +1,78 @@
+{
+  "summary": "Frontend-only mandatory pointer-routing retest completed on public preview after native document-capture Nav change. Routing remains non-deterministic for required pointer matrices and quick open-click, while keyboard routing, home origin, timeline lock/arrows, and gallery/quote/victory regressions passed. No error selectors and no horizontal overflow detected.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Fresh pointer matrix (5 links × 3 runs)",
+        "issue": "Failed 6/15 required pointer checks (9/15 pass). Repro examples: Legacy stuck at node 0 in run 1; Cars stuck at node 2 in runs 1 and 2; Tracks stuck at node 2 in run 1; Victories stuck at node 7 in run 2; Victories click detached during run 3.",
+        "selector": "[data-testid='navigation-legacy-button'], [data-testid='navigation-timeline-button'], [data-testid='navigation-cars-button'], [data-testid='navigation-tracks-button'], [data-testid='navigation-victories-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Sequential pointer matrix",
+        "issue": "Only 2/5 passed. Legacy remained node 0; Cars and Tracks remained node 2; Timeline and Victories passed.",
+        "selector": "[data-testid='navigation-menu-panel'], [data-testid^='navigation-']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Quick open-click",
+        "issue": "Immediate open then Timeline click still lands at ORIGIN (active-node-0).",
+        "selector": "[data-testid='menu-toggle-button'], [data-testid='navigation-timeline-button']",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Menu pointer click -> document capture route handler -> __spatialGo",
+        "issue": "Intermittent route execution remains; same selector alternates between correct landing and stale node landing across fresh reloads. Also observed element detachment during Victories click while menu transitions.",
+        "affected_selectors": [
+          "[data-testid='navigation-legacy-button']",
+          "[data-testid='navigation-cars-button']",
+          "[data-testid='navigation-tracks-button']",
+          "[data-testid='navigation-victories-button']",
+          ".unified-spatial-viewport"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx",
+    "/app/test_reports/artifacts_iteration_16_frontend",
+    "/app/test_reports/artifacts_iteration_16_diag",
+    "/app/test_reports/artifacts_iteration_16_trace",
+    "/app/test_reports/artifacts_iteration_16_matrix",
+    "/app/test_reports/artifacts_iteration_16_final"
+  ],
+  "action_items": [
+    "Stabilize pointer routing transaction so every pointer click on Legacy/Timeline/Cars/Tracks/Victories deterministically dispatches and lands target node.",
+    "Fix quick open-click path so first click after menu open cannot fall back to ORIGIN.",
+    "Prevent menu-panel DOM detachment race during route click (observed on Victories) by sequencing close after confirmed route dispatch/commit.",
+    "After fix, rerun mandatory set: fresh matrix (3 runs), sequential matrix, quick open-click, keyboard Enter/Space, home origin, timeline lock/arrows, and gallery/quote/victory regressions."
+  ],
+  "critical_code_review_comments": [
+    "Native capture listener is present, but setOpen(false) scheduled in same click transaction can still race with menu panel lifecycle and route-state updates under fast pointer interactions.",
+    "Routing validation is nearest-stop based; intermediate under-scroll/stale progression leaves active-node unchanged, exposing dispatch/commit timing gaps.",
+    "No evidence of global error boundary/runtime crash; issue scope is interaction sequencing and deterministic state commit, not general app stability."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_16.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "74%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "This run fully executed mandatory scope on https://lewis-victories.preview.emergentagent.com. PASS: keyboard Enter/Space routing, Home origin, timeline route + ArrowRight year shift + small-wheel lock, gallery next-scroll, quote next, victory year filter, no .error selectors, no horizontal overflow. FAIL: pointer determinism remains (fresh matrix 9/15, sequential 2/5) and quick open-click timeline fails to node 0. Trace run showed intermittent route invocation plus one menu-button click targeting hero-image and one Victories click detached during panel transition.",
+  "rca of the issue": "Repro: 1) Reload and run pointer clicks for Legacy/Timeline/Cars/Tracks/Victories. 2) Observe changing outcomes across runs without code changes. 3) In quick open-click, Timeline often remains node 0. 4) In one run, Victories element detached while clicking. Root cause likely residual race between capture-click route dispatch, menu transition/close lifecycle, and spatial active-node commit timing. Mitigation: serialize route dispatch and menu close as one deterministic state machine (dispatch -> confirm commit -> close), and guard against click handling while panel is transitioning/detaching."
+}
