@@ -1,0 +1,72 @@
+{
+  "summary": "Completed mandatory frontend-only retest on public preview for unified spatial deterministic routing and timeline wheel-lock behavior. Menu-driven camera routing remains non-deterministic and fails required matrix; timeline lock and threshold behavior pass when timeline node is entered directly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Nav menu routing",
+        "issue": "Fresh per-link menu matrix fails for all required links (Legacy/Timeline/Cars/Tracks/Victories). Most clicks leave viewport at active-node-0 (ORIGIN) instead of target node.",
+        "selector": "[data-testid='navigation-legacy-button'], [data-testid='navigation-timeline-button'], [data-testid='navigation-cars-button'], [data-testid='navigation-tracks-button'], [data-testid='navigation-victories-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Nav quick open-click",
+        "issue": "Quick menu open -> Timeline click still lands at ORIGIN (active-node-0), so invocation timing is not deterministic.",
+        "selector": "[data-testid='menu-toggle-button'], [data-testid='navigation-timeline-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Sequential menu matrix",
+        "issue": "Sequential route checks are inconsistent (Timeline/Tracks pass, but Legacy/Cars/Victories fail in same session).",
+        "selector": "[data-testid='navigation-menu-panel'], [data-testid^='navigation-']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Menu -> spatial router integration",
+        "issue": "Instrumentation shows some menu clicks do not invoke window.__spatialGo at all (e.g., Legacy run), while others do (e.g., Timeline), causing nondeterministic camera behavior.",
+        "affected_selectors": [
+          "[data-testid='navigation-legacy-button']",
+          "[data-testid='navigation-timeline-button']",
+          ".unified-spatial-viewport"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx",
+    "/app/frontend/src/UnifiedSpatial.css"
+  ],
+  "action_items": [
+    "Fix menu click handler determinism so every required link consistently calls spatial routing and lands on intended active node.",
+    "Investigate why certain menu clicks never call window.__spatialGo despite handler path expecting synchronous invocation.",
+    "Re-run mandatory matrix after fix: fresh-per-link, sequential, and quick open-click timing.",
+    "After menu routing fix, revalidate timeline lock through menu path (direct path currently passes)."
+  ],
+  "critical_code_review_comments": [
+    "Nav.go is a compact one-line conditional branch that mixes route call and close-state update; observed behavior indicates event-path inconsistency under real interaction timing. Split into explicit steps and verify invocation order.",
+    "In production preview runs, __spatialGo and __hamiltonLenis are both present during failure, so root cause is not router readiness but inconsistent menu click-to-handler execution/invocation.",
+    "Timeline wheel-guard implementation in SpatialExperience behaves correctly when active node is 2: single/small wheel locked, arrow controls active, and large cumulative wheel exits to Cars after threshold."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_12.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "70%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "PASS: timeline lock behavior verified via direct timeline route (single wheel and cumulative small wheels keep active-node-2/year unchanged; next arrow and ArrowRight increment year; large cumulative wheel exits to active-node-3/CARS). PASS: gallery next/previous scrolls (0 -> 1155 -> 0), quote next updates text, victories year filter updates count, no overflow, no page error selectors. FAIL: menu matrix remains blocking and nondeterministic in fresh, sequential, and quick-open paths.",
+  "rca of the issue": "Repro: load page, open menu, click Legacy (or other required links) on fresh session -> viewport remains active-node-0/ORIGIN. Additional instrumentation wrapping window.__spatialGo captured zero calls for failing Legacy click, but captured call for Timeline in same run. This indicates inconsistent click-to-route invocation from menu interactions (not route-map math and not router readiness). Mitigation: make menu button routing path explicit and atomic (invoke router first, verify invocation, then close panel), and avoid race-prone compact branch behavior."
+}
