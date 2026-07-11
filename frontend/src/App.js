@@ -18,11 +18,12 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+    window.__hamiltonLenis = lenis;
     let frame;
     const raf = (time) => { lenis.raf(time); frame = requestAnimationFrame(raf); };
     frame = requestAnimationFrame(raf);
     axios.get(`${API}/archive`).then(({ data }) => { setArchive(data); setArchiveError(false); }).catch(() => setArchiveError(true));
-    return () => { cancelAnimationFrame(frame); lenis.destroy(); };
+    return () => { cancelAnimationFrame(frame); lenis.destroy(); delete window.__hamiltonLenis; };
   }, []);
   return <main className="app-shell" data-testid="hamilton-fan-archive"><Nav open={menuOpen} setOpen={setMenuOpen} />{archiveError && <div className="archive-error" style={{ position: "fixed", zIndex: 110, top: 92, left: "50%", transform: "translateX(-50%)", padding: "11px 18px", borderRadius: 999, background: "rgba(12,12,12,.92)", color: "white", font: '10px "Space Mono"' }} role="alert" data-testid="archive-error-message">Live race data is temporarily unavailable. The curated career archive remains on screen.</div>}<Hero stats={archive?.stats} /><StorySections archive={archive} /></main>;
 }

@@ -60,6 +60,18 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Added direct test selectors for helmet, track line, scan line, orbit rings, and count-up statistics
 - Resolved the Framer Motion positioned-container warning and verified pointer/scroll interactions on the public experience
 
+## Hero V3 — Stable 3D Editorial Stage
+- Replaced the previous floating collage with one coherent 3D archival card and two physical depth planes
+- Added controlled pointer tilt, restrained parallax, perspective grid floor, ambient light volumes, and circuit-line depth
+- Reworked headline hierarchy into a cleaner `STILL / WE RISE` composition with editorial serif contrast
+- Framed the authentic trophy photo inside a glass archival interface with scan, shine, live status, and metadata rails
+- Redesigned the floating helmet as a compact second-plane token rather than a disconnected sticker
+- Rebuilt the `44` orbital mark, stats rail, CTA, telemetry, and marquee as one consistent visual system
+- Removed the old Hero V2 stylesheet import so only the stable V3 system controls the page
+- Routed all navigation links through the same Lenis scroll engine to remove native-scroll conflicts
+- Verified all five menu targets land at the section top in one continuous sequence
+- Verified desktop/mobile composition, authentic image load, 105/7/104 stats, CTA, reduced motion, and console health
+
 ## Authentic Photography Replacement
 - Replaced the generated visual set with the first five user-supplied Lewis Hamilton photographs
 - Trophy-kiss image now leads the hero, Silverstone moment, trophy record section, and championship-era scenes
