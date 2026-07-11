@@ -1,0 +1,65 @@
+{
+  "summary": "Completed full frontend-only regression on public preview for unified spatial journey requirements (desktop 1920x800 and mobile 390x844). Core spatial architecture and most interactions pass, but two blocking UX regressions were reproduced: nondeterministic menu routing and non-functional gallery next/previous scrolling.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Nav menu routing",
+        "issue": "Menu links are not deterministic: Legacy/Timeline/Victories frequently route to ORIGIN (or wrong node) instead of their target spatial node.",
+        "selector": "[data-testid='navigation-legacy-button'], [data-testid='navigation-timeline-button'], [data-testid='navigation-victories-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "VisualGallery",
+        "issue": "Gallery next/previous controls do not change strip position on desktop; scrollLeft remains 0 across repeated clicks despite overflow content.",
+        "selector": "[data-testid='gallery-next-button'], [data-testid='gallery-previous-button'], [data-testid='gallery-image-strip']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Menu camera navigation",
+        "issue": "Direct window.__spatialGo('legacy'|'timeline'|'cars'|'tracks'|'victories'|'footer') routes correctly, but menu-driven navigation is inconsistent/flaky for multiple links.",
+        "affected_selectors": [
+          "[data-testid='menu-toggle-button']",
+          "[data-testid='navigation-menu-panel']",
+          "[data-testid^='navigation-']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx",
+    "/app/frontend/src/UnifiedSpatial.css",
+    "/app/frontend/src/App.css"
+  ],
+  "action_items": [
+    "Fix menu-link routing determinism so Legacy/Timeline/Cars/Tracks/Victories always trigger correct spatial camera destination from the menu.",
+    "Stabilize nav flow around menu open/close animation and routing invocation timing (avoid fallback to wrong destination when spatial router is not yet resolved).",
+    "Fix gallery navigation buttons so next/previous reliably update gallery strip scroll position when GALLERY node is active.",
+    "Re-run full frontend regression for menu + gallery + timeline + quote + victory interactions after fixes."
+  ],
+  "critical_code_review_comments": [
+    "Nav.go fallback path computes destination from getBoundingClientRect of transformed spatial nodes; this is high-risk in camera-transformed layouts and can resolve to incorrect top/origin. Ensure menu always uses the spatial router path or a deterministic route-stop map.",
+    "Menu panel uses animated clipPath transition; current interaction timing appears race-prone for routing on quick open->click flows. Add deterministic routing trigger after panel state settles.",
+    "Gallery controls are wired, but click results indicate handler/pointer routing is not consistently effective in spatial mode; verify pointer-event activation and event delivery at active-node-4."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_10.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "84%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Validated PASS: single unified spatial container; no duplicate normal-flow chapter sections outside camera; fresh load starts with full-screen hero; LEWIS/HAMILTON visible during hero minimization phase; timeline wheel does not change year and arrows/buttons work; cars controls work; quote controls change quote; victories filters work; hero stats settle to 105/7/104; images load; no horizontal overflow on desktop/mobile; no console/page errors; back-to-top reaches origin. FAIL: menu routing is nondeterministic for several links, and gallery next/previous does not move strip.",
+  "rca of the issue": "Repro (menu): open menu -> click Legacy/Timeline/Victories -> often remains at ORIGIN or wrong node, while direct window.__spatialGo calls succeed for same targets. Probable root cause: race/fallback behavior in Nav.go where transformed-section getBoundingClientRect fallback is used or timing conflicts with menu animation. Repro (gallery): route to GALLERY node, verify strip dimensions (clientWidth 1918, scrollWidth 4908), click next/previous repeatedly, scrollLeft stays 0. Probable root cause: interaction not reaching move handler consistently in spatial mode (pointer-event/stacking activation issue) despite visible controls."
+}

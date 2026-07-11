@@ -4,6 +4,7 @@ export const Nav = ({ open, setOpen }) => {
   const links = ["Legacy", "Timeline", "Cars", "Tracks", "Victories"];
   const go = (id) => {
     setOpen(false);
+    if (window.__spatialGo) { window.setTimeout(() => window.__spatialGo(id.toLowerCase()), 40); return; }
     const target = id.toLowerCase() === "top" ? 0 : document.getElementById(id.toLowerCase());
     if (target === null) return;
     const destination = target === 0 ? 0 : target.getBoundingClientRect().top + window.scrollY;
