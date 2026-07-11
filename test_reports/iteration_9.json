@@ -1,0 +1,38 @@
+{
+  "summary": "Completed focused frontend-only mandatory retest for iteration 8 HIGH issue on public preview URL. Timeline keyboard navigation is now stable and all requested regression checks passed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/frontend/src/HeroV3.css",
+    "/app/frontend/src/components/Hero.jsx",
+    "/app/frontend/src/SpatialV5.css",
+    "/app/frontend/src/components/Nav.jsx"
+  ],
+  "action_items": [
+    "No blocking fixes required from this focused retest.",
+    "Optional: run one additional mobile keyboard/accessibility pass if hardware-keyboard support is a product requirement."
+  ],
+  "critical_code_review_comments": [
+    "No new critical code issues identified in this retest scope."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_9.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "100% (targeted retest cases)"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Validated on https://lewis-victories.preview.emergentagent.com. Timeline starts at 2007 and key sequence works exactly: ArrowRight->2008, ArrowRight->2009, ArrowLeft->2008. After clicking next button, ArrowRight/ArrowLeft remained stable (+1/-1). Wheel did not change active year. Keyboard remained functional after opening/closing menu and after wheel interaction. Quick smoke passed for full-width Hero start, spatial racetrack map presence, deterministic Cars link, no horizontal overflow, and no page error selectors.",
+  "rca of the issue": "Iteration 8 failure likely came from unstable keydown listener lifecycle/stale closure behavior. Current implementation using dependency [data.length] plus functional setActiveIndex updates produced deterministic keyboard behavior throughout retest and removed reproduced failure."
+}

@@ -27,12 +27,12 @@ export const SeasonTimeline = ({ seasons = [] }) => {
     const handleKeys = (event) => {
       const bounds = timelineRef.current?.getBoundingClientRect();
       if (!bounds || bounds.top > window.innerHeight || bounds.bottom < 0) return;
-      if (event.key === "ArrowRight") { event.preventDefault(); moveTo(activeIndex + 1); }
-      if (event.key === "ArrowLeft") { event.preventDefault(); moveTo(activeIndex - 1); }
+      if (event.key === "ArrowRight") { event.preventDefault(); setActiveIndex((current) => Math.min(data.length - 1, current + 1)); }
+      if (event.key === "ArrowLeft") { event.preventDefault(); setActiveIndex((current) => Math.max(0, current - 1)); }
     };
     window.addEventListener("keydown", handleKeys);
     return () => window.removeEventListener("keydown", handleKeys);
-  });
+  }, [data.length]);
 
   return <section ref={timelineRef} id="timeline" className="timeline-section timeline-v2 timeline-arrow-only" data-testid="season-timeline-section">
     <div className="timeline-intro"><p className="eyebrow" data-testid="timeline-section-label">(02) / THE JOURNEY</p><h2 data-testid="timeline-section-title">NINETEEN<br/><i>seasons.</i><br/>ONE STANDARD.</h2></div>
