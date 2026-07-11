@@ -159,6 +159,15 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Disabled pointer interception on the moving racing indicator so overlapping chapter markers remain clickable
 - Verified all 11 card contents render and a standard Legacy card click reaches the full-screen chapter
 
+## Progress-Aware Back to Circuit — 2026-07-11
+- Changed Back to Circuit from a scroll-to-start action into an in-place circuit overview
+- Preserves the exact chapter scroll position and recenters the camera to the full top-down track
+- Shows contextual track coverage and current position, including Legacy 2%, Records 38%, and Victories 90%
+- Keeps the completed racing line illuminated up to the current chapter instead of resetting it
+- Supports current/different marker selection and resumes the journey through wheel, touch, or keyboard scrolling
+- Clears stale overview state when navigating through hashes or the main menu
+- Iteration 26 passed all requested desktop/mobile coverage, navigation, accessibility, and overflow checks
+
 ## Prioritized Backlog
 ### P0
 - None; the post-Legacy overlap, lag, and first-route framing regressions are resolved and verified
