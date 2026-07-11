@@ -131,11 +131,21 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Added the two-image batch with first→2020 and second→2019
 - Verified both 2019 and 2020 through timeline controls, including successful image loading
 
+## Spatial Framing and Performance Stabilization — 2026-07-11
+- Added chapter-level containment, paused inactive animations, and reduced inactive node scale to prevent distant pages from overlapping the active viewport
+- Fixed first-load hash navigation by synchronizing route positioning with Lenis initialization and providing a native scroll fallback before Lenis is ready
+- Strengthened active-node selectors so every chapter, including the footer, reliably overrides minimized baseline styles
+- Removed transform interpolation from active chapters so they reach full viewport scale immediately while the spatial camera continues its glide
+- Verified fresh direct links for all 11 content chapters, full-screen active framing, minimized inactive nodes, post-Legacy continuity, and transformed control hit areas
+- Iteration 22 independently passed desktop/mobile framing, timeline, Gallery, Quotes, Victories, overflow, console, and continuous spatial navigation checks
+
 ## Prioritized Backlog
 ### P0
-- None; the requested core experience is complete
+- None; the post-Legacy overlap, lag, and first-route framing regressions are resolved and verified
 
 ### P1
+- Refactor the compressed spatial camera and story components into smaller modules without altering the verified coordinate model
+- Add a longer continuous navigation soak test for future spatial-camera changes
 - Add an interactive world map connecting each victory to its circuit and country
 - Add individual victory detail panels with race story, starting grid, and finishing margin
 - Add a season-by-season points and championship battle visualization
@@ -146,6 +156,7 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Add image attribution and editorial source notes page
 
 ## Next Tasks
-1. Interactive global victory map
-2. Rich race detail overlays for landmark wins
-3. Shareable fan-stat cards to improve organic reach
+1. Spatial camera performance profiling and modular refactor
+2. Interactive global victory map
+3. Rich race detail overlays for landmark wins
+4. Shareable fan-stat cards to improve organic reach
