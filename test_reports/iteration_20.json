@@ -1,0 +1,39 @@
+{
+  "summary": "Frontend-only deep-interaction retest completed on public preview; active-chapter behavior now matches user requirement and targeted controls work when their section is active.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/UnifiedSpatial.css",
+    "/app/test_reports/artifacts_iteration_20_frontend"
+  ],
+  "action_items": [
+    "No blocking issues found in requested frontend scope.",
+    "Optional: keep future regression tests chapter-scoped (activate chapter first, then test its controls)."
+  ],
+  "critical_code_review_comments": [
+    "Pointer-events gating in UnifiedSpatial.css is intentionally chapter-scoped and now aligns with expected interaction model.",
+    "SpatialExperience/StorySections remain heavily compressed single-line JSX, which increases debugging cost for future interaction regressions."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_20.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "100% (requested flows)"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Validated with route-first approach: __spatialGo('gallery'|'quotes'|'victories', {immediate:true}) then interact. Gallery next/previous changed scrollLeft, quote next/previous changed quote text, victories year filter updated active/count/list. Confirmed gallery controls are offscreen/non-interactive while victories is active (expected). Menu/hash smoke, timeline arrows smoke, no horizontal overflow, and no console errors in this run.",
+  "rca of the issue": "Prior failure was a test-sequencing mismatch: attempting distant section controls while camera remained on a different active node. With explicit chapter activation before control interaction, behavior is correct and consistent with the user’s active-chapter requirement."
+}
