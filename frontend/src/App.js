@@ -4,6 +4,7 @@ import "@/Upgrade.css";
 import "@/TimelineV2.css";
 import "@/HeroV3.css";
 import "@/UnifiedSpatial.css";
+import "@/SpatialStability.css";
 import axios from "axios";
 import Lenis from "lenis";
 import { Nav } from "@/components/Nav";
