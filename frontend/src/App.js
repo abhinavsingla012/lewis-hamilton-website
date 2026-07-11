@@ -21,7 +21,9 @@ function App() {
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     window.__hamiltonLenis = lenis;
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
-    lenis.scrollTo(0, { immediate: true, force: true });
+    const initialRoute = window.location.hash.replace("#route-", "");
+    if (window.location.hash.startsWith("#route-")) window.__spatialGo?.(initialRoute, { immediate: true });
+    else lenis.scrollTo(0, { immediate: true, force: true });
     let frame;
     const raf = (time) => { lenis.raf(time); frame = requestAnimationFrame(raf); };
     frame = requestAnimationFrame(raf);

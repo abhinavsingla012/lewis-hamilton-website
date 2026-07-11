@@ -1,0 +1,43 @@
+{
+  "summary": "Frontend-only retest completed for iteration 21 fixes. Fresh deep-links for all requested chapters now consistently activate correct HUD and full-viewport framing on desktop and mobile; post-Legacy navigation overlap/lag issue was not reproducible.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/App.js",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/UnifiedSpatial.css",
+    "/app/frontend/src/SpatialStability.css",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx",
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/test_reports/iteration_21.json"
+  ],
+  "action_items": [
+    "No blocking frontend issues found in this retest scope.",
+    "Optional: run one additional soak test (multi-minute continuous route cycling) before release lock."
+  ],
+  "critical_code_review_comments": [
+    "Iteration 21 hash/activation fixes appear effective: active chapter class, HUD label, and viewport framing remained synchronized in all tested deep-links.",
+    "No console error selectors, horizontal overflow, blank viewport, or transformed-hit-area click failures were observed in this run."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_22.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "100% (requested retest scenarios)"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Desktop (1920x1080) and mobile (390x844) both passed direct fresh deep-links for legacy/timeline/cars/gallery/records/milestones/tracks/moment/quotes/victories/footer. Active chapter bounding boxes were full viewport; inactive remained minimized. Timeline arrows+keyboard, gallery prev/next, quote prev/next, and victory year filter worked. Continuous navigation after Legacy showed no freezes, overlap, or severe lag.",
+  "rca of the issue": "Previously reported race/desync between initial hash activation and chapter transform state appears mitigated by iteration 21 changes (initial hash honoring post-Lenis setup, __spatialGo fallback, stronger active selector specificity, and active transform transition removal)."
+}
