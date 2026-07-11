@@ -1,0 +1,83 @@
+{
+  "summary": "Frontend-only mandatory final retest completed on public preview after native hash-anchor migration. Pointer reliability is still not deterministic: fresh matrix, sequential matrix, quick open-click, and keyboard Space path fail. Home origin, timeline lock/arrows, gallery/quote/victory flows, and no error/overflow checks pass.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Fresh pointer matrix all links",
+        "issue": "Failed 4/5. Legacy/Cars/Tracks/Victories did not update hash (remained empty); only Timeline updated correctly.",
+        "selector": "[data-testid='navigation-legacy-button'], [data-testid='navigation-timeline-button'], [data-testid='navigation-cars-button'], [data-testid='navigation-tracks-button'], [data-testid='navigation-victories-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Sequential pointer matrix",
+        "issue": "Failed 2/5. Legacy did not update hash; Tracks remained stale at #route-cars instead of #route-tracks.",
+        "selector": "[data-testid='navigation-menu-panel'], [data-testid^='navigation-']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Quick open-click",
+        "issue": "Immediate open then Timeline click produced empty hash instead of #route-timeline.",
+        "selector": "[data-testid='menu-toggle-button'], [data-testid='navigation-timeline-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Keyboard Enter/Space",
+        "issue": "Enter passed (#route-timeline), but Space failed to switch focused link route (stayed #route-timeline instead of #route-tracks).",
+        "selector": "[data-testid='navigation-timeline-button'], [data-testid='navigation-tracks-button']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Native anchor click/hashchange -> spatial route sync",
+        "issue": "Hash commit remains intermittent from menu pointer interactions; observed empty-hash outcomes and stale hash carry-over despite valid anchor href targets.",
+        "affected_selectors": [
+          "[data-testid='navigation-legacy-button']",
+          "[data-testid='navigation-timeline-button']",
+          "[data-testid='navigation-cars-button']",
+          "[data-testid='navigation-tracks-button']",
+          "[data-testid='navigation-victories-button']",
+          ".unified-spatial-viewport"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/test_reports/artifacts_iteration_18_frontend",
+    "/app/test_reports/artifacts_iteration_18_targeted"
+  ],
+  "action_items": [
+    "Stabilize menu anchor pointer path so hash always commits to the clicked route key on first click.",
+    "Fix sequential stale-hash transition (Tracks currently inherits #route-cars in observed run).",
+    "Fix quick open-click race causing empty hash on first interaction.",
+    "Ensure keyboard Space on focused menu anchors activates the intended route same as Enter.",
+    "Retest mandatory matrix set after fix: fresh, sequential, quick open-click, Enter/Space, hash key updates, home origin, timeline lock/arrows, gallery/quote/victory, and error/overflow checks."
+  ],
+  "critical_code_review_comments": [
+    "Nav link currently combines native href navigation with onClick route mutation and immediate menu close, increasing event-order ambiguity under fast pointer interactions.",
+    "Single-line compressed Nav component structure reduces debuggability for click/hash sequencing regressions.",
+    "SpatialExperience hash listener appears functional when hash is correct; instability is localized to menu interaction transaction rather than route listener math."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_18.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "67%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Two Playwright runs executed on https://lewis-victories.preview.emergentagent.com. Run-1: fresh matrix 1/5 pass, sequential 3/5 pass, quick open-click fail, Enter pass, Space fail, home pass, timeline arrows pass; script stopped at wrong gallery selector then corrected. Run-2: corrected gallery selectors; hash update matrix 3/5 (legacy fail, tracks stale), gallery scroll pass, quote next pass, victory year filter pass, no .error selectors, no horizontal overflow.",
+  "rca of the issue": "Repro: (1) Load page. (2) Open menu and click Legacy/Cars/Tracks/Victories from fresh sessions; hash often remains empty. (3) In sequential run, Tracks can remain #route-cars. (4) Quick open then immediate Timeline click can produce empty hash. (5) Keyboard Enter works while Space may not route to focused target. RCA: unresolved event ordering in menu interaction path where native anchor navigation and custom onClick hash mutation/close behavior conflict, yielding dropped or stale hash commits under some interaction timings. Mitigation: rely on one deterministic commit path (single source of truth for hash set + close sequencing) and validate Space-key activation parity for anchor controls."
+}
