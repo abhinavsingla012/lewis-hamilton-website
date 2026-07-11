@@ -1,0 +1,86 @@
+{
+  "summary": "Frontend-only final mandatory retest completed on public preview. Unified spatial menu pointer routing is still non-deterministic and fails required matrix. Keyboard activation and Home-logo return pass. No console error selectors and no horizontal overflow detected.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Unified spatial menu routing (fresh matrix)",
+        "issue": "Fresh pointer clicks for Legacy/Timeline/Cars/Tracks/Victories all landed on active-node-0 (ORIGIN) instead of target nodes.",
+        "selector": "[data-testid='navigation-legacy-button'], [data-testid='navigation-timeline-button'], [data-testid='navigation-cars-button'], [data-testid='navigation-tracks-button'], [data-testid='navigation-victories-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Unified spatial menu routing (sequential matrix)",
+        "issue": "Sequential session remained inconsistent: Legacy failed (stayed node 0), Cars failed (stayed node 2), Victories failed (stayed node 7), while Timeline and Tracks passed.",
+        "selector": "[data-testid='navigation-menu-panel'], [data-testid^='navigation-']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Quick open-click behavior",
+        "issue": "Quick menu open then Timeline click still lands at ORIGIN (active-node-0).",
+        "selector": "[data-testid='menu-toggle-button'], [data-testid='navigation-timeline-button']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Timeline-through-menu path",
+        "issue": "Timeline wheel-lock and arrow checks were blocked in mandatory path because timeline route did not land from menu click (active-node remained 0).",
+        "selector": "[data-testid='navigation-timeline-button'], [data-testid='timeline-active-year']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Menu button click -> Nav.go -> SpatialExperience.__spatialGo",
+        "issue": "Diagnostic trace shows __spatialGo is available, but some menu clicks never invoke it (legacy/cars/victories), while timeline/tracks invoke it and route correctly.",
+        "affected_selectors": [
+          "[data-testid='navigation-legacy-button']",
+          "[data-testid='navigation-cars-button']",
+          "[data-testid='navigation-victories-button']",
+          ".unified-spatial-viewport"
+        ]
+      },
+      {
+        "flow": "Single menu click dispatch path",
+        "issue": "Successful links generated duplicate router invocations (3 calls per click), indicating competing onMouseDown/onTouchStart/onClick lifecycle and unstable deterministic behavior.",
+        "affected_selectors": [
+          "[data-testid='navigation-timeline-button']",
+          "[data-testid='navigation-tracks-button']"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/Nav.jsx",
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/SeasonTimeline.jsx",
+    "/app/frontend/src/components/StorySections.jsx",
+    "/app/frontend/src/components/VisualGallery.jsx"
+  ],
+  "action_items": [
+    "Fix deterministic pointer routing so all five required menu links always invoke spatial navigation and land correct active node.",
+    "Consolidate multi-event handlers (onMouseDown/onTouchStart/onClick) into a single deterministic interaction path to avoid duplicate/missed routing.",
+    "After fix, re-run mandatory matrix: fresh per-link, sequential matrix, quick open-click, keyboard Enter/Space, and timeline-through-menu lock/arrows.",
+    "Confirm gallery/quote/victory-filter checks after menu routing fix because failures became route-blocked in this run."
+  ],
+  "critical_code_review_comments": [
+    "Nav links currently bind three event handlers to the same go() call; this produces triple invocations on successful clicks and zero invocations on some failed clicks, matching observed nondeterminism.",
+    "Spatial router readiness is not the current blocker: __spatialGo was true before clicks in diagnostic runs, yet specific buttons still did not invoke it.",
+    "Menu close (setOpen(false)) in same gesture path likely competes with multi-event lifecycle and can terminate/skip intended routing for certain button interactions."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_14.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "45%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Reproduced blocking failure on public preview: fresh matrix failed all five links to ORIGIN, sequential matrix passed only Timeline+Tracks, quick Timeline click failed, keyboard Enter/Space passed, Home-logo return passed, no error selectors, no horizontal overflow. Diagnostic trace wrapped window.__spatialGo and confirmed calls absent for legacy/cars/victories but present (triplicated) for timeline/tracks.",
+  "rca of the issue": "RCA/Repro: 1) Open menu and click Legacy/Cars/Victories -> active node does not move. 2) Same session click Timeline/Tracks -> route may work and __spatialGo gets called multiple times. 3) Hook trace shows __spatialGo exists before interaction, so failure is not readiness; it is click lifecycle inconsistency. Likely root cause is concurrent event bindings (onMouseDown/onTouchStart/onClick) with immediate menu close causing race/ordering variance where some clicks skip router invocation and others invoke it multiple times. Mitigation: use one canonical pointer/click event, debounce/guard duplicate invocations, then close menu after confirmed route dispatch."
+}
