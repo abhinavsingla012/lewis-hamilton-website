@@ -14,10 +14,17 @@ const seasonImages = {
   2019: IMAGES.season2019, 2020: IMAGES.season2020, 2021: IMAGES.podium, 2022: IMAGES.garage,
   2023: IMAGES.helmet, 2024: IMAGES.silverstone, 2025: IMAGES.ferrari,
 };
-const imagePositions = {
-  2007: "50% 26%", 2008: "50% 22%", 2009: "50% 28%", 2010: "50% 24%",
-  2011: "50% 24%", 2014: "50% 28%", 2015: "50% 24%", 2016: "52% 27%",
-  2017: "50% 22%", 2018: "50% 24%", 2019: "50% 25%", 2020: "50% 26%",
+const imageFrames = {
+  2007: { fit: "contain", position: "50% 100%" }, 2008: { fit: "contain", position: "50% 100%" },
+  2009: { fit: "contain", position: "50% 100%" }, 2010: { fit: "contain", position: "50% 100%" },
+  2011: { fit: "contain", position: "50% 100%" }, 2012: { fit: "contain", position: "50% 100%" },
+  2013: { fit: "contain", position: "50% 100%" }, 2014: { fit: "cover", position: "62% 50%" },
+  2015: { fit: "cover", position: "62% 50%" }, 2016: { fit: "cover", position: "70% 50%" },
+  2017: { fit: "contain", position: "50% 100%" }, 2018: { fit: "cover", position: "60% 50%" },
+  2019: { fit: "cover", position: "48% 50%" }, 2020: { fit: "cover", position: "48% 52%" },
+  2021: { fit: "contain", position: "50% 100%" }, 2022: { fit: "contain", position: "50% 100%" },
+  2023: { fit: "contain", position: "50% 100%" }, 2024: { fit: "contain", position: "50% 100%" },
+  2025: { fit: "contain", position: "50% 100%" },
 };
 const positionColors = {
   1: "#d6b34a", 2: "#d9dde2", 3: "#b8794a", 4: "#8fa3b8",
@@ -52,6 +59,7 @@ export const SeasonTimeline = ({ seasons = [] }) => {
   const active = data[Math.min(activeIndex, data.length - 1)];
   const achievements = active?.achievements?.[achievementType] || [];
   const activePlace = achievements[Math.min(signalIndex, Math.max(0, achievements.length - 1))];
+  const activeFrame = imageFrames[active.year] || { fit: "cover", position: "50% 50%" };
   const positionColor = positionColors[active.position] || "#777b80";
   const winConversion = active.races ? Math.round((active.wins / active.races) * 100) : 0;
   const campaignLabel = active.champion ? "TITLE CAMPAIGN" : active.wins ? "VICTORY CAMPAIGN" : "RELENTLESS PURSUIT";
@@ -101,15 +109,16 @@ export const SeasonTimeline = ({ seasons = [] }) => {
       <div className="timeline-v3-image-field" aria-hidden="true" />
       <motion.figure
         key={`image-${active.year}`}
-        className="timeline-v3-portrait"
+        className={`timeline-v3-portrait fit-${activeFrame.fit}`}
         initial={reduceMotion ? false : { opacity: 0, scale: 1.035 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: reduceMotion ? .01 : .55, ease: [0.22, 1, 0.36, 1] }}
       >
+        <div className="timeline-v3-portrait-backdrop" style={{ backgroundImage: `url(${seasonImages[active.year]})`, backgroundPosition: activeFrame.position }} aria-hidden="true" />
         <img
           src={seasonImages[active.year]}
           alt={`${active.year} ${active.team} season`}
-          style={{ objectPosition: imagePositions[active.year] || "50% 30%" }}
+          style={{ objectFit: activeFrame.fit, objectPosition: activeFrame.position }}
           decoding="async"
           draggable="false"
           data-testid="timeline-active-image"
@@ -118,7 +127,7 @@ export const SeasonTimeline = ({ seasons = [] }) => {
       <motion.div
         key={`echo-${active.year}`}
         className="timeline-v4-image-echo"
-        style={{ backgroundImage: `url(${seasonImages[active.year]})`, backgroundPosition: imagePositions[active.year] || "50% 30%" }}
+        style={{ backgroundImage: `url(${seasonImages[active.year]})`, backgroundPosition: activeFrame.position }}
         initial={reduceMotion ? false : { opacity: 0, x: -16 }}
         animate={{ opacity: .22, x: 0 }}
         transition={{ duration: reduceMotion ? .01 : .58, ease: [0.22, 1, 0.36, 1] }}
