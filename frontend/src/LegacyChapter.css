@@ -13,3 +13,4 @@
 .legacy-narrative{top:clamp(154px,21vh,188px)}
 @media(max-width:850px){.legacy-narrative{top:max(132px,18.5vh)}}
 @media(min-width:851px) and (max-height:720px){.legacy-narrative{top:154px}}
+.legacy-era-rail .is-mclaren span{color:#ff6200}

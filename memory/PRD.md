@@ -293,6 +293,13 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Iteration 42 passed exact natural dimensions, selector/model mapping, all seven crops, story tones, technical copy, live stats, source links, interactions, route stability, reduced motion, rapid switching, and the six-viewport responsive matrix
 - No mocked flows or APIs; no functional blockers remain
 
+## McLaren Papaya-Orange Theme Correction — 2026-07-12
+- Shifted McLaren mode from the yellow-leaning `#FF8700` treatment to a deeper orange system led by `#FF6200`
+- Added `#FF8A2B` hover/highlight orange, `#D94700` deep contrast, darker orange glow, and matching RGB variables
+- Updated the McLaren switcher state, all CSS-variable-driven chapter accents, circuit progress/racing line, markers, chapter indicators, and Timeline era spine
+- Updated the Legacy McLaren era cue to the same orange so no yellow-gold historical marker remains
+- Verified live computed theme values, active-button glow, and circuit progress render as `rgb(255, 98, 0)`; JavaScript lint passed
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified

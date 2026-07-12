@@ -1,5 +1,5 @@
 const careerEras = [
-  { key: "mclaren", label: "McLAREN", range: "2007—12", start: 0, end: 5, color: "#ff8700" },
+  { key: "mclaren", label: "McLAREN", range: "2007—12", start: 0, end: 5, color: "#ff6200" },
   { key: "mercedes", label: "MERCEDES", range: "2013—24", start: 6, end: 17, color: "#00d2be" },
   { key: "ferrari", label: "FERRARI", range: "2025—", start: 18, end: 18, color: "#e10600" },
 ];
