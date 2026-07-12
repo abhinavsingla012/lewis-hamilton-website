@@ -188,6 +188,16 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Restores both controls automatically when the Silverstone circuit appears
 - Verified the Hero state is hidden and circuit state is visible during route handoff
 
+## Legacy Chapter Redesign — 2026-07-11
+- Completed the first page-by-page chapter redesign with a full-screen editorial monument for Lewis Hamilton's legacy
+- Added a layered authentic portrait, 44 ghost numeral, monumental `THE RECORD / BEYOND / RECORDS` typography, richer cultural narrative, and team-era career rail
+- Expanded the data hierarchy to six verified records: 7 titles, 105 wins, 202 podiums, 104 poles, 31 winning circuits, and 19 seasons
+- Added responsive desktop/mobile compositions, selected-team accent support, reduced-motion visibility, and deterministic Legacy entry framing
+- Preserved progress-aware Back to Circuit and all existing chapter data test IDs
+- Hardened circuit marker routing with direct hit-circle test targets, non-blocking labels, top interaction stacking, and exact pixel/progress navigation locks
+- Fixed programmatic stop drift by using a 12,000px scroll denominator and releasing navigation only after both pixel and normalized progress alignment
+- Iteration 35 passed Legacy visibility plus Timeline 5/5 desktop and 5/5 mobile exact-stop batches, Legacy/Cars exact stops, keyboard routing, overflow, and pointer interception checks
+
 ## Prioritized Backlog
 ### P0
 - None; the post-Legacy overlap, lag, and first-route framing regressions are resolved and verified
@@ -206,8 +216,9 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Add image attribution and editorial source notes page
 
 ## Next Tasks
-1. Multi-minute Silverstone camera soak test and performance profiling
-2. Modularize the circuit camera calculations without altering the verified path
-3. Interactive global victory map
-4. Rich race detail overlays for landmark wins
-5. Shareable fan-stat cards to improve organic reach
+1. Redesign the Timeline chapter as the next page-by-page visual refinement
+2. Multi-minute Silverstone camera soak test and performance profiling
+3. Modularize the circuit camera calculations without altering the verified path
+4. Interactive global victory map
+5. Rich race detail overlays for landmark wins
+6. Shareable fan-stat cards to improve organic reach
