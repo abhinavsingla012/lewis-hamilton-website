@@ -140,7 +140,7 @@ export const SeasonTimeline = ({ seasons = [] }) => {
       <span className="timeline-v4-year-outline" aria-hidden="true">{active.year}</span>
 
       <header className="timeline-v3-heading">
-        <p data-testid="timeline-section-label"><span>02</span> THE ASCENT</p>
+        <p data-testid="timeline-section-label"><span>CH. 02</span> THE ASCENT</p>
         <h2 data-testid="timeline-section-title">19 SEASONS. <span>ONE STANDARD.</span></h2>
       </header>
 

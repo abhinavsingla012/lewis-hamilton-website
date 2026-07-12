@@ -251,6 +251,14 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Mobile wraps the punchline intentionally and keeps the compact story aligned separately
 - Verified on the requested 2019 image state at 1366×768: title/story separation, exact copy, zero horizontal overflow, clean lint, and successful production build
 
+## Chapter Marker Visibility Patch — 2026-07-12
+- Replaced Timeline's ambiguous circled `02` treatment with a clearly typeset `CH. 02 / THE ASCENT` marker
+- Removed the glyph ambiguity that visually made `02` resemble `B2`
+- Moved the Legacy narrative block to a safe responsive offset below the persistent Back to Circuit control
+- Added explicit desktop, mobile, and short-height Legacy spacing rules so `01 / THE LEGACY · 2007—2025` remains visible
+- Verified at 1366×768 that Legacy has a 23.3px control-to-label gap and Timeline renders the correct marker text
+- JavaScript lint and production build passed
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified
