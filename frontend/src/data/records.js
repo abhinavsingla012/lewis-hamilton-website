@@ -1,0 +1,63 @@
+export const recordCategories = [
+  {
+    id: "crowns",
+    label: "Crowns",
+    index: "01",
+    palette: { bg: "#e9e4da", ink: "#152033", accent: "#d7a600", plane: "#f8f2e5" },
+    primary: { value: "7", numeric: 7, title: "WORLD CHAMPIONSHIPS", context: "JOINT-MOST IN FORMULA 1 HISTORY", detail: "2008 · 2014 · 2015 · 2017 · 2018 · 2019 · 2020" },
+    statement: "Seven crowns. Three eras of machinery. One benchmark that survived every reinvention.",
+    orbit: ["2008", "2014", "2015", "2017", "2018", "2019", "2020"],
+    records: [],
+  },
+  {
+    id: "victory",
+    label: "Victory",
+    index: "02",
+    palette: { bg: "#e33224", ink: "#fff7e9", accent: "#191918", plane: "#ff7554" },
+    primary: { value: "106", numeric: 106, title: "CAREER WINS", context: "MOST ALL-TIME", detail: "RECORD HELD SINCE PORTUGAL · 2020" },
+    statement: "Not one kind of victory. From pole, from pressure, at home, and across more circuits than anyone.",
+    orbit: ["CANADA 2007", "SILVERSTONE ×9", "BARCELONA 2026"],
+    records: [
+      { id: "pole-wins", value: "61", label: "WINS FROM POLE", detail: "Record held since the 2017 United States GP" },
+      { id: "silverstone", value: "9", label: "WINS AT SILVERSTONE", detail: "2008 · 2014–17 · 2019–21 · 2024" },
+      { id: "circuits", value: "31", label: "WINNING CIRCUITS", detail: "More different circuits than any driver" },
+    ],
+  },
+  {
+    id: "precision",
+    label: "Precision",
+    index: "03",
+    palette: { bg: "#b7d6d2", ink: "#102f34", accent: "#007f7a", plane: "#e8f2ef" },
+    primary: { value: "104", numeric: 104, title: "POLE POSITIONS", context: "MOST ALL-TIME", detail: "RECORD HELD SINCE MONZA · 2017" },
+    statement: "A thousandth of a second, repeated across generations of cars, tyres and regulations.",
+    orbit: ["30 GRANDS PRIX", "32 CIRCUITS", "HUNGARORING ×9"],
+    records: [
+      { id: "front-rows", value: "177", label: "FRONT-ROW STARTS", detail: "Record held since the 2017 United States GP" },
+    ],
+  },
+  {
+    id: "presence",
+    label: "Presence",
+    index: "04",
+    palette: { bg: "#d4c5e8", ink: "#291d3d", accent: "#6f3eb6", plane: "#f0e8f7" },
+    primary: { value: "207", numeric: 207, title: "CAREER PODIUMS", context: "MOST ALL-TIME", detail: "RECORD HELD SINCE SPAIN · 2020" },
+    statement: "The sustained presence of a champion: season after season, era after era, still at the front.",
+    orbit: ["38 GRANDS PRIX", "36 CIRCUITS", "SILVERSTONE ×16"],
+    records: [
+      { id: "points", value: "5,165.5", label: "CAREER POINTS", detail: "The highest total in Formula 1 history" },
+    ],
+  },
+  {
+    id: "immortality",
+    label: "Immortality",
+    index: "05",
+    palette: { bg: "#ff8a30", ink: "#29170d", accent: "#f8e6c2", plane: "#ffba77" },
+    primary: { value: "19", suffix: "Y", numeric: 19, title: "WINNING SPAN", context: "19 YEARS · 4 DAYS", detail: "CANADA 2007 → BARCELONA-CATALUNYA 2026" },
+    statement: "The first win and the latest are separated by a generation—and connected by the same number 44.",
+    orbit: ["2007", "44", "2026"],
+    records: [
+      { id: "laps-led", value: "5,521", label: "LAPS LED", detail: "The most laps led in Formula 1 history" },
+      { id: "age-decades", value: "20 / 30 / 40", label: "WINNING AGES", detail: "First to win races in his 20s, 30s and 40s" },
+    ],
+  },
+];

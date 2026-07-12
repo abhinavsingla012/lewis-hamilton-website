@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-import { gallery, IMAGES } from "../data/content";
+import { gallery } from "../data/content";
 import { GalleryEditorialSlide } from "./GalleryEditorialSlide";
+import { RecordsMonument } from "./RecordsMonument";
 
 const milestones = [
   { number: "001", year: "2007", race: "CANADA", label: "THE FIRST", note: "Victory in only his sixth Formula 1 start." },
@@ -188,7 +189,7 @@ export const VisualGallery = ({ activeKey, isActive }) => {
         </div>
       </div>
     </section>
-    <section className="records-section" data-testid="career-records-section"><img src={IMAGES.trophies} alt="Seven championship trophies" data-testid="records-trophy-image"/><div className="records-shade"/><div className="records-copy"><h2>NOT JUST<br/>IN HISTORY.<br/><i>Above it.</i></h2><div className="record-grid"><div data-testid="record-career-wins"><strong>105</strong><span>ALL-TIME GRAND PRIX WINS</span></div><div data-testid="record-career-poles"><strong>104</strong><span>ALL-TIME POLE POSITIONS</span></div><div data-testid="record-winning-circuits"><strong>31</strong><span>DIFFERENT WINNING CIRCUITS</span></div><div data-testid="record-world-titles"><strong>7</strong><span>WORLD CHAMPIONSHIPS</span></div></div></div></section>
+    <RecordsMonument isActive={activeKey === "records"} />
     <section className="milestones-section" data-testid="milestone-victories-section"><div className="milestones-title"><h2>SIX MOMENTS<br/>THAT MOVED<br/><i>the limit.</i></h2></div><div className="milestone-grid">{milestones.map((item, index) => <article key={item.number} data-testid={`milestone-card-${index + 1}`}><span className="milestone-number">#{item.number}</span><div><span>{item.year} / {item.race}</span><h3>{item.label}</h3><p>{item.note}</p></div></article>)}</div></section>
   </>;
 };
