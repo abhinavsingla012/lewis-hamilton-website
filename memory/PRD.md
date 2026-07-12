@@ -242,6 +242,15 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Iteration 39 passed desktop/tablet image framing, visibility, routing, interactions, reduced motion, and rapid-switch checks; it identified two remaining mobile stacking failures
 - Corrected 390×844 and 320×700 image/story/year/data zones; targeted self-test now passes strict separation and zero horizontal overflow at both sizes
 
+## Timeline Editorial Headline Patch — 2026-07-12
+- Shortened the chapter punchline to `19 SEASONS. ONE STANDARD.` and positioned it as a single compact desktop line
+- Added semantic championship-rank color to `ONE STANDARD.` while preserving the selected team accent elsewhere
+- Repositioned the headline and season story into separate, non-overlapping editorial bands
+- Added a localized left-side readability scrim rather than darkening the full season photograph
+- Increased narrative, overline, signature-label, and signature-moment contrast for reliable readability across all image tones
+- Mobile wraps the punchline intentionally and keeps the compact story aligned separately
+- Verified on the requested 2019 image state at 1366×768: title/story separation, exact copy, zero horizontal overflow, clean lint, and successful production build
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified
