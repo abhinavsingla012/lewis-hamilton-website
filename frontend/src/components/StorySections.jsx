@@ -10,7 +10,7 @@ import { CareerCars } from "./CareerCars";
 const Reveal = ({ children, className = "" }) => <motion.div className={className} initial={{ opacity: 0, y: 55 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-12%" }} transition={{ duration: .8, ease: [0.22, 1, 0.36, 1] }}>{children}</motion.div>;
 const SectionHead = ({ label, title, light = false }) => <div className={`section-head ${light ? "light" : ""}`}><span className="section-head-marker-slot" aria-hidden="true" /><h2 data-testid={`${label.toLowerCase()}-section-title`}>{title}</h2></div>;
 
-export const StorySections = ({ archive }) => {
+export const StorySections = ({ archive, activeKey, galleryActive }) => {
   const [quote, setQuote] = useState(0);
   const [year, setYear] = useState("All");
   const [showAll, setShowAll] = useState(false);
@@ -57,7 +57,7 @@ export const StorySections = ({ archive }) => {
 
     <CareerCars seasons={archive?.seasons} />
 
-    <VisualGallery />
+    <VisualGallery activeKey={activeKey} isActive={galleryActive} />
 
     <section id="tracks" className="tracks-section" data-testid="tracks-section">
       <Reveal><SectionHead index="07" label="TRACKS" title="WHERE GREATNESS REPEATED ITSELF." /></Reveal>

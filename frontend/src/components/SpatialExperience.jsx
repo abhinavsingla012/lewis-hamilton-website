@@ -280,7 +280,7 @@ export const SpatialExperience = ({ archive }) => {
         <a className="circuit-attribution" href="https://github.com/julesr0y/f1-circuits-svg" target="_blank" rel="noreferrer" data-testid="circuit-map-attribution-link">Circuit geometry: Jules Roy / CC BY 4.0 · adapted</a>
       </motion.div>
       <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} /></motion.div>
-      <div className="circuit-chapters"><StorySections archive={archive} /></div>
+      <div className="circuit-chapters"><StorySections archive={archive} activeKey={activeKey} galleryActive={activeKey === "gallery" && !isCircuitOverview && !isNavigating} /></div>
       {chapterKeys.has(activeKey) && !isCircuitOverview && !isNavigating && <BackToCircuitButton onClick={openCircuitOverview} />}
       {chapterMarker && !isCircuitOverview && !isNavigating && <ChapterMarker {...chapterMarker} className="global-chapter-marker" />}
       {showJourneyHud && <><div className="circuit-hud" data-testid="circuit-journey-hud"><span>{String(routeIndex + 1).padStart(2, "0")} / {String(SPATIAL_ROUTE.length).padStart(2, "0")}</span><strong>{hudLabel}</strong><small>{displayKey === "circuit" ? `CURRENT POSITION · ${currentLabel}` : "FOLLOW THE RACING LINE"}</small></div><div className="circuit-progress" data-testid="circuit-journey-progress"><motion.span style={{ scaleX: scrollYProgress }} /></div></>}

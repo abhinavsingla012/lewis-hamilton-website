@@ -28,13 +28,13 @@ export const IMAGES = {
   season2020: "https://customer-assets.emergentagent.com/job_lewis-victories/artifacts/pfeqcsqs_imago49236444-1536x1024.jpg",
 };
 export const gallery = [
-  { image: IMAGES.hero, label: "HOME KING", meta: "SILVERSTONE / HISTORY", shape: "portrait" },
-  { image: IMAGES.helmet, label: "THE SALUTE", meta: "THE FIRST MERCEDES CROWN", shape: "portrait" },
-  { image: IMAGES.podium, label: "THE CATCH", meta: "VICTORY IN MOTION", shape: "square" },
-  { image: IMAGES.rain, label: "THE SPRAY", meta: "CHAMPAGNE MOMENT", shape: "portrait" },
-  { image: IMAGES.portrait, label: "AFTER THE FLAG", meta: "RAW CELEBRATION", shape: "portrait" },
-  { image: IMAGES.monaco, label: "STREET ROYALTY", meta: "MONACO", shape: "wide" },
-  { image: IMAGES.fans, label: "TEAM LH", meta: "A GLOBAL FOLLOWING", shape: "wide" },
+  { id: "paddock", image: "/images/gallery/01-paddock-portrait.webp", alt: "Lewis Hamilton at the Allianz VIP Lounge during the 2013 Brazilian Grand Prix", category: "MODE 01 / THE INDIVIDUAL", title: "PADDOCK PRESENCE", short: "STYLE", ghost: "STYLE", year: "2013", location: "SÃO PAULO / OFF TRACK", description: "Before the paddock became a runway, Lewis was already rewriting what a driver could look like beyond the visor.", position: "50% 28%" },
+  { id: "first-skin", image: "/images/gallery/02-helmet-2007.webp", alt: "Lewis Hamilton's yellow 2007 Formula 1 race helmet", category: "MODE 02 / THE ARMOUR", title: "THE FIRST SKIN", short: "HELMET", ghost: "ARMOUR", year: "2007", location: "THE ROOKIE / ICONOGRAPHY", description: "Yellow, red and green: a debut-season identity made instantly recognizable at 300 kilometres per hour.", position: "50% 48%" },
+  { id: "home-king", image: "/images/gallery/03-home-crown.webp", alt: "Lewis Hamilton kissing a trophy after a landmark victory", category: "MODE 03 / THE CHAMPION", title: "HOME KING", short: "CROWN", ghost: "CROWN", year: "2024", location: "SILVERSTONE / HOME", description: "The records became emotion again. A home victory, a trophy held close, and 945 days released at once.", position: "50% 34%" },
+  { id: "salute", image: "/images/gallery/04-helmet-salute.webp", alt: "Lewis Hamilton raising his race helmet in celebration", category: "MODE 04 / THE SYMBOL", title: "THE SALUTE", short: "SALUTE", ghost: "RISE", year: "2014", location: "THE ASCENT / MERCEDES", description: "Helmet held high, the gesture became a signature—part triumph, part acknowledgement, always unmistakably Lewis.", position: "50% 24%" },
+  { id: "motion", image: "/images/gallery/05-victory-motion.webp", alt: "Lewis Hamilton catching a trophy during a podium celebration", category: "MODE 05 / THE SHOWMAN", title: "VICTORY IN MOTION", short: "MOTION", ghost: "MOTION", year: "ERA 44", location: "PODIUM / INSTINCT", description: "Even the ceremony moves at his speed: trophies airborne, reflexes sharp, theatre arriving naturally after precision.", position: "50% 32%" },
+  { id: "unfiltered", image: "/images/gallery/06-raw-celebration.webp", alt: "Lewis Hamilton in an unguarded podium celebration", category: "MODE 06 / THE HUMAN", title: "UNFILTERED", short: "HUMAN", ghost: "FEEL", year: "STILL I RISE", location: "AFTER THE FLAG / RELEASE", description: "Beyond the statistics is the release—the shout, the breath, the moment the weight of expectation finally lifts.", position: "50% 30%" },
+  { id: "reinvention", image: "/images/gallery/07-ferrari-era.webp", alt: "Lewis Hamilton driving the number 44 Ferrari in 2025", category: "MODE 07 / THE REINVENTION", title: "THE RED CHAPTER", short: "FERRARI", ghost: "AGAIN", year: "2025", location: "MARANELLO / NEW ERA", description: "Greatness does not stand still. In red, number 44 chooses the unknown—and begins the work of becoming new again.", position: "54% 50%" },
 ];
 export const eras = [
   { year: "2008", title: "The first crown", team: "McLaren MP4-23", wins: "5 wins", copy: "A title decided by one point, in the final corners of the final lap.", image: IMAGES.mclaren },
