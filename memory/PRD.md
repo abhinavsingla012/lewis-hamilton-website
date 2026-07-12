@@ -220,6 +220,16 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Iteration 37 verified seamless blending, all viewport widths, routing, controls, themes, and camera stability; subsequent fixes removed rapid-switch transition duplicates and disabled the scan beam in reduced motion
 - Final self-test passed rapid season/tab switching with exactly one image, data article, and image echo; zero duplicate test IDs; reduced-motion scan count `0`; and no mobile overflow
 
+## Timeline V5 Viewer Experience Layers — 2026-07-12
+- Added curated editorial storytelling for every season from 2007–2025: defining headline, concise campaign narrative, and signature race moment
+- Added meaningful title context that tracks championships banked and consecutive title streaks through the selected season
+- Added active-season comparisons against Hamilton's career season peaks for wins, podiums, and poles using lightweight transform-only telemetry rails
+- Added a clickable McLaren/Mercedes/Ferrari era spine with historical team colors and seven championship markers; era buttons jump directly to 2007, 2013, and 2025
+- Converted every achievement location into a keyboard-focusable signal control that updates the active circuit, race round, progress rail, and highlighted telemetry sector
+- Preserved the V4 cinematic image/data dissolve, selected-theme interaction accent, semantic rank color, exact camera stop, and active-only rendering
+- Compressed all three concepts for mobile: editorial story, peak comparisons, horizontal era spine, and active circuit signal remain visible without overflow
+- Iteration 38 passed all 19 stories, title logic, era routing and marker counts, linked telemetry, existing controls/routes/themes, viewport matrix, reduced motion, build, and runtime console checks
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified

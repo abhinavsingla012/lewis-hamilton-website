@@ -10,7 +10,7 @@ export const TimelineEraSpine = ({ activeIndex, data, onSelect }) => <nav classN
     const titles = data.slice(era.start, era.end + 1).filter((season) => season.champion);
     return <button key={era.key} type="button" className={active ? "is-active" : ""} style={{ "--era-color": era.color }} aria-pressed={active} onClick={() => onSelect(era.start)} data-testid={`timeline-era-${era.key}-button`}>
       <span>{era.label}<small>{era.range}</small></span>
-      <i>{titles.map((season) => <b key={season.year} title={`${season.year} world title`} />)}</i>
+      <i>{titles.map((season) => <b key={season.year} title={`${season.year} world title`} data-testid={`timeline-era-${era.key}-title-${season.year}`} />)}</i>
     </button>;
   })}
 </nav>;
