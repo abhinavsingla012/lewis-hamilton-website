@@ -1,120 +1,117 @@
 {
-  "project_type": "Immersive Editorial Fan Archive / Unified Spatial React SPA",
-  "persona": "E1 - Anti-AI Designer (Top 1%)",
-  "theme_strategy": {
-    "description": "Dark cinematic visual language. Deep Obsidian base with 3-team persistent accent variables.",
-    "base_dark": "#0A0A0A",
-    "text_light": "#F5F4EF",
-    "themes": [
-      {
-        "name": "Ferrari",
-        "color": "#E8002D",
-        "css_var": "--theme-accent"
-      },
-      {
-        "name": "Mercedes",
-        "color": "#00D2BE",
-        "css_var": "--theme-accent"
-      },
-      {
-        "name": "McLaren",
-        "color": "#FF8000",
-        "css_var": "--theme-accent"
-      }
-    ]
-  },
+  "theme_strategy": "Fashion-week editorial mode. Completely abandons standard museum grids and fixed 40/60 splits. Rejects black backgrounds entirely. Each slide is an immersive 'color world' with distinct asymmetric art direction, representing the high-fashion and dynamic lifestyle of Lewis Hamilton.",
   "typography": {
-    "headings": {
-      "family": "Unbounded, sans-serif",
-      "weight": "700/800",
-      "usage": "Monumental impact. Never centered. tracking-tighter."
+    "primary_heading": {
+      "family": "Playfair Display, serif",
+      "weights": ["400", "900"],
+      "usage": "Massive, runway-style editorial headers. Often spanning off-screen or overlapping images.",
+      "styles": "uppercase, tight tracking (tracking-tighter), mixed italic and normal words."
     },
-    "technical": {
-      "family": "'Space Mono', monospace",
-      "weight": "400/700",
-      "usage": "For markers, stats, context labels, tracking-widest, uppercase."
+    "secondary_heading": {
+      "family": "Cabinet Grotesk, sans-serif",
+      "weights": ["800"],
+      "usage": "Bold structural text, chapter numbers, hard-cut typographic posters."
     },
-    "editorial": {
-      "family": "Playfair Display, or native serif italic",
-      "weight": "400 italic",
-      "usage": "Expressive story quotes, overlapping elements to break the rigid tech grid."
+    "metadata_body": {
+      "family": "JetBrains Mono, monospace",
+      "weights": ["400"],
+      "usage": "Contact-sheet annotations, location tags, date stamps, technical artifact descriptors.",
+      "styles": "uppercase, tracking-widest, small text (text-xs or text-sm)."
     }
   },
   "colors": {
-    "rules": [
-      "NO generic full-screen gradients. Use texture (noise, grain, paper).",
-      "Contrast first. Dark themes use bg-black/30 over images, NEVER darker than 50%.",
-      "Themed accent color applied to active states, scroll progress lines, and key markers."
-    ]
-  },
-  "layouts": {
-    "VisualGallery": {
-      "container": "100svh fixed container, relative positioning. Hides overflow.",
-      "safe_zones": "Absolute positioned overlay at top/bottom corners for 'Back to Circuit' and 'CH. 04'. High z-index (z-50), mix-blend-difference or frosted glassmorphism to ensure contrast. MUST NOT scroll.",
-      "grid_structure": "Asymmetrical 2-column layout. Left (40% width): Pinned editorial context, active category, animated progress bar. Right (60% width): The 'Photo Stack'.",
-      "photo_stack": "Instead of a generic horizontal carousel, stack images directly on top of each other absolutely. As the user scrolls, the active image reveals via clip-path from bottom to top, while the previous image slightly scales down."
-    }
-  },
-  "motion": {
-    "scroll_trap_logic": {
-      "mechanism": "Capture onWheel and onTouchMove events within VisualGallery. Prevent default body scrolling while inside.",
-      "navigation": "Internal index (0 to N-1). Scrolling down increases index. Scrolling up decreases. Add a 800ms debounce/throttle to prevent skipping photos.",
-      "release_condition": "If at index 0 and scrolling up -> fire 'previousChapter()'. If at index N-1 and scrolling down -> fire 'nextChapter()'. DO NOT alter global spatial camera coordinates directly; call the provided boundary callbacks."
-    },
-    "photo_transitions": {
-      "enter": "clip-path: inset(100% 0 0 0) to inset(0 0 0 0). scale: 1.1 to 1.0. duration: 0.85s, ease: [0.76, 0, 0.24, 1] (custom framer-motion easing).",
-      "exit": "scale: 1.0 to 0.95, filter: blur(4px) and brightness(0.6). duration: 0.85s."
-    },
-    "reduced_motion": "Detect prefers-reduced-motion. Fallback to simple crossfade opacity changes. Maintain scroll-trap logic."
-  },
-  "component_instructions": {
-    "VisualGallery.jsx": [
-      "Use pure Tailwind CSS + Framer Motion. DO NOT use generic Shadcn cards.",
-      "Build a monolithic, full-screen editorial component.",
-      "Render a vertical progress indicator (e.g., a 1px vertical line that fills with the team accent color).",
-      "Each photo must include a large floating Typography number (e.g., '01', '02') using Unbounded outline style.",
-      "Add data-testid='gallery-scroll-container', data-testid='gallery-next-release', and data-testid='gallery-photo-active'."
+    "worlds": [
+      { "name": "Cobalt", "hex": "#0030BA", "text": "#FFFFFF", "accent": "#CCFF00" },
+      { "name": "Scarlet", "hex": "#FF2400", "text": "#FFFFFF", "accent": "#E0E0E0" },
+      { "name": "Acid Green", "hex": "#CCFF00", "text": "#111111", "accent": "#0030BA" },
+      { "name": "Ivory", "hex": "#FFFFF0", "text": "#111111", "accent": "#FF2400" },
+      { "name": "Silver", "hex": "#D6D6D6", "text": "#111111", "accent": "#FF2400" }
     ],
-    "CSS": [
-      "Add bespoke clip-path utilities if needed, or rely on framer-motion inline styles.",
-      "Ensure the gallery container has touch-action: none to prevent native mobile scroll when trapping."
+    "rules": [
+      "NEVER use #000000 for backgrounds.",
+      "Text contrast must strictly follow the defined 'text' color for each 'world'.",
+      "Use accents for small typographic highlights, borders, or slash elements."
     ]
   },
-  "image_urls": {
-    "racing_portrait": {
-      "url": "https://images.unsplash.com/photo-1762234142252-44d3149002d0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwyfHxMZXdpcyUyMEhhbWlsdG9uJTIwcG9ydHJhaXQlMjByYWNpbmd8ZW58MHx8fHwxNzgzODU5NDI0fDA&ixlib=rb-4.1.0&q=85",
-      "category": "Mode 1: The Competitor",
-      "description": "Lewis in racing suit leaning against wall."
-    },
-    "helmet_focus": {
-      "url": "https://images.unsplash.com/photo-1761751237608-427f16f0a595?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwxfHxMZXdpcyUyMEhhbWlsdG9uJTIwcG9ydHJhaXQlMjByYWNpbmd8ZW58MHx8fHwxNzgzODU5NDI0fDA&ixlib=rb-4.1.0&q=85",
-      "category": "Mode 2: The Armor",
-      "description": "Detailed F1 helmet shot with sponsors."
-    },
-    "red_suit": {
-      "url": "https://images.unsplash.com/photo-1761751237853-7489598b7498?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHwzfHxGMSUyMHJhY2luZyUyMGhlbG1ldHxlbnwwfHx8fDE3ODM4NTk0MjR8MA&ixlib=rb-4.1.0&q=85",
-      "category": "Mode 3: The Legacy",
-      "description": "Red racing suit representing the Ferrari transition."
-    },
-    "retro_helmet": {
-      "url": "https://images.unsplash.com/photo-1603099989919-a4ff17894981?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHw0fHxGMSUyMHJhY2luZyUyMGhlbG1ldHxlbnwwfHx8fDE3ODM4NTk0MjR8MA&ixlib=rb-4.1.0&q=85",
-      "category": "Mode 4: The Machine",
-      "description": "White and red aesthetic helmet shot."
+  "visual_enhancers": {
+    "textures": "Subtle grain overlay (mix-blend-overlay, opacity 20%) applied globally to kill the digital flatness and enhance the editorial magazine feel.",
+    "shapes": "Use CSS clip-path for harsh diagonal cuts and asymmetric image masks.",
+    "borders": "1px solid contrasting borders on images for the 'contact sheet' and 'artifact' archetypes."
+  },
+  "components": {
+    "VisualGallery": {
+      "path": "/app/frontend/src/components/VisualGallery.jsx",
+      "css_path": "/app/frontend/src/styles/GalleryChapter.css",
+      "description": "A scroll-hijacked, 100svh immersive editorial slider. Traps vertical scroll/touch until the user completes the 16-slide sequence.",
+      "archetypes": [
+        {
+          "name": "full-bleed-cutout",
+          "description": "Image spans almost full height, offset to one side. Massive editorial typography behind and in front of the image. Z-index layering is critical."
+        },
+        {
+          "name": "contact-sheet",
+          "description": "Multiple instances or crops of the same image arranged in a strict, border-heavy grid. Lots of negative space. Monospace annotations surrounding the frames."
+        },
+        {
+          "name": "diagonal-runway",
+          "description": "Image is clipped with a harsh diagonal clip-path. Typography follows the diagonal axis (using CSS transform rotate). High energy."
+        },
+        {
+          "name": "helmet-artifact",
+          "description": "Clinical, precise. Small centered image. Surrounded by technical monospace specs, crosshairs, and connecting lines (using absolute positioned divs)."
+        },
+        {
+          "name": "poster-duotone",
+          "description": "Image is treated with CSS filters (grayscale, high contrast, mix-blend-mode: multiply) over a vibrant background color. Creates a screen-printed poster effect."
+        }
+      ]
     }
   },
+  "motion_and_interaction": {
+    "scroll_hijack": "Attach passive: false wheel/touchmove listeners. Prevent default scrolling if index > 0 and index < max. Release boundary to parent scroll only on extreme ends.",
+    "transitions": "Hard cuts. No slow fades. When slide changes, trigger a 0.1s white background flash (opacity 1 to 0) over the entire screen to simulate a camera flash.",
+    "parallax": "Apply subtle opposite-direction y-axis transforms to typography vs images during the slide entrance.",
+    "reduced_motion": "Respect prefers-reduced-motion media query by disabling parallax and camera flashes, reverting to simple opacity crossfades."
+  },
+  "image_data": [
+    { "id": 1, "url": "https://images.unsplash.com/photo-1762234142252-44d3149002d0", "layout": "full-bleed-cutout", "colorWorld": "Scarlet", "title": "PADDOCK ARRIVAL", "meta": "SILVERSTONE • 2023", "desc": "Defying the conventional racing uniform." },
+    { "id": 2, "url": "https://images.pexels.com/photos/20726663/pexels-photo-20726663.jpeg", "layout": "contact-sheet", "colorWorld": "Ivory", "title": "STREETWEAR ERA", "meta": "MILAN FASHION WEEK", "desc": "Blending motorsport heritage with high fashion." },
+    { "id": 3, "url": "https://images.unsplash.com/photo-1761751237608-427f16f0a595", "layout": "helmet-artifact", "colorWorld": "Acid Green", "title": "CROWN JEWEL", "meta": "MONACO • QUALIFYING", "desc": "The canvas of a champion. Every detail mapped." },
+    { "id": 4, "url": "https://images.pexels.com/photos/14079603/pexels-photo-14079603.jpeg", "layout": "diagonal-runway", "colorWorld": "Cobalt", "title": "SPEED BLUR", "meta": "MONZA • PARABOLICA", "desc": "1000 horsepower captured in a single frame." },
+    { "id": 5, "url": "https://images.unsplash.com/photo-1761751237853-7489598b7498", "layout": "poster-duotone", "colorWorld": "Silver", "title": "RED ERA", "meta": "MARANELLO ANTICIPATION", "desc": "The next chapter written in scarlet." },
+    { "id": 6, "url": "https://images.pexels.com/photos/33821594/pexels-photo-33821594.jpeg", "layout": "full-bleed-cutout", "colorWorld": "Ivory", "title": "OFF TRACK", "meta": "BERLIN • AUTUMN", "desc": "Unfiltered focus." },
+    { "id": 7, "url": "https://images.pexels.com/photos/31331381/pexels-photo-31331381.jpeg", "layout": "diagonal-runway", "colorWorld": "Scarlet", "title": "APEX", "meta": "SUZUKA • TURN 1", "desc": "Precision at the limit of grip." },
+    { "id": 8, "url": "https://images.unsplash.com/photo-1536180838057-b604200e6f36", "layout": "contact-sheet", "colorWorld": "Silver", "title": "MONOCHROME", "meta": "PARIS • EDITORIAL", "desc": "Stripped down to the essentials." },
+    { "id": 9, "url": "https://images.pexels.com/photos/29252131/pexels-photo-29252131.jpeg", "layout": "poster-duotone", "colorWorld": "Acid Green", "title": "HEAT", "meta": "SINGAPORE • NIGHT", "desc": "Under the floodlights." },
+    { "id": 10, "url": "https://images.unsplash.com/photo-1748019156345-64162e5b877e", "layout": "helmet-artifact", "colorWorld": "Ivory", "title": "ARCHIVE", "meta": "BRACKLEY • HQ", "desc": "A history of victories." },
+    { "id": 11, "url": "https://images.unsplash.com/photo-1622401976173-a0b80c12fbd1", "layout": "diagonal-runway", "colorWorld": "Cobalt", "title": "THE MACHINE", "meta": "AERODYNAMICS", "desc": "Man and machine as one." },
+    { "id": 12, "url": "https://images.pexels.com/photos/14079604/pexels-photo-14079604.jpeg", "layout": "full-bleed-cutout", "colorWorld": "Silver", "title": "THE FANS", "meta": "SILVERSTONE • GRANDSTAND", "desc": "The energy of the home crowd." }
+  ],
+  "accessibility": {
+    "focus_management": "Ensure keyboard users can navigate through the trapped gallery via Up/Down arrow keys or PageUp/PageDown.",
+    "aria_labels": "All slides must have role='group' and aria-roledescription='slide'. Include hidden screen reader text summarizing the location and context of each photo.",
+    "color_contrast": "Text colors defined in the 'worlds' object meet WCAG AA standards. Ensure hover states on any navigation dots/arrows also meet 3:1."
+  },
+  "instructions_to_main_agent": [
+    "1. Replace VisualGallery.jsx and GalleryChapter.css completely.",
+    "2. Implement the scroll-trapping mechanism carefully to allow normal page scrolling ONLY when the gallery is at index 0 (scrolling up) or index 11 (scrolling down).",
+    "3. Build 5 distinct layout components mapped to the archetypes (e.g., <FullBleedCutout />, <ContactSheet />, etc.). Render them dynamically based on the image_data array.",
+    "4. Implement the 'Camera Flash' hard-cut transition between slides using Framer Motion or pure CSS animations.",
+    "5. Do NOT alter the existing 3D spatial camera coordinates from the parent layout.",
+    "6. Use Tailwind CSS for structural layouts and colors mapped to inline styles or custom Tailwind config extensions.",
+    "7. Ensure 100svh constraints so the gallery perfectly fits mobile and desktop viewports (1920x800 down to 320x700)."
+  ],
   "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
-    "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid this: make creative, distinctive frontends that surprise and delight.",
     "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
     "Create depth through layered design elements with z-index hierarchy.",
-    "Use glass-morphism effects with backdrop filters (12-24px blur).",
-    "You MUST NOT apply universal transition. Eg: `transition: all`. This results in breaking transforms. Always add transitions for specific interactive elements.",
-    "You MUST NOT center align the app container, ie do not add `.App { text-align: center; }` in the css file. This disrupts the human natural reading flow of text.",
-    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
-    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc for icons.",
-    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
-    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms.",
+    "You MUST NOT center align the app container.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects.",
+    "Use 2-3x more spacing than feels comfortable.",
     "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
-    "All interactive and key informational elements MUST include a `data-testid` attribute to facilitate robust automated testing.",
-    "CRITICAL: DO NOT use complete `transparent` background in header, overlays, any surface that has content under it."
+    "NEVER use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc for icons.",
+    "All interactive and key informational elements MUST include a data-testid attribute."
   ]
 }
