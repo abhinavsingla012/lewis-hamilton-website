@@ -209,6 +209,17 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Iteration 36 passed all 10 backend tests and Timeline desktop/mobile interaction, styling, theme, routing, wheel, overflow, and performance checks
 - Hardened first-load hash initialization after one non-reproducible reduced-motion race; a targeted 5/5 mobile reduced-motion reload soak passed at the exact Timeline stop
 
+## Timeline V4 Hybrid Museum Installation — 2026-07-12
+- Reworked the Timeline from a visually divided photo/data layout into one continuous full-width cinematic surface
+- Extended each authentic season image across the composition with a feathered alpha mask, angled image echo, textured dissolve band, and localized data scrim to remove the hard vertical seam
+- Added restrained telemetry depth: a season-progress racing path, sector marks, scanning beam, signal labels, campaign classification, and win-conversion rail
+- Expanded the monumental year treatment across the image/data transition and added a faint vertical year echo for archival depth
+- Restyled achievement controls as animated signal bands and added a global-performance heading while preserving all circuit, locality, country, and round data
+- Kept championship rank as a semantic color and team theme as the interaction accent
+- Preserved active-only rendering, exact Timeline stop `0.305`, all controls, responsive layouts, and reduced-motion support
+- Iteration 37 verified seamless blending, all viewport widths, routing, controls, themes, and camera stability; subsequent fixes removed rapid-switch transition duplicates and disabled the scan beam in reduced motion
+- Final self-test passed rapid season/tab switching with exactly one image, data article, and image echo; zero duplicate test IDs; reduced-motion scan count `0`; and no mobile overflow
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified

@@ -90,4 +90,4 @@
 @media(max-width:430px) and (max-height:760px){
   .timeline-v3-heading{top:16vh}.timeline-v3-year-lockup{top:28vh}.timeline-v3-data{top:41vh}.timeline-v3-result strong{font-size:10vw}.timeline-v3-place-list strong{font-size:6px}.timeline-v3-place-list small{font-size:4.5px}
 }
-@media(prefers-reduced-motion:reduce){.timeline-v3-portrait,.timeline-v3-data{will-change:auto}.timeline-v3-navigation>button,.timeline-v3-tabs button,.timeline-v3-rail button:after{transition:none}}
+@media(prefers-reduced-motion:reduce){.timeline-v3-portrait,.timeline-v3-data{will-change:auto}.timeline-v4-scan{display:none!important;animation:none!important;opacity:0!important}.timeline-v3-navigation>button,.timeline-v3-tabs button,.timeline-v3-rail button:after{transition:none}}

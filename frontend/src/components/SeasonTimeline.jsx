@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Crown, Flag, MapPin, Radio } from "lucide-react";
 import { IMAGES } from "../data/content";
 import { TimelineTelemetry } from "./TimelineTelemetry";
@@ -85,37 +85,31 @@ export const SeasonTimeline = ({ seasons = [] }) => {
   >
     <div className="timeline-v3-stage" data-testid="timeline-scroll-runway">
       <div className="timeline-v3-image-field" aria-hidden="true" />
-      <AnimatePresence initial={false} mode="sync">
-        <motion.figure
-          key={`image-${active.year}`}
-          className="timeline-v3-portrait"
-          initial={reduceMotion ? false : { opacity: 0, scale: 1.035 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: .99 }}
-          transition={{ duration: reduceMotion ? .01 : .55, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <img
-            src={seasonImages[active.year]}
-            alt={`${active.year} ${active.team} season`}
-            style={{ objectPosition: imagePositions[active.year] || "50% 30%" }}
-            decoding="async"
-            draggable="false"
-            data-testid="timeline-active-image"
-          />
-        </motion.figure>
-      </AnimatePresence>
-      <AnimatePresence initial={false} mode="sync">
-        <motion.div
-          key={`echo-${active.year}`}
-          className="timeline-v4-image-echo"
-          style={{ backgroundImage: `url(${seasonImages[active.year]})`, backgroundPosition: imagePositions[active.year] || "50% 30%" }}
-          initial={reduceMotion ? false : { opacity: 0, x: -16 }}
-          animate={{ opacity: .22, x: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: reduceMotion ? .01 : .58, ease: [0.22, 1, 0.36, 1] }}
-          aria-hidden="true"
+      <motion.figure
+        key={`image-${active.year}`}
+        className="timeline-v3-portrait"
+        initial={reduceMotion ? false : { opacity: 0, scale: 1.035 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: reduceMotion ? .01 : .55, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <img
+          src={seasonImages[active.year]}
+          alt={`${active.year} ${active.team} season`}
+          style={{ objectPosition: imagePositions[active.year] || "50% 30%" }}
+          decoding="async"
+          draggable="false"
+          data-testid="timeline-active-image"
         />
-      </AnimatePresence>
+      </motion.figure>
+      <motion.div
+        key={`echo-${active.year}`}
+        className="timeline-v4-image-echo"
+        style={{ backgroundImage: `url(${seasonImages[active.year]})`, backgroundPosition: imagePositions[active.year] || "50% 30%" }}
+        initial={reduceMotion ? false : { opacity: 0, x: -16 }}
+        animate={{ opacity: .22, x: 0 }}
+        transition={{ duration: reduceMotion ? .01 : .58, ease: [0.22, 1, 0.36, 1] }}
+        aria-hidden="true"
+      />
       <div className="timeline-v3-image-scrim" aria-hidden="true" />
       <div className="timeline-v4-dissolve" aria-hidden="true" />
       <div className="timeline-v3-grid" aria-hidden="true" />
@@ -136,17 +130,15 @@ export const SeasonTimeline = ({ seasons = [] }) => {
         </div>
       </div>
 
-      <AnimatePresence initial={false} mode="sync">
-        <motion.article
-          key={`data-${active.year}`}
-          className="timeline-v3-data"
-          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
-          transition={{ duration: reduceMotion ? .01 : .34, ease: [0.22, 1, 0.36, 1] }}
-          aria-live="polite"
-          data-testid={`season-card-${active.year}`}
-        >
+      <motion.article
+        key={`data-${active.year}`}
+        className="timeline-v3-data"
+        initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduceMotion ? .01 : .34, ease: [0.22, 1, 0.36, 1] }}
+        aria-live="polite"
+        data-testid={`season-card-${active.year}`}
+      >
           <div className="timeline-v3-result">
             <div>
               <span data-testid="timeline-championship-label">DRIVERS&apos; CHAMPIONSHIP</span>
@@ -192,8 +184,7 @@ export const SeasonTimeline = ({ seasons = [] }) => {
               {!achievements.length && <p className="timeline-v3-empty" data-testid="timeline-achievement-empty-state">NO {achievementType.toUpperCase()} RECORDED THIS SEASON</p>}
             </div>
           </div>
-        </motion.article>
-      </AnimatePresence>
+      </motion.article>
 
       <nav className="timeline-v3-navigation" aria-label="Season timeline controls" data-testid="timeline-season-navigation">
         <button type="button" onClick={() => moveTo(activeIndex - 1)} disabled={activeIndex === 0} data-testid="timeline-previous-year-button" aria-label="Previous season"><ChevronLeft/></button>
