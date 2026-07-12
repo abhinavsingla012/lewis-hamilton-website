@@ -259,6 +259,17 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Verified at 1366×768 that Legacy has a 23.3px control-to-label gap and Timeline renders the correct marker text
 - JavaScript lint and production build passed
 
+## Global CH. 0X Chapter Marker System — 2026-07-12
+- Added a reusable `ChapterMarker` component and shared `ChapterMarkers.css` visual system
+- Standardized the complete route order: CH. 01 Legacy, CH. 02 The Ascent, CH. 03 Cars, CH. 04 Gallery, CH. 05 Records, CH. 06 Milestones, CH. 07 Tracks, CH. 08 Silverstone 2024, CH. 09 Voices, CH. 10 Victories, CH. 11 Still We Rise
+- Centralized active marker rendering in `SpatialExperience` so all routes use one fixed safe zone below Back to Circuit rather than independent section offsets
+- Added automatic dark/light marker contrast for Gallery, Tracks, and Footer backgrounds
+- Removed duplicate in-section marker DOM while retaining section heading spacing and all original content
+- Iteration 40 confirmed marker copy/order, exact route stops, reduced motion, Timeline interactions, and no duplicate test IDs; it identified desktop title and mobile control collisions in the first implementation
+- Reworked markers into the global overlay and added a Tracks-specific narrow-screen offset for its unusually tall title block
+- Final self-test passed all 44 route/viewport combinations at 1366×768, 1920×800, 390×844, and 320×700 with zero Back-to-Circuit intersections, title collisions, clipping, or duplicate test IDs
+- Production build and JavaScript lint passed
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified

@@ -4,11 +4,25 @@ import { BackToCircuitButton } from "./BackToCircuitButton";
 import { HeroStage } from "./HeroStage";
 import { SilverstoneMap } from "./SilverstoneMap";
 import { StorySections } from "./StorySections";
+import { ChapterMarker } from "./ChapterMarker";
 import { CIRCUIT_CHAPTERS, CIRCUIT_HUB, SPATIAL_ROUTE } from "../data/circuitRoute";
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const chapterKeys = new Set(CIRCUIT_CHAPTERS.map(({ key }) => key));
 const finalPathPosition = CIRCUIT_CHAPTERS.at(-1).path;
+const chapterMarkers = {
+  legacy: { number: "01", label: "THE LEGACY", testId: "legacy-section-label" },
+  timeline: { number: "02", label: "THE ASCENT", testId: "timeline-section-label" },
+  cars: { number: "03", label: "CARS", testId: "cars-section-label" },
+  gallery: { number: "04", label: "GALLERY", testId: "gallery-section-label" },
+  records: { number: "05", label: "RECORDS", testId: "records-section-label" },
+  milestones: { number: "06", label: "MILESTONES", testId: "milestones-section-label" },
+  tracks: { number: "07", label: "TRACKS", testId: "tracks-section-label" },
+  moment: { number: "08", label: "SILVERSTONE 2024", testId: "moment-section-label" },
+  quotes: { number: "09", label: "VOICES", testId: "voices-section-label" },
+  victories: { number: "10", label: "VICTORIES", testId: "victories-section-label" },
+  footer: { number: "11", label: "STILL WE RISE", testId: "footer-section-label" },
+};
 
 const getPathProgress = (value) => {
   const points = [{ stop: CIRCUIT_HUB.stop, path: CIRCUIT_CHAPTERS[0].path }, ...CIRCUIT_CHAPTERS];
@@ -251,6 +265,7 @@ export const SpatialExperience = ({ archive }) => {
   const routeIndex = Math.max(0, SPATIAL_ROUTE.findIndex(({ key }) => key === activeKey));
   const currentLabel = activeKey === "transit" ? "RACING LINE" : (SPATIAL_ROUTE[routeIndex]?.label || "RACING LINE");
   const hudLabel = isCircuitOverview ? `${coverage}% COMPLETE` : currentLabel;
+  const chapterMarker = chapterMarkers[activeKey];
 
   return <section ref={runway} className="circuit-runway" data-testid="unified-spatial-experience">
     <div className="circuit-viewport" data-active={displayKey} data-overview={isCircuitOverview ? "true" : "false"} data-traveling={isNavigating ? "true" : "false"} data-testid="circuit-spatial-viewport">
@@ -266,6 +281,7 @@ export const SpatialExperience = ({ archive }) => {
       <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} /></motion.div>
       <div className="circuit-chapters"><StorySections archive={archive} /></div>
       {chapterKeys.has(activeKey) && !isCircuitOverview && !isNavigating && <BackToCircuitButton onClick={openCircuitOverview} />}
+      {chapterMarker && !isCircuitOverview && !isNavigating && <ChapterMarker {...chapterMarker} className="global-chapter-marker" />}
       <div className="circuit-hud" data-testid="circuit-journey-hud"><span>{String(routeIndex + 1).padStart(2, "0")} / {String(SPATIAL_ROUTE.length).padStart(2, "0")}</span><strong>{hudLabel}</strong><small>{displayKey === "circuit" ? `CURRENT POSITION · ${currentLabel}` : "FOLLOW THE RACING LINE"}</small></div>
       <div className="circuit-progress" data-testid="circuit-journey-progress"><motion.span style={{ scaleX: scrollYProgress }} /></div>
     </div>
