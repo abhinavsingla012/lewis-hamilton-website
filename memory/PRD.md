@@ -319,6 +319,16 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - JavaScript lint and production build passed; self-tests verified single transition layer, deterministic Space/Arrow/Page keys, zero critical overlaps, theme persistence, exact route lock, and settled slide-16 release to Records
 - No APIs or flows are mocked
 
+## Records Chapter — The Record Reactor — 2026-07-12
+- Rejected the first palette-changing typographic monument because it repeated Gallery's state-based editorial language, then rebuilt Records from zero as one fixed industrial world
+- Created a physical 12-position F1-inspired reactor with turbine dial, selector arm, gear teeth, bolts, pressure arcs, warning lamps, timing strip, odometer drums, engraved specification plate, and mechanical record rail
+- Added the 12 user-approved 2026 records: 7 titles, 106 wins, 104 poles, 207 podiums, 5,165.5 points, 9 Silverstone wins, 31 winning circuits, 61 wins from pole, 5,521 laps led, 177 front rows, 19Y4D winning span, and wins in the driver's 20s/30s/40s
+- Added click, pointer-drag, and Left/Right keyboard selection with dial/selector/odometer/specification synchronization and theme-selection persistence
+- Preserved native spatial scrolling with no Records scroll trap; Gallery ↔ Records ↔ Milestones routing and Back to Circuit remain unchanged
+- Added reduced-motion behavior and responsive machine layouts for 1920x800 through 320x700
+- Iteration 44 passed all core interaction, value, route, accessibility, reduced-motion, and mobile checks; fixed its only reported issue with a dedicated 851–1200px layout that prevents dial/specification overlap at 1024x768
+- JavaScript lint and production build pass; no APIs or flows are mocked
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified
