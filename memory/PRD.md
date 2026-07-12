@@ -300,6 +300,13 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Updated the Legacy McLaren era cue to the same orange so no yellow-gold historical marker remains
 - Verified live computed theme values, active-button glow, and circuit progress render as `rgb(255, 98, 0)`; JavaScript lint passed
 
+## Chapter HUD Removal — 2026-07-12
+- Removed the bottom route counter, active chapter name, racing-line hint, and global journey progress line whenever a full chapter page is active
+- Preserved the journey HUD and progress line only for the Silverstone circuit overview and camera travel/transit states
+- Eliminated the Cars and Timeline layout collisions shown by the user without changing chapter content or exact route stops
+- Verified Cars and Timeline render with zero HUD/progress DOM while Back to Circuit restores both on the circuit overview
+- JavaScript lint and production build passed; the brief preview 502 during build recovered with all services healthy
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified

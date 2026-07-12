@@ -266,6 +266,7 @@ export const SpatialExperience = ({ archive }) => {
   const currentLabel = activeKey === "transit" ? "RACING LINE" : (SPATIAL_ROUTE[routeIndex]?.label || "RACING LINE");
   const hudLabel = isCircuitOverview ? `${coverage}% COMPLETE` : currentLabel;
   const chapterMarker = chapterMarkers[activeKey];
+  const showJourneyHud = isCircuitOverview || isNavigating || activeKey === "transit";
 
   return <section ref={runway} className="circuit-runway" data-testid="unified-spatial-experience">
     <div className="circuit-viewport" data-active={displayKey} data-overview={isCircuitOverview ? "true" : "false"} data-traveling={isNavigating ? "true" : "false"} data-testid="circuit-spatial-viewport">
@@ -282,8 +283,7 @@ export const SpatialExperience = ({ archive }) => {
       <div className="circuit-chapters"><StorySections archive={archive} /></div>
       {chapterKeys.has(activeKey) && !isCircuitOverview && !isNavigating && <BackToCircuitButton onClick={openCircuitOverview} />}
       {chapterMarker && !isCircuitOverview && !isNavigating && <ChapterMarker {...chapterMarker} className="global-chapter-marker" />}
-      <div className="circuit-hud" data-testid="circuit-journey-hud"><span>{String(routeIndex + 1).padStart(2, "0")} / {String(SPATIAL_ROUTE.length).padStart(2, "0")}</span><strong>{hudLabel}</strong><small>{displayKey === "circuit" ? `CURRENT POSITION · ${currentLabel}` : "FOLLOW THE RACING LINE"}</small></div>
-      <div className="circuit-progress" data-testid="circuit-journey-progress"><motion.span style={{ scaleX: scrollYProgress }} /></div>
+      {showJourneyHud && <><div className="circuit-hud" data-testid="circuit-journey-hud"><span>{String(routeIndex + 1).padStart(2, "0")} / {String(SPATIAL_ROUTE.length).padStart(2, "0")}</span><strong>{hudLabel}</strong><small>{displayKey === "circuit" ? `CURRENT POSITION · ${currentLabel}` : "FOLLOW THE RACING LINE"}</small></div><div className="circuit-progress" data-testid="circuit-journey-progress"><motion.span style={{ scaleX: scrollYProgress }} /></div></>}
     </div>
   </section>;
 };
