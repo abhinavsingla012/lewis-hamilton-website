@@ -1,79 +1,99 @@
 {
+  "theme": "dark",
   "typography": {
-    "fonts": {
-      "monument_numbers": "Anton, Impact, 'Oswald', sans-serif",
-      "data_context": "'JetBrains Mono', 'IBM Plex Mono', monospace",
-      "body": "'Space Grotesk', 'Inter', sans-serif"
+    "headings": {
+      "font": "Barlow Condensed, Chivo, or Anton",
+      "style": "Industrial, bold, tightly tracked, uppercase for engraved plaques and labels."
     },
-    "scale": {
-      "giant_hero": "text-[25vw] leading-[0.8] tracking-tighter",
-      "secondary_record": "text-6xl md:text-8xl tracking-tight",
-      "era_context": "text-xs md:text-sm uppercase tracking-[0.2em]",
-      "category_nav": "text-sm md:text-base font-bold uppercase tracking-wider"
+    "numbers": {
+      "font": "JetBrains Mono, Roboto Mono, or standard monospace",
+      "style": "Highly mechanical, monospaced for exact odometer alignment. Font size fluid text-5xl to text-7xl."
     },
-    "rules": "Never center align massive numbers; offset them asymmetrically. Giant numbers must have tighter tracking and compressed line heights. Data context must use monospaced precision fonts."
-  },
-  "colors": {
-    "background_strategy": "Avoid pure black. Use monumental architectural tones. Light theme: 'bg-[#EAE8E3]' (warm concrete). Dark theme: 'bg-[#18181A]' (deep charcoal, not black).",
-    "text_strategy": "Primary numbers use the persistent Team Theme color (Ferrari Red #E32636, Mercedes Teal #00A19B, McLaren Papaya #FF8000) or high-contrast structural grayscale (e.g., #111111).",
-    "accents": "Subtle border colors 'border-black/10' or 'border-white/10' for spatial nodes and kinetic lines."
-  },
-  "layouts": {
-    "container": "Single 100svh page (h-[100svh] w-screen overflow-hidden). NO internal vertical scrolling. Everything exists in a spatial, layered z-index configuration.",
-    "composition": "Reject grid/cards. Use 'Kinetic Data Sculpture'. Records are absolutely positioned blocks overlapping and interacting with background circuit geometry.",
-    "controls_position": "Bottom-left or bottom-center fixed constellation node controller for category switching.",
-    "safe_zones": "Top-left for 'Back to CH.05 / Circuit' routing, Top-right for potential global controls."
-  },
-  "component_name": "RecordsMonument",
-  "records_data": {
-    "Championships": [
-      { "value": "7", "title": "World Championships", "context": "Most All-Time (Tied) | 2008, 2014-2015, 2017-2020", "type": "primary" },
-      { "value": "12", "title": "Years Span", "context": "Longest time between first & last title (2008-2020)", "type": "secondary" }
-    ],
-    "Wins": [
-      { "value": "106", "title": "Career Wins", "context": "Most All-Time | Record held since 2020", "type": "primary" },
-      { "value": "84", "title": "Wins With Mercedes", "context": "Most wins with the same team", "type": "secondary" },
-      { "value": "31", "title": "Different Circuits", "context": "Wins at most different circuits", "type": "secondary" }
-    ],
-    "Pole Positions": [
-      { "value": "104", "title": "Career Poles", "context": "Most All-Time | Record held since 2017", "type": "primary" },
-      { "value": "15", "title": "Consecutive Seasons", "context": "With a pole position (2007-2021)", "type": "secondary" },
-      { "value": "9", "title": "Hungaroring Poles", "context": "Most pole positions at the same circuit", "type": "secondary" }
-    ],
-    "Podiums": [
-      { "value": "207", "title": "Career Podiums", "context": "Most All-Time | Record held since 2020", "type": "primary" },
-      { "value": "18", "title": "Consecutive Seasons", "context": "With a podium finish (2007-2024)", "type": "secondary" }
-    ],
-    "Legacy": [
-      { "value": "5165.5", "title": "Career Points", "context": "Most career points scored", "type": "primary" },
-      { "value": "5521", "title": "Laps Led", "context": "Most laps led all-time", "type": "secondary" }
-    ]
-  },
-  "motion": {
-    "libraries": "Framer Motion (for spatial transitions and layout shifts)",
-    "category_switch": "When switching categories via constellation nodes, the current kinetic sculpture scales down/fades out (-y or z-axis push), and the new category's numbers slam/slide into view with a stagger-children effect.",
-    "number_animation": "Giant primary numbers should use a counter animation (0 to value) over 1.5s on initial mount, utilizing 'framer-motion' useSpring for weight.",
-    "reduced_motion": "Wrap massive spatial animations in a 'useReducedMotion' check to default to opacity fades for accessibility."
-  },
-  "interactions": {
-    "category_controller": "Spatial Constellation Nodes. A connected SVG node map or pill-segmented control where clicking a point shifts the 'camera' (data view).",
-    "keyboard": "Arrow keys (Left/Right) or Tab must switch between record categories.",
-    "routing": "Include a prominent 'Back to Circuit / CH.05' button (Top Left) to maintain native Gallery->Records->Milestones journey."
-  },
-  "visual enhancers": {
-    "circuit_geometry": "Background contains subtle, slow-rotating SVG circuit geometries or thin architectural grids to give the spatial void scale.",
-    "texture": "Overlay a fixed mix-blend-overlay noise texture (opacity 0.05) to avoid flat digital colors and reinforce the monumental/concrete aesthetic."
-  },
-  "accessibility": {
-    "contrast": "Ensure data context and small texts meet 4.5:1 ratio against the monumental backgrounds.",
-    "test_ids": "Crucial: Add 'data-testid' to ALL navigation nodes (e.g., 'data-testid=\"nav-node-wins\"'), the main numbers ('data-testid=\"primary-record-value\"'), and the back button ('data-testid=\"back-to-circuit-button\"')."
-  },
-  "image_urls": {
-    "trophy_visuals": {
-      "description": "Optional background imagery to support the monumental feel if typography isn't enough.",
-      "category": "background_abstract",
-      "urls": []
+    "body": {
+      "font": "IBM Plex Sans or Inter",
+      "style": "Clean, technical utility font. Small, highly legible."
     }
   },
-  "UNIVERSAL GUIDELINES FOR MAIN AGENT": "1. NEVER USE CARDS or GRIDS for this page. It is a typographic monument. 2. Ensure responsive scaling: use viewport units (vw/vh/svh) and 'clamp()' for typography to handle 1920x800 down to 320x700 flawlessly. 3. Maintain persistent team theme (do not reset state when viewing records). 4. Do NOT use black background, stick to structural grays or theme-adaptive concrete tones. 5. Include unique data-testid attributes for all interactive UI elements."
+  "colors": {
+    "background": "#0A0A0A",
+    "surface": "#1A1A1A",
+    "primary": "#D9281C",
+    "accent": "#CCFF00",
+    "text": "#E6E6E6",
+    "border": "#333333",
+    "metals": {
+      "brushed_light": "#B3B3B3",
+      "brushed_dark": "#4D4D4D",
+      "enamel_red": "#D9281C"
+    }
+  },
+  "layouts": {
+    "container": "relative w-full h-screen overflow-hidden flex flex-col items-center justify-center bg-[#0A0A0A] text-[#E6E6E6]",
+    "reactor_core": "relative w-[85vmin] max-w-[700px] aspect-square rounded-full flex items-center justify-center bg-[#111] shadow-[inset_0_0_80px_rgba(0,0,0,1),0_0_50px_rgba(0,0,0,0.5)] border-[12px] border-[#222]",
+    "odometer_display": "relative z-10 flex flex-row items-center justify-center gap-[2px] bg-black border-4 border-[#333] p-2 sm:p-4 rounded shadow-[inset_0_10px_30px_rgba(0,0,0,1)]",
+    "timing_strip": "absolute bottom-[10%] w-auto max-w-[90%] bg-black/95 border-t-2 border-b-2 border-[#D9281C] px-6 py-2 text-[#CCFF00] font-mono uppercase tracking-[0.2em] text-lg sm:text-2xl shadow-[0_0_20px_rgba(217,40,28,0.4)] z-20 text-center"
+  },
+  "components": [
+    {
+      "name": "RecordReactor",
+      "path": "/app/frontend/src/components/RecordsMonument.jsx",
+      "instructions": "Main container. Must be exactly 100vh. Render the central physical machine environment. Control the state for the selected record index (0 to 11)."
+    },
+    {
+      "name": "MechanicalDial",
+      "instructions": "Outer rotating ring of the reactor with 12 segments/nodes. Use framer-motion. Users can click a node or drag the ring to rotate. Snap to 30-degree increments. Update the parent selected index state."
+    },
+    {
+      "name": "OdometerDrum",
+      "instructions": "Takes the numerical value of the active record. Split into digits. For each digit, render a column of numbers (0-9) inside an `overflow-hidden` container. Animate the column's `y` translation using Framer Motion to roll to the correct digit. Use top/bottom gradients inside the container to simulate the curve of a physical drum."
+    },
+    {
+      "name": "GaugeArcs",
+      "instructions": "SVG arcs overlaying the reactor. They should animate (fill up or rotate) with a sharp 'enamel red' color when a new record is selected, simulating physical pressure or RPM."
+    }
+  ],
+  "motion": {
+    "odometer_spin": "Use Framer Motion spring: { type: 'spring', stiffness: 60, damping: 15, mass: 1 }. Stagger the animation of each digit slightly.",
+    "dial_rotation": "Spring animation for rotating the dial: { type: 'spring', stiffness: 50, damping: 20 }.",
+    "reduced_motion": "Wrap animations in a check for `useReducedMotion`. If true, bypass the spin/roll and instantly set the values."
+  },
+  "visual_enhancers": {
+    "shadows": "Heavy use of inset shadows on the odometer and dial to simulate physical depth and metallic bevels.",
+    "textures": "Carbon fiber background for the room. Radial gradients on the dial to simulate brushed metal.",
+    "glow": "text-shadow on the timing strip to mimic fluorescent LED displays. e.g. text-shadow: 0 0 8px #CCFF00."
+  },
+  "accessibility": {
+    "keyboard": "Dial MUST be focusable. Allow Left/Right or Up/Down arrows to select previous/next record. Add `tabIndex={0}` to the reactor container.",
+    "aria": "Use aria-live='polite' in an off-screen span that announces the active record title and value. The visual odometer should be aria-hidden.",
+    "test_ids": "Apply unique data-testid to EVERY interactive and critical data element: 'records-container', 'reactor-dial', 'odometer-drum-[index]', 'timing-strip-label', 'dial-node-[index]'."
+  },
+  "image_urls": {
+    "carbon_fiber": {
+      "url": "https://images.unsplash.com/photo-1648071343677-fac075603d3c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHwyfHxjYXJib24lMjBmaWJlciUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzgzODY1NTY4fDA&ixlib=rb-4.1.0&q=85",
+      "category": "background",
+      "description": "Hexagonal carbon fiber texture for the fixed environment background."
+    }
+  },
+  "instructions_to_main_agent": [
+    "COMPLETELY REBUILD RecordsMonument.jsx into 'The Record Reactor'. Provide .js files only.",
+    "ABSOLUTELY NO editorial layouts, no changing color worlds, no slide transitions, and no floating cards. Maintain a single, fixed industrial environment (dark, metallic, enamel red, fluorescent).",
+    "DO NOT implement an internal scroll trap. The native page wheel MUST continue to bubble up so it moves between Gallery ↔ Records ↔ Milestones seamlessly. The reactor interaction must rely solely on pointer clicks, drag, and keyboard.",
+    "Odometer Implementation: Treat each digit as a separate column of numbers (0-9). Use `overflow-hidden` on the wrapper and `framer-motion` to animate the `y` translation of the column to simulate a rolling physical drum. Use monospace fonts for exact alignment.",
+    "The 12 records must be selectable via a circular mechanical dial (turbine ring) around the odometer. Each of the 12 records has a node on the dial. Clicking a node or dragging the dial rotates it.",
+    "Use the 2026 record values EXACTLY as supplied by the user (e.g., 106 wins, 207 podiums, etc). Map out 12 primary records using this data.",
+    "Preserve the single-screen architecture (`h-screen`) and ensure responsive design from 1920x800 down to 320x700 by using `vmin` units for the central reactor core.",
+    "Maintain spatial route coordinates: ensure the layout reserves space and safe zones for 'Back to Circuit' and 'CH.05' navigation.",
+    "Theme Context safety: Ensure that if the global app theme is toggled, it does not reset the currently selected record index in the React state. The state must persist."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "Create depth through layered design elements with z-index hierarchy",
+    "You MUST NOT apply universal transition (e.g., transition: all). Add transitions for specific interactive elements excluding transforms",
+    "You MUST NOT center align the app container using .App { text-align: center; }",
+    "Every interaction needs micro-animations - hover states, transitions, entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations separate good from extraordinary.",
+    "Never use placeholder URLs. Use provided image URLs.",
+    "All interactive and key informational elements MUST include a `data-testid` attribute.",
+    "DO NOT use complete `transparent` background in header, overlays, or any surface that has content under it."
+  ]
 }
