@@ -1,122 +1,120 @@
 {
-  "theme": "dark",
+  "project_type": "Immersive Editorial Fan Archive / Unified Spatial React SPA",
+  "persona": "E1 - Anti-AI Designer (Top 1%)",
+  "theme_strategy": {
+    "description": "Dark cinematic visual language. Deep Obsidian base with 3-team persistent accent variables.",
+    "base_dark": "#0A0A0A",
+    "text_light": "#F5F4EF",
+    "themes": [
+      {
+        "name": "Ferrari",
+        "color": "#E8002D",
+        "css_var": "--theme-accent"
+      },
+      {
+        "name": "Mercedes",
+        "color": "#00D2BE",
+        "css_var": "--theme-accent"
+      },
+      {
+        "name": "McLaren",
+        "color": "#FF8000",
+        "css_var": "--theme-accent"
+      }
+    ]
+  },
   "typography": {
     "headings": {
-      "font": "Bebas Neue, sans-serif",
-      "style": "uppercase, tracking-tighter, leading-none",
-      "sizes": "text-[12vw] md:text-[8vw] xl:text-[10vw]"
+      "family": "Unbounded, sans-serif",
+      "weight": "700/800",
+      "usage": "Monumental impact. Never centered. tracking-tighter."
     },
-    "subheadings": {
-      "font": "Cabinet Grotesk, sans-serif",
-      "style": "tracking-tight, font-black",
-      "sizes": "text-2xl md:text-4xl"
+    "technical": {
+      "family": "'Space Mono', monospace",
+      "weight": "400/700",
+      "usage": "For markers, stats, context labels, tracking-widest, uppercase."
     },
-    "body": {
-      "font": "IBM Plex Sans, sans-serif",
-      "style": "font-light, leading-relaxed",
-      "sizes": "text-sm md:text-base"
-    },
-    "data_labels": {
-      "font": "IBM Plex Mono, monospace",
-      "style": "uppercase, tracking-[0.2em], text-muted-foreground",
-      "sizes": "text-[10px] md:text-xs"
+    "editorial": {
+      "family": "Playfair Display, or native serif italic",
+      "weight": "400 italic",
+      "usage": "Expressive story quotes, overlapping elements to break the rigid tech grid."
     }
   },
   "colors": {
-    "background": "#050505",
-    "surface": "#111111",
-    "text": {
-      "primary": "#FFFFFF",
-      "secondary": "#A3A3A3",
-      "muted": "#525252"
-    },
-    "teams": {
-      "mclaren": "#FF8000",
-      "mercedes": "#00A19B",
-      "ferrari": "#EF1A2D"
-    }
+    "rules": [
+      "NO generic full-screen gradients. Use texture (noise, grain, paper).",
+      "Contrast first. Dark themes use bg-black/30 over images, NEVER darker than 50%.",
+      "Themed accent color applied to active states, scroll progress lines, and key markers."
+    ]
   },
   "layouts": {
-    "container": "relative w-full h-[100svh] overflow-hidden bg-[#050505] text-white flex flex-col",
-    "background_typography": "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-[0.03] font-bebas text-[40vw] text-white whitespace-nowrap select-none pointer-events-none",
-    "car_image_wrapper": "absolute inset-0 z-10 flex items-center justify-center pointer-events-none",
-    "car_image": "w-full max-w-[150vw] md:max-w-[90vw] h-auto object-cover scale-100 mix-blend-normal drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]",
-    "info_overlay_left": "absolute bottom-24 md:bottom-32 left-6 md:left-16 z-20 flex flex-col gap-6 w-[85%] md:w-[400px] pointer-events-auto",
-    "info_overlay_right": "absolute top-24 md:top-32 right-6 md:right-16 z-20 flex flex-col gap-8 md:text-right pointer-events-auto",
-    "selector_timeline": "absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 md:gap-4 overflow-x-auto w-[90%] md:w-max px-4 scrollbar-none",
-    "navigation_arrows": "absolute top-1/2 -translate-y-1/2 z-30 w-full flex justify-between px-4 md:px-8 pointer-events-none"
+    "VisualGallery": {
+      "container": "100svh fixed container, relative positioning. Hides overflow.",
+      "safe_zones": "Absolute positioned overlay at top/bottom corners for 'Back to Circuit' and 'CH. 04'. High z-index (z-50), mix-blend-difference or frosted glassmorphism to ensure contrast. MUST NOT scroll.",
+      "grid_structure": "Asymmetrical 2-column layout. Left (40% width): Pinned editorial context, active category, animated progress bar. Right (60% width): The 'Photo Stack'.",
+      "photo_stack": "Instead of a generic horizontal carousel, stack images directly on top of each other absolutely. As the user scrolls, the active image reveals via clip-path from bottom to top, while the previous image slightly scales down."
+    }
   },
   "motion": {
-    "active_car_transition": {
-      "initial": { "opacity": 0, "x": 50, "scale": 0.98 },
-      "animate": { "opacity": 1, "x": 0, "scale": 1, "transition": { "duration": 0.6, "ease": [0.16, 1, 0.3, 1] } },
-      "exit": { "opacity": 0, "x": -50, "scale": 0.98, "transition": { "duration": 0.4, "ease": [0.16, 1, 0.3, 1] } }
+    "scroll_trap_logic": {
+      "mechanism": "Capture onWheel and onTouchMove events within VisualGallery. Prevent default body scrolling while inside.",
+      "navigation": "Internal index (0 to N-1). Scrolling down increases index. Scrolling up decreases. Add a 800ms debounce/throttle to prevent skipping photos.",
+      "release_condition": "If at index 0 and scrolling up -> fire 'previousChapter()'. If at index N-1 and scrolling down -> fire 'nextChapter()'. DO NOT alter global spatial camera coordinates directly; call the provided boundary callbacks."
     },
-    "reduced_motion": "Ensure `prefers-reduced-motion` limits animations to simple opacity crossfades without translation or scaling."
+    "photo_transitions": {
+      "enter": "clip-path: inset(100% 0 0 0) to inset(0 0 0 0). scale: 1.1 to 1.0. duration: 0.85s, ease: [0.76, 0, 0.24, 1] (custom framer-motion easing).",
+      "exit": "scale: 1.0 to 0.95, filter: blur(4px) and brightness(0.6). duration: 0.85s."
+    },
+    "reduced_motion": "Detect prefers-reduced-motion. Fallback to simple crossfade opacity changes. Maintain scroll-trap logic."
   },
-  "accessibility": {
-    "focus_states": "focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]",
-    "aria_labels": "All selector buttons must have aria-label corresponding to the car year and model. Navigation arrows must have aria-label 'Previous Car' and 'Next Car'."
-  },
-  "media": {
-    "image_urls": [
-      {
-        "category": "2007 McLaren MP4-22",
-        "url": "https://images.pexels.com/photos/28832062/pexels-photo-28832062.jpeg",
-        "description": "McLaren F1 speeding - representing the 2007 era dominance."
-      },
-      {
-        "category": "2008 McLaren MP4-23",
-        "url": "https://images.unsplash.com/photo-1719405524179-3efd1909b2d1",
-        "description": "McLaren display closeup - representing 2008 championship."
-      },
-      {
-        "category": "2014 Mercedes W05 Hybrid",
-        "url": "https://images.unsplash.com/photo-1692931118842-a3dae79053c0",
-        "description": "Mercedes car representing the start of hybrid era dominance."
-      },
-      {
-        "category": "2018 Mercedes W09 EQ Power+",
-        "url": "https://images.unsplash.com/photo-1781281723358-facac81be3c6",
-        "description": "Mercedes front view - 2018 dominance."
-      },
-      {
-        "category": "2019 Mercedes W10 EQ Power+",
-        "url": "https://images.unsplash.com/photo-1758785479923-9471a3900bff",
-        "description": "Mercedes silver arrow representing 2019."
-      },
-      {
-        "category": "2020 Mercedes W11 EQ Performance",
-        "url": "https://images.unsplash.com/photo-1739956699833-583bb45f5a03",
-        "description": "Dark atmospheric shot representing the black W11 dominance."
-      },
-      {
-        "category": "2025 Ferrari SF-25",
-        "url": "https://images.unsplash.com/photo-1641654958798-2dee7f4c4474",
-        "description": "Red Ferrari racing down representing the new chapter."
-      }
+  "component_instructions": {
+    "VisualGallery.jsx": [
+      "Use pure Tailwind CSS + Framer Motion. DO NOT use generic Shadcn cards.",
+      "Build a monolithic, full-screen editorial component.",
+      "Render a vertical progress indicator (e.g., a 1px vertical line that fills with the team accent color).",
+      "Each photo must include a large floating Typography number (e.g., '01', '02') using Unbounded outline style.",
+      "Add data-testid='gallery-scroll-container', data-testid='gallery-next-release', and data-testid='gallery-photo-active'."
     ],
-    "handling": "Images must be preloaded. Use object-cover for full width impact. The image should sit horizontally centered, clipped deliberately by viewport bounds to feel monumental."
+    "CSS": [
+      "Add bespoke clip-path utilities if needed, or rely on framer-motion inline styles.",
+      "Ensure the gallery container has touch-action: none to prevent native mobile scroll when trapping."
+    ]
   },
-  "component_path": "/app/frontend/src/components/cars-chapter.js",
-  "instructions_to_main_agent": [
-    "Create a new component `CarsChapter` in `/app/frontend/src/components/cars-chapter.js`.",
-    "This component must be a 100svh fixed viewport (no internal vertical scrolling) with `overflow-hidden`.",
-    "Maintain the 7 requested cars: 2007 McLaren MP4-22, 2008 McLaren MP4-23, 2014 Mercedes W05, 2018 Mercedes W09, 2019 Mercedes W10, 2020 Mercedes W11, 2025 Ferrari SF-25.",
-    "Implement a data structure containing: model, year, team, wins, podiums, poles, championship outcome, power unit, chassis concept, and a concise significance story for each car.",
-    "Use Framer Motion's `AnimatePresence` to handle switching between cars. The active car's image and data mount/unmount seamlessly. No infinite framer loops.",
-    "Implement keyboard navigation: `ArrowLeft` and `ArrowRight` to switch cars. Ensure event listeners are properly managed.",
-    "Add a compact, mobile-scrollable 7-car selector timeline at the bottom of the screen.",
-    "Implement an image preloader hook/effect that loads all 7 car images quietly in the background when the component mounts to preserve transition performance.",
-    "Do NOT use generic Shadcn cards. Use raw Tailwind divs with explicit Z-indices to layer the background text, car image, and foreground stats.",
-    "Use `data-testid` attributes on all interactive elements: `data-testid='car-selector-button-{year}'`, `data-testid='prev-car-button'`, `data-testid='next-car-button'`."
-  ],
+  "image_urls": {
+    "racing_portrait": {
+      "url": "https://images.unsplash.com/photo-1762234142252-44d3149002d0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwyfHxMZXdpcyUyMEhhbWlsdG9uJTIwcG9ydHJhaXQlMjByYWNpbmd8ZW58MHx8fHwxNzgzODU5NDI0fDA&ixlib=rb-4.1.0&q=85",
+      "category": "Mode 1: The Competitor",
+      "description": "Lewis in racing suit leaning against wall."
+    },
+    "helmet_focus": {
+      "url": "https://images.unsplash.com/photo-1761751237608-427f16f0a595?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwxfHxMZXdpcyUyMEhhbWlsdG9uJTIwcG9ydHJhaXQlMjByYWNpbmd8ZW58MHx8fHwxNzgzODU5NDI0fDA&ixlib=rb-4.1.0&q=85",
+      "category": "Mode 2: The Armor",
+      "description": "Detailed F1 helmet shot with sponsors."
+    },
+    "red_suit": {
+      "url": "https://images.unsplash.com/photo-1761751237853-7489598b7498?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHwzfHxGMSUyMHJhY2luZyUyMGhlbG1ldHxlbnwwfHx8fDE3ODM4NTk0MjR8MA&ixlib=rb-4.1.0&q=85",
+      "category": "Mode 3: The Legacy",
+      "description": "Red racing suit representing the Ferrari transition."
+    },
+    "retro_helmet": {
+      "url": "https://images.unsplash.com/photo-1603099989919-a4ff17894981?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHw0fHxGMSUyMHJhY2luZyUyMGhlbG1ldHxlbnwwfHx8fDE3ODM4NTk0MjR8MA&ixlib=rb-4.1.0&q=85",
+      "category": "Mode 4: The Machine",
+      "description": "White and red aesthetic helmet shot."
+    }
+  },
   "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
-    "Do not converge toward generic outputs. Use the custom Typography scale.",
-    "Do not add universal transitions (e.g., `transition: all`). Only transition specific properties.",
-    "Never center-align the app container (`.App { text-align: center; }`). Use strict left-aligned typography for readability.",
-    "Ensure layered design elements with explicit z-index hierarchy.",
-    "Add subtle noise overlays or gradients ONLY if it enhances depth, but do not use simplistic full-screen CSS gradients.",
-    "All missing assets must use provided image URLs. NEVER use placeholder text or dummy image APIs."
+    "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: `transition: all`. This results in breaking transforms. Always add transitions for specific interactive elements.",
+    "You MUST NOT center align the app container, ie do not add `.App { text-align: center; }` in the css file. This disrupts the human natural reading flow of text.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "All interactive and key informational elements MUST include a `data-testid` attribute to facilitate robust automated testing.",
+    "CRITICAL: DO NOT use complete `transparent` background in header, overlays, any surface that has content under it."
   ]
 }
