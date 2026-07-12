@@ -56,9 +56,10 @@ def test_archive_seasons_span_2007_to_2025_and_include_required_fields(archive_p
     years = [season["year"] for season in seasons]
     assert years == list(range(2007, 2026))
 
-    required = {"year", "wins", "podiums", "poles", "races", "points", "position", "team", "car", "champion"}
+    required = {"year", "wins", "podiums", "poles", "races", "points", "position", "team", "car", "champion", "achievements"}
     for season in seasons:
         assert required.issubset(set(season.keys()))
+        assert set(season["achievements"]) == {"wins", "podiums", "poles"}
 
 
 def test_archive_2020_season_values_exact(archive_payload):
@@ -71,6 +72,11 @@ def test_archive_2020_season_values_exact(archive_payload):
     assert season_2020["position"] == 1
     assert season_2020["team"] == "Mercedes"
     assert season_2020["car"] == "W11 EQ Performance"
+    assert len(season_2020["achievements"]["wins"]) == 11
+    assert len(season_2020["achievements"]["podiums"]) == 14
+    assert len(season_2020["achievements"]["poles"]) == 10
+    achievement_fields = {"round", "race", "circuit", "locality", "country"}
+    assert achievement_fields.issubset(season_2020["achievements"]["wins"][0])
 
 
 def test_archive_tracks_include_silverstone_record(archive_payload):

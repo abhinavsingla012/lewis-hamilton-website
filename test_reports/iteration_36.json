@@ -1,0 +1,46 @@
+{
+  "summary": "Backend and frontend regression testing completed for requested P0 timeline scope. Backend /api/archive validations passed (10/10). Timeline behavior, routing, controls, tabs, theming, desktop/mobile readability, wheel behavior, and exact-stop checks passed; one intermittent reduced-motion deep-link visibility race appeared once but did not reproduce in targeted reruns.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Reduced-motion deep-link to #route-timeline during mixed viewport/reload sequence",
+        "issue": "One run timed out with timeline section hidden despite URL hash route. Fresh reduced-motion rerun and explicit route call both passed, so issue is intermittent/flaky.",
+        "affected_selectors": [
+          "[data-testid=\"season-timeline-section\"]",
+          "[data-testid=\"circuit-spatial-viewport\"]"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_archive_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Investigate reduced-motion/hash routing timing race to eliminate intermittent hidden timeline state on reload sequences.",
+    "Ensure REACT_APP_BACKEND_URL is exported in backend test runner env by default to avoid accidental pytest skips in future iterations."
+  ],
+  "critical_code_review_comments": [
+    "All critical timeline controls in tested scope currently expose data-testid and were interactable in automation.",
+    "Exact timeline chapter stop remains stable at progress 0.305 (num=3660, den=12000) with data-traveling=false.",
+    "No duplicate critical timeline/team control data-testid values detected in DOM during targeted scan."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_36.json"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "95%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Verified in this run: /api/archive seasons=19 (2007-2025), victories=105, 2020 values 11/14/10/347 with matching achievement counts; timeline route active=timeline traveling=false; 1st/2nd/3rd/lower position colors differentiated; theme switches preserved position color; wheel from timeline routed to cars; desktop 1920x800 and mobile 390x844 had no horizontal overflow. One intermittent reduced-motion hidden timeline timeout occurred once in a mixed-state run but could not be reproduced in two targeted reduced-motion reruns.",
+  "rca of the issue": "Intermittent frontend race condition suspected between hash-route handling, chapter visibility gating, and post-navigation state when reloading under changed media/viewport state. Symptoms: timeline section remained hidden once despite #route-timeline. Mitigation observed: explicit immediate route call via window.__spatialGo('timeline', { immediate: true }) and fresh reduced-motion load both restore expected visibility."
+}

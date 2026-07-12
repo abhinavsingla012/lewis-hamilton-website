@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 JOLPICA_URL = "https://api.jolpi.ca/ergast/f1/drivers/hamilton/results.json"
 CUTOFF_SEASON = 2025
 CACHE_TTL = timedelta(days=7)
+ARCHIVE_CACHE_KEY = "hamilton-2025-v4"
 SEASON_FALLBACK = {
     "2007": 4, "2008": 5, "2009": 2, "2010": 3, "2011": 3,
     "2012": 4, "2013": 1, "2014": 11, "2015": 10, "2016": 10,
@@ -66,7 +67,12 @@ def fallback_archive() -> dict:
     for year, wins in SEASON_FALLBACK.items():
         season = int(year)
         position, points, team, car = SEASON_META[season]
-        seasons.append({"year": season, "wins": wins, "podiums": 0, "poles": 0, "races": 0, "points": points, "position": position, "team": team, "car": car, "champion": position == 1})
+        seasons.append({
+            "year": season, "wins": wins, "podiums": 0, "poles": 0,
+            "races": 0, "points": points, "position": position,
+            "team": team, "car": car, "champion": position == 1,
+            "achievements": {"wins": [], "podiums": [], "poles": []},
+        })
     return {
         "source": "curated", "cutoff_season": CUTOFF_SEASON,
         "updated_at": datetime.now(timezone.utc).isoformat(),
@@ -90,6 +96,18 @@ def fetch_results() -> list[dict]:
         offset += 100
 
 
+def achievement_entry(race: dict) -> dict:
+    circuit = race["Circuit"]
+    location = circuit.get("Location", {})
+    return {
+        "round": int(race["round"]),
+        "race": race["raceName"].replace(" Grand Prix", ""),
+        "circuit": circuit["circuitName"],
+        "locality": location.get("locality", ""),
+        "country": location.get("country", ""),
+    }
+
+
 def build_archive(races: list[dict]) -> dict:
     eligible = [race for race in races if int(race["season"]) <= CUTOFF_SEASON]
     podiums = [race for race in eligible if int(race["Results"][0]["position"]) <= 3]
@@ -98,13 +116,22 @@ def build_archive(races: list[dict]) -> dict:
     podiums_by_year = Counter(race["season"] for race in podiums)
     poles_by_year = Counter(race["season"] for race in eligible if int(race["Results"][0]["grid"]) == 1)
     races_by_year = Counter(race["season"] for race in eligible)
+    season_races = defaultdict(list)
+    for race in eligible:
+        season_races[int(race["season"])].append(race)
     seasons = []
     for year in range(2007, CUTOFF_SEASON + 1):
         position, points, team, car = SEASON_META[year]
+        year_races = season_races[year]
         seasons.append({
             "year": year, "wins": wins_by_year[str(year)], "podiums": podiums_by_year[str(year)],
             "poles": poles_by_year[str(year)], "races": races_by_year[str(year)], "points": points,
             "position": position, "team": team, "car": car, "champion": position == 1,
+            "achievements": {
+                "wins": [achievement_entry(race) for race in year_races if race["Results"][0]["position"] == "1"],
+                "podiums": [achievement_entry(race) for race in year_races if int(race["Results"][0]["position"]) <= 3],
+                "poles": [achievement_entry(race) for race in year_races if int(race["Results"][0]["grid"]) == 1],
+            },
         })
     track_data = defaultdict(lambda: {"wins": 0, "podiums": 0, "country": ""})
     for race in podiums:
@@ -145,12 +172,16 @@ async def root():
 
 @api_router.get("/archive", response_model=Archive)
 async def get_archive():
-    cached = await db.archives.find_one({"key": "hamilton-2025-v3"}, {"_id": 0})
+    cached = await db.archives.find_one({"key": ARCHIVE_CACHE_KEY}, {"_id": 0})
     if cached and datetime.now(timezone.utc) - datetime.fromisoformat(cached["updated_at"]) < CACHE_TTL:
         return cached
     try:
         archive = build_archive(await run_in_threadpool(fetch_results))
-        await db.archives.update_one({"key": "hamilton-2025-v3"}, {"$set": {"key": "hamilton-2025-v3", **archive}}, upsert=True)
+        await db.archives.update_one(
+            {"key": ARCHIVE_CACHE_KEY},
+            {"$set": {"key": ARCHIVE_CACHE_KEY, **archive}},
+            upsert=True,
+        )
         return archive
     except Exception as exc:
         logger.warning("Jolpica refresh failed: %s", exc)
