@@ -2,15 +2,15 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Marquee from "react-fast-marquee";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Flag, Trophy } from "lucide-react";
-import { eras, IMAGES, quotes, trackShapes } from "../data/content";
+import { IMAGES, quotes, trackShapes } from "../data/content";
 import { SeasonTimeline } from "./SeasonTimeline";
 import { VisualGallery } from "./VisualGallery";
+import { CareerCars } from "./CareerCars";
 
 const Reveal = ({ children, className = "" }) => <motion.div className={className} initial={{ opacity: 0, y: 55 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-12%" }} transition={{ duration: .8, ease: [0.22, 1, 0.36, 1] }}>{children}</motion.div>;
 const SectionHead = ({ label, title, light = false }) => <div className={`section-head ${light ? "light" : ""}`}><span className="section-head-marker-slot" aria-hidden="true" /><h2 data-testid={`${label.toLowerCase()}-section-title`}>{title}</h2></div>;
 
 export const StorySections = ({ archive }) => {
-  const [era, setEra] = useState(2);
   const [quote, setQuote] = useState(0);
   const [year, setYear] = useState("All");
   const [showAll, setShowAll] = useState(false);
@@ -55,18 +55,7 @@ export const StorySections = ({ archive }) => {
 
     <SeasonTimeline seasons={archive?.seasons} />
 
-    <section id="cars" className="cars-section" data-testid="cars-section">
-      <Reveal><SectionHead index="03" label="CARS" title="MACHINES OF DOMINANCE." light /></Reveal>
-      <div className="car-stage">
-        <motion.img key={eras[era].image} initial={{ opacity: 0, scale: 1.08 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: .65 }} src={eras[era].image} alt={eras[era].team} data-testid="featured-car-image" />
-        <div className="car-overlay" />
-        <motion.div key={eras[era].year} className="car-info" initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}>
-          <span className="car-year" data-testid="featured-car-year">{eras[era].year}</span><h3 data-testid="featured-car-title">{eras[era].title}</h3><p className="mono" data-testid="featured-car-model">{eras[era].team} / {eras[era].wins}</p><p data-testid="featured-car-description">{eras[era].copy}</p>
-        </motion.div>
-        <div className="car-controls"><button onClick={() => setEra((era - 1 + eras.length) % eras.length)} data-testid="previous-car-button" aria-label="Previous car"><ChevronLeft /></button><span data-testid="car-slide-counter">0{era + 1} / 0{eras.length}</span><button onClick={() => setEra((era + 1) % eras.length)} data-testid="next-car-button" aria-label="Next car"><ChevronRight /></button></div>
-      </div>
-      <div className="era-strip">{eras.map((item, index) => <button className={index === era ? "active" : ""} onClick={() => setEra(index)} key={item.year} data-testid={`car-era-${item.year}-button`}><span>{item.year}</span>{item.team}</button>)}</div>
-    </section>
+    <CareerCars seasons={archive?.seasons} />
 
     <VisualGallery />
 

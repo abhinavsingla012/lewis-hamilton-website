@@ -7,6 +7,7 @@ import "@/CircuitExperience.css";
 import "@/TeamThemes.css";
 import "@/LegacyChapter.css";
 import "@/ChapterMarkers.css";
+import "@/CarsChapter.css";
 import axios from "axios";
 import Lenis from "lenis";
 import { Nav } from "@/components/Nav";
