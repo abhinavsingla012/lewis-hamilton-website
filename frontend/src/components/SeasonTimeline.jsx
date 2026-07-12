@@ -2,6 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Crown, Flag, MapPin, Radio } from "lucide-react";
 import { IMAGES } from "../data/content";
+import { seasonStories } from "../data/seasonStories";
+import { TimelineEraSpine } from "./TimelineEraSpine";
+import { TimelineStory } from "./TimelineStory";
 import { TimelineTelemetry } from "./TimelineTelemetry";
 
 const seasonImages = {
@@ -45,15 +48,26 @@ export const SeasonTimeline = ({ seasons = [] }) => {
   const data = seasons.length ? seasons : fallback;
   const [activeIndex, setActiveIndex] = useState(0);
   const [achievementType, setAchievementType] = useState("wins");
+  const [signalIndex, setSignalIndex] = useState(0);
   const active = data[Math.min(activeIndex, data.length - 1)];
   const achievements = active?.achievements?.[achievementType] || [];
+  const activePlace = achievements[Math.min(signalIndex, Math.max(0, achievements.length - 1))];
   const positionColor = positionColors[active.position] || "#777b80";
   const winConversion = active.races ? Math.round((active.wins / active.races) * 100) : 0;
   const campaignLabel = active.champion ? "TITLE CAMPAIGN" : active.wins ? "VICTORY CAMPAIGN" : "RELENTLESS PURSUIT";
+  const peaks = useMemo(() => ["wins", "podiums", "poles"].reduce((result, key) => ({ ...result, [key]: Math.max(...data.map((season) => Number(season[key]) || 0), 1) }), {}), [data]);
+  const titlesToDate = data.slice(0, activeIndex + 1).filter((season) => season.champion).length;
+  let activeStreak = 0;
+  for (let index = activeIndex; index >= 0 && data[index]?.champion; index -= 1) activeStreak += 1;
+  const titleContext = activeStreak > 1 ? `TITLE STREAK ×${activeStreak}` : `${titlesToDate} ${titlesToDate === 1 ? "TITLE" : "TITLES"} BANKED`;
   const moveTo = (nextIndex) => {
     const next = Math.max(0, Math.min(data.length - 1, nextIndex));
     setActiveIndex(next);
   };
+
+  useEffect(() => {
+    setSignalIndex(0);
+  }, [activeIndex, achievementType]);
 
   useEffect(() => {
     [activeIndex - 1, activeIndex + 1].forEach((index) => {
@@ -113,7 +127,7 @@ export const SeasonTimeline = ({ seasons = [] }) => {
       <div className="timeline-v3-image-scrim" aria-hidden="true" />
       <div className="timeline-v4-dissolve" aria-hidden="true" />
       <div className="timeline-v3-grid" aria-hidden="true" />
-      <TimelineTelemetry activeIndex={activeIndex} activeYear={active.year} reduceMotion={reduceMotion} />
+      <TimelineTelemetry activeIndex={activeIndex} activeYear={active.year} reduceMotion={reduceMotion} signalIndex={signalIndex} />
       <span className="timeline-v4-year-outline" aria-hidden="true">{active.year}</span>
 
       <header className="timeline-v3-heading">
@@ -129,6 +143,7 @@ export const SeasonTimeline = ({ seasons = [] }) => {
           <small data-testid="timeline-active-car">{active.car}</small>
         </div>
       </div>
+      <TimelineStory active={active} peaks={peaks} story={seasonStories[active.year]} titleContext={titleContext} reduceMotion={reduceMotion} />
 
       <motion.article
         key={`data-${active.year}`}
@@ -176,16 +191,23 @@ export const SeasonTimeline = ({ seasons = [] }) => {
                 data-testid={`timeline-${key}-tab-button`}
               ><Icon aria-hidden="true"/><span>{label}</span><strong>{active[key]}</strong></button>)}
             </div>
+            <div className="timeline-v5-circuit-signal" data-testid="timeline-circuit-signal">
+              <span>ACTIVE CIRCUIT SIGNAL</span>
+              <strong data-testid="timeline-signal-circuit">{activePlace?.circuit?.replace(" Circuit", "") || "NO SIGNAL"}</strong>
+              <small data-testid="timeline-signal-round">{activePlace ? `ROUND ${String(activePlace.round).padStart(2, "0")} / ${String(active.races).padStart(2, "0")} · ${activePlace.race}` : "NO RECORDED EVENT"}</small>
+              <i><b style={{ transform: `scaleX(${activePlace && active.races ? activePlace.round / active.races : 0})` }} /></i>
+            </div>
             <div className="timeline-v3-place-list" role="tabpanel" data-testid="timeline-achievement-list">
-              {achievements.map((place, index) => <div key={`${place.round}-${place.circuit}`} data-testid={`timeline-${achievementType}-place-${slug(place.circuit)}-${index + 1}`}>
+              {achievements.map((place, index) => <button type="button" className={index === signalIndex ? "is-signaled" : ""} aria-pressed={index === signalIndex} onPointerEnter={() => setSignalIndex(index)} onFocus={() => setSignalIndex(index)} onClick={() => setSignalIndex(index)} key={`${place.round}-${place.circuit}`} data-testid={`timeline-${achievementType}-place-${slug(place.circuit)}-${index + 1}`}>
                 <span>{String(place.round).padStart(2, "0")}</span>
                 <p><strong>{place.circuit.replace(" Circuit", "")}</strong><small>{place.locality || place.race} · {place.country}</small></p>
-              </div>)}
+              </button>)}
               {!achievements.length && <p className="timeline-v3-empty" data-testid="timeline-achievement-empty-state">NO {achievementType.toUpperCase()} RECORDED THIS SEASON</p>}
             </div>
           </div>
       </motion.article>
 
+      <TimelineEraSpine activeIndex={activeIndex} data={data} onSelect={moveTo} />
       <nav className="timeline-v3-navigation" aria-label="Season timeline controls" data-testid="timeline-season-navigation">
         <button type="button" onClick={() => moveTo(activeIndex - 1)} disabled={activeIndex === 0} data-testid="timeline-previous-year-button" aria-label="Previous season"><ChevronLeft/></button>
         <div className="timeline-v3-rail" data-testid="timeline-season-progress">
