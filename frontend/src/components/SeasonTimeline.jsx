@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Crown, Flag, MapPin, Radio } from "lucide-react";
 import { IMAGES } from "../data/content";
+import { TimelineTelemetry } from "./TimelineTelemetry";
 
 const seasonImages = {
   2007: IMAGES.season2007, 2008: IMAGES.season2008, 2009: IMAGES.season2009, 2010: IMAGES.season2010,
@@ -47,6 +48,8 @@ export const SeasonTimeline = ({ seasons = [] }) => {
   const active = data[Math.min(activeIndex, data.length - 1)];
   const achievements = active?.achievements?.[achievementType] || [];
   const positionColor = positionColors[active.position] || "#777b80";
+  const winConversion = active.races ? Math.round((active.wins / active.races) * 100) : 0;
+  const campaignLabel = active.champion ? "TITLE CAMPAIGN" : active.wins ? "VICTORY CAMPAIGN" : "RELENTLESS PURSUIT";
   const moveTo = (nextIndex) => {
     const next = Math.max(0, Math.min(data.length - 1, nextIndex));
     setActiveIndex(next);
@@ -101,8 +104,23 @@ export const SeasonTimeline = ({ seasons = [] }) => {
           />
         </motion.figure>
       </AnimatePresence>
+      <AnimatePresence initial={false} mode="sync">
+        <motion.div
+          key={`echo-${active.year}`}
+          className="timeline-v4-image-echo"
+          style={{ backgroundImage: `url(${seasonImages[active.year]})`, backgroundPosition: imagePositions[active.year] || "50% 30%" }}
+          initial={reduceMotion ? false : { opacity: 0, x: -16 }}
+          animate={{ opacity: .22, x: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: reduceMotion ? .01 : .58, ease: [0.22, 1, 0.36, 1] }}
+          aria-hidden="true"
+        />
+      </AnimatePresence>
       <div className="timeline-v3-image-scrim" aria-hidden="true" />
+      <div className="timeline-v4-dissolve" aria-hidden="true" />
       <div className="timeline-v3-grid" aria-hidden="true" />
+      <TimelineTelemetry activeIndex={activeIndex} activeYear={active.year} reduceMotion={reduceMotion} />
+      <span className="timeline-v4-year-outline" aria-hidden="true">{active.year}</span>
 
       <header className="timeline-v3-heading">
         <p data-testid="timeline-section-label"><span>02</span> THE ASCENT</p>
@@ -131,10 +149,16 @@ export const SeasonTimeline = ({ seasons = [] }) => {
         >
           <div className="timeline-v3-result">
             <div>
-              <span>DRIVERS&apos; CHAMPIONSHIP</span>
+              <span data-testid="timeline-championship-label">DRIVERS&apos; CHAMPIONSHIP</span>
               <strong data-testid="timeline-position-value">{active.position === "—" ? "—" : ordinal(active.position)}</strong>
             </div>
             {active.champion && <span className="timeline-v3-crown" data-testid="timeline-champion-badge"><Crown aria-hidden="true"/> WORLD CHAMPION</span>}
+          </div>
+
+          <div className="timeline-v4-campaign" data-testid="timeline-campaign-signal">
+            <span data-testid="timeline-campaign-label">{campaignLabel}</span>
+            <i><b style={{ transform: `scaleX(${winConversion / 100})` }} /></i>
+            <small data-testid="timeline-win-conversion">{winConversion}% WIN CONVERSION</small>
           </div>
 
           <div className="timeline-v3-stats" data-testid="timeline-season-stat-grid">
@@ -145,6 +169,10 @@ export const SeasonTimeline = ({ seasons = [] }) => {
           </div>
 
           <div className="timeline-v3-achievements">
+            <div className="timeline-v4-location-heading" data-testid="timeline-location-heading">
+              <span>GLOBAL PERFORMANCE SIGNAL</span>
+              <strong>{String(achievements.length).padStart(2, "0")} LOCATIONS / {achievementType.toUpperCase()}</strong>
+            </div>
             <div className="timeline-v3-tabs" role="tablist" aria-label="Season achievement locations" data-testid="timeline-achievement-selector">
               {achievementOptions.map(({ key, label, icon: Icon }) => <button
                 key={key}

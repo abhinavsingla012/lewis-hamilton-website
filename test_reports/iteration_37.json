@@ -1,0 +1,61 @@
+{
+  "summary": "Frontend-only validation completed for Timeline V4 hybrid-design regression on public URL across desktop/mobile viewports. Core routing, controls, theme switching, no-overflow matrix, and exact timeline stop passed. Critical rapid-switch DOM uniqueness and reduced-motion scan behavior failed expected requirements.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "SeasonTimeline AnimatePresence stack",
+        "issue": "Rapid switching seasons/tabs leaves multiple concurrent 'active' nodes in DOM (timeline-active-image x4, data cards x3, image echoes x4), violating single-active-article/image expectation and creating duplicate critical test IDs.",
+        "selector": "[data-testid=\"timeline-active-image\"], .timeline-v3-data, .timeline-v4-image-echo",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "TimelineTelemetry reduced-motion behavior",
+        "issue": "With prefers-reduced-motion enabled, scanning beam element still renders (scanCount=1). Requirement expects absent/effectively disabled scan animation under reduced motion.",
+        "selector": ".timeline-v4-scan",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Rapid season and tab switching stress flow",
+        "issue": "Duplicate critical data-testid values appear during transition overlap; violates uniqueness and indicates concurrent mounted transition states.",
+        "affected_selectors": [
+          "[data-testid=\"timeline-active-image\"]",
+          "[data-testid=\"timeline-position-value\"]",
+          "[data-testid=\"timeline-achievement-list\"]"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/artifacts_iteration_37_frontend/final_desktop.jpeg",
+    "/app/test_reports/artifacts_iteration_37_frontend/final_mobile.jpeg"
+  ],
+  "action_items": [
+    "Ensure only one active timeline image/data/echo remains mounted after rapid interactions (avoid overlapping active test IDs during AnimatePresence transitions).",
+    "Enforce reduced-motion handling so scanning beam is not rendered or has animation effectively disabled when prefers-reduced-motion is true.",
+    "Add data-testid to newly introduced user-visible telemetry overlays (echo/dissolve/sector labels/scan signal) if considered critical interaction/verification surfaces."
+  ],
+  "critical_code_review_comments": [
+    "Timeline exact direct route remains deterministic at progress 0.305 with data-traveling=false.",
+    "Desktop blend target appears met visually (no hard vertical seam; computed left border on data pane is 0px).",
+    "Theme switching correctly changes accent while championship rank color remains semantically separate from team accent."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_37.json"
+  ],
+  "success_rate": {
+    "backend": "N/A",
+    "frontend": "82%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Validated on public URL with viewport matrix 1920x800, 1024x768, 768x1024, 390x844, 320x700: no horizontal overflow. Route checks passed for circuit/legacy/cars/timeline and timeline boundary controls passed. Key failing area is rapid interaction transition overlap causing duplicate active DOM and duplicate critical test IDs.",
+  "rca of the issue": "RCA: SeasonTimeline uses AnimatePresence mode='sync' for image/data/echo blocks keyed by year. Under fast sequential state updates, exiting and entering nodes coexist for transition duration, causing multiple simultaneously mounted 'active' elements and duplicate data-testid values. For reduced-motion issue, UI automation observed .timeline-v4-scan still present under reduced-motion emulation, indicating render gating and/or CSS animation disable path is not consistently preventing scan effect in RM mode."
+}
