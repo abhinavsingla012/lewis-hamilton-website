@@ -1,0 +1,13 @@
+.chapter-kicker{display:flex;align-items:center;gap:8px;margin:0;color:inherit;font:700 7px "Space Mono";letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}.chapter-kicker span{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-left:2px solid var(--acid);color:inherit;font:700 7px Unbounded;letter-spacing:0}.chapter-kicker i{color:var(--acid);font-style:normal}.chapter-kicker strong{font:inherit;letter-spacing:inherit}
+.gallery-section .chapter-kicker,.tracks-section .chapter-kicker,footer .chapter-kicker{color:#101010}.gallery-section .chapter-kicker span,.tracks-section .chapter-kicker span,footer .chapter-kicker span{border-left-color:#101010}.gallery-section .chapter-kicker i,.tracks-section .chapter-kicker i,footer .chapter-kicker i{color:#101010}
+.legacy-overline .chapter-kicker{color:#f5f4ef}.legacy-overline .chapter-kicker span{color:#f5f4ef}.legacy-overline .chapter-kicker strong,.legacy-overline .chapter-kicker i{color:var(--acid)}
+.timeline-v3-heading .chapter-kicker span{display:inline-flex;width:auto;height:22px;padding:0 8px;border:0;border-left:2px solid var(--acid);border-radius:0;color:#f5f5f0;font:700 7px Unbounded;letter-spacing:0}
+.circuit-chapters .cars-section .section-head{top:19vh}
+.gallery-heading{position:relative;min-height:134px}.gallery-heading>.chapter-kicker{position:absolute;left:5vw;top:108px}
+.records-copy{padding-top:19vh}
+.milestones-title{padding-top:108px}
+.tracks-section .section-head,.archive-section .section-head{position:relative;min-height:134px}.tracks-section .section-head>.chapter-kicker,.archive-section .section-head>.chapter-kicker{position:absolute;left:0;top:108px}
+.moment-copy>.chapter-kicker,.quote-inner>.chapter-kicker{margin-bottom:18px}
+.quote-section{padding-top:20vh}
+.circuit-chapters>footer{padding-top:20vh}.footer-chapter-marker{margin-bottom:22px}
+@media(max-width:850px){.chapter-kicker{gap:6px;font-size:6px}.chapter-kicker span,.timeline-v3-heading .chapter-kicker span{min-height:18px;height:18px;padding:0 6px;font-size:6px}.timeline-v3-heading{top:max(132px,16.5vh)}.timeline-v5-story{top:max(192px,25vh)}.circuit-chapters .cars-section .section-head{top:max(132px,18vh)}.gallery-heading{min-height:112px}.gallery-heading>.chapter-kicker{left:18px;top:80px}.records-copy{padding-top:132px}.milestones-title{padding-top:80px}.tracks-section .section-head,.archive-section .section-head{min-height:112px}.tracks-section .section-head>.chapter-kicker,.archive-section .section-head>.chapter-kicker{top:80px}.quote-section{padding-top:132px}.circuit-chapters>footer{padding-top:132px}.footer-chapter-marker{margin-bottom:14px}}

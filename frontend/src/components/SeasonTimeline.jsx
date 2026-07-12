@@ -6,6 +6,7 @@ import { seasonStories } from "../data/seasonStories";
 import { TimelineEraSpine } from "./TimelineEraSpine";
 import { TimelineStory } from "./TimelineStory";
 import { TimelineTelemetry } from "./TimelineTelemetry";
+import { ChapterMarker } from "./ChapterMarker";
 
 const seasonImages = {
   2007: IMAGES.season2007, 2008: IMAGES.season2008, 2009: IMAGES.season2009, 2010: IMAGES.season2010,
@@ -140,7 +141,7 @@ export const SeasonTimeline = ({ seasons = [] }) => {
       <span className="timeline-v4-year-outline" aria-hidden="true">{active.year}</span>
 
       <header className="timeline-v3-heading">
-        <p data-testid="timeline-section-label"><span>CH. 02</span> THE ASCENT</p>
+        <ChapterMarker number="02" label="THE ASCENT" testId="timeline-section-label" />
         <h2 data-testid="timeline-section-title">19 SEASONS. <span>ONE STANDARD.</span></h2>
       </header>
 

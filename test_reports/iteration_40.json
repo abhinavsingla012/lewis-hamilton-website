@@ -1,0 +1,82 @@
+{
+  "summary": "Frontend-only validation completed for chapter marker standardization across all 11 routes on public URL. Route determinism and interactions pass, but marker placement has layout collisions at required viewports (desktop and mobile), including repeated Back to Circuit intersections on mobile.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "ChapterMarker / Gallery heading",
+        "issue": "Marker intersects gallery main title text in desktop viewports (1366x768 and 1920x800).",
+        "selector": "[data-testid='gallery-section-label'], .gallery-heading h2",
+        "priority": "HIGH"
+      },
+      {
+        "component": "ChapterMarker / Tracks heading",
+        "issue": "Marker intersects tracks section title in desktop viewports (1366x768 and 1920x800).",
+        "selector": "[data-testid='tracks-section-label'], [data-testid='tracks-section-title']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "Back to Circuit + chapter markers (mobile)",
+        "issue": "Back to Circuit intersects chapter marker on multiple routes at 390x844 (timeline, gallery, records, milestones, tracks, victories, footer).",
+        "selector": "[data-testid='back-to-circuit-button'] with [data-testid='timeline-section-label'|'gallery-section-label'|'records-section-label'|'milestones-section-label'|'tracks-section-label'|'victories-section-label'|'footer-section-label']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Back to Circuit + chapter markers (mobile narrow)",
+        "issue": "Back to Circuit intersects chapter marker on multiple routes at 320x700 (timeline, cars, gallery, records, milestones, tracks, victories, footer).",
+        "selector": "[data-testid='back-to-circuit-button'] with [data-testid='timeline-section-label'|'cars-section-label'|'gallery-section-label'|'records-section-label'|'milestones-section-label'|'tracks-section-label'|'victories-section-label'|'footer-section-label']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "Milestones marker (mobile narrow)",
+        "issue": "Marker is not fully within viewport (clipped/out of viewport) at 320x700.",
+        "selector": "[data-testid='milestones-section-label']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Chapter routes at required matrix viewports",
+        "issues": [
+          "Marker placement spacing is not robust across section visual languages; desktop title collisions remain in Gallery and Tracks.",
+          "Mobile safe-area/vertical offset strategy does not consistently preserve marker separation from persistent Back to Circuit control."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/artifacts_iteration_40_frontend",
+    "/app/test_reports/artifacts_iteration_40_frontend_rerun",
+    "/app/test_reports/artifacts_iteration_40_frontend_final",
+    "/app/test_reports/artifacts_iteration_40_frontend_final2",
+    "/app/test_reports/artifacts_iteration_40_matrix"
+  ],
+  "action_items": [
+    "Reposition CH markers in Gallery and Tracks so marker box does not intersect section h2 text at 1366x768 and 1920x800.",
+    "Introduce per-mobile breakpoint top offsets (or Back to Circuit offset adjustments) to guarantee no marker/button intersections at 390x844 and 320x700.",
+    "Fix milestones marker vertical placement at 320x700 to keep full marker in viewport.",
+    "Retest the full matrix after CSS adjustments: 1366x768, 1920x800, 390x844, 320x700."
+  ],
+  "critical_code_review_comments": [
+    "Shared ChapterMarker component adoption is consistent across chapter pages and marker text/order is correct from CH. 01 to CH. 11.",
+    "Route direct hashes still settle deterministically to expected stops with data-traveling=false for all 11 routes.",
+    "Timeline interactions and Back to Circuit flow are functionally working; failures are placement/layout collisions, not navigation logic.",
+    "No runtime error banners found, no duplicate data-testid values detected in this run, and reduced-motion marker visibility passed for sampled chapters."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_40.json"
+  ],
+  "success_rate": {
+    "backend": "N/A",
+    "frontend": "78%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Validated public URL chapter marker rollout against requested matrix. Core logic/order/routes pass, but placement regressions remain: desktop overlap (Gallery/Tracks title collisions) and recurring mobile Back to Circuit collisions; milestones marker clipping at 320x700 also present.",
+  "rca of the issue": "RCA: marker positioning relies on fixed absolute top offsets (e.g., 80/108px patterns) while Back to Circuit has fixed top values and section title blocks vary by viewport/content density. On narrow/short screens these independent offsets converge, causing marker/button and marker/title intersections. Repro: navigate by #route-* across all chapters at 390x844 and 320x700, and Gallery/Tracks at desktop widths; observe bounding-box intersection between marker and required protected content."
+}

@@ -5,9 +5,10 @@ import { ArrowUpRight, ChevronLeft, ChevronRight, Flag, Trophy } from "lucide-re
 import { eras, IMAGES, quotes, trackShapes } from "../data/content";
 import { SeasonTimeline } from "./SeasonTimeline";
 import { VisualGallery } from "./VisualGallery";
+import { ChapterMarker } from "./ChapterMarker";
 
 const Reveal = ({ children, className = "" }) => <motion.div className={className} initial={{ opacity: 0, y: 55 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-12%" }} transition={{ duration: .8, ease: [0.22, 1, 0.36, 1] }}>{children}</motion.div>;
-const SectionHead = ({ index, label, title, light = false }) => <div className={`section-head ${light ? "light" : ""}`}><p className="eyebrow" data-testid={`${label.toLowerCase()}-section-label`}>({index}) / {label}</p><h2 data-testid={`${label.toLowerCase()}-section-title`}>{title}</h2></div>;
+const SectionHead = ({ index, label, title, light = false }) => <div className={`section-head ${light ? "light" : ""}`}><ChapterMarker number={index} label={label} testId={`${label.toLowerCase()}-section-label`} /><h2 data-testid={`${label.toLowerCase()}-section-title`}>{title}</h2></div>;
 
 export const StorySections = ({ archive }) => {
   const [era, setEra] = useState(2);
@@ -36,7 +37,7 @@ export const StorySections = ({ archive }) => {
         <figcaption data-testid="legacy-portrait-caption"><span>STEVENAGE</span><i>→</i><span>THE WORLD</span></figcaption>
       </figure>
       <div className="legacy-narrative">
-        <p className="legacy-overline legacy-enter" style={{ "--legacy-delay": ".12s" }} data-testid="legacy-section-label"><span>01 / THE LEGACY</span><span>2007—2025</span></p>
+        <div className="legacy-overline legacy-enter" style={{ "--legacy-delay": ".12s" }}><ChapterMarker number="01" label="THE LEGACY" testId="legacy-section-label" /><span>2007—2025</span></div>
         <h2 id="legacy-monument-title" className="legacy-title legacy-enter" style={{ "--legacy-delay": ".18s" }} data-testid="legacy-section-title"><span>THE RECORD</span><span>BEYOND</span><span>RECORDS.</span></h2>
         <p className="legacy-statement legacy-enter" style={{ "--legacy-delay": ".28s" }} data-testid="legacy-statement">From Stevenage to seven world titles, Lewis Hamilton did more than redraw Formula 1’s limits. He expanded who could see themselves at the front of the grid—and what a champion could stand for beyond it.</p>
       </div>
@@ -56,7 +57,7 @@ export const StorySections = ({ archive }) => {
     <SeasonTimeline seasons={archive?.seasons} />
 
     <section id="cars" className="cars-section" data-testid="cars-section">
-      <Reveal><SectionHead index="03" label="Cars" title="MACHINES OF DOMINANCE." light /></Reveal>
+      <Reveal><SectionHead index="03" label="CARS" title="MACHINES OF DOMINANCE." light /></Reveal>
       <div className="car-stage">
         <motion.img key={eras[era].image} initial={{ opacity: 0, scale: 1.08 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: .65 }} src={eras[era].image} alt={eras[era].team} data-testid="featured-car-image" />
         <div className="car-overlay" />
@@ -71,7 +72,7 @@ export const StorySections = ({ archive }) => {
     <VisualGallery />
 
     <section id="tracks" className="tracks-section" data-testid="tracks-section">
-      <Reveal><SectionHead index="04" label="Tracks" title="WHERE GREATNESS REPEATED ITSELF." /></Reveal>
+      <Reveal><SectionHead index="07" label="TRACKS" title="WHERE GREATNESS REPEATED ITSELF." /></Reveal>
       <div className="track-grid">
         {(tracks.length ? tracks : [{circuit:"Silverstone Circuit", country:"UK", wins:9, podiums:15},{circuit:"Hungaroring",country:"Hungary",wins:8,podiums:12},{circuit:"Circuit Gilles Villeneuve",country:"Canada",wins:7,podiums:10},{circuit:"Circuit de Barcelona-Catalunya",country:"Spain",wins:6,podiums:12},{circuit:"Shanghai International Circuit",country:"China",wins:6,podiums:9}]).map((track, index) => <Reveal key={track.circuit} className={`track-card track-${index + 1}`}>
           <div className="track-top"><span>0{index + 1}</span><span>{track.country}</span></div>
@@ -85,16 +86,16 @@ export const StorySections = ({ archive }) => {
     <section className="moment-section" data-testid="silverstone-moment-section">
       <Marquee className="moment-marquee" speed={55} autoFill><span>HOME. HISTORY. HAMILTON.&nbsp;</span></Marquee>
       <img src={IMAGES.silverstone} alt="Lewis Hamilton at Silverstone" data-testid="silverstone-moment-image" />
-      <div className="moment-copy"><p className="eyebrow">SILVERSTONE / 2024</p><h2>“GET IN THERE, LEWIS.”</h2><p data-testid="silverstone-moment-description">Nine wins at one circuit. A record no Formula 1 driver had ever held before.</p></div>
+      <div className="moment-copy"><ChapterMarker number="08" label="SILVERSTONE 2024" testId="moment-section-label" /><h2>“GET IN THERE, LEWIS.”</h2><p data-testid="silverstone-moment-description">Nine wins at one circuit. A record no Formula 1 driver had ever held before.</p></div>
     </section>
 
     <section className="quote-section" data-testid="quote-section">
       <div className="quote-number" aria-hidden="true">44</div>
-      <div className="quote-inner"><p className="eyebrow">IN THEIR WORDS</p><motion.blockquote key={quote} initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} data-testid="featured-quote">“{quotes[quote].quote}”</motion.blockquote><div className="quote-credit"><div><strong data-testid="quote-person">{quotes[quote].person}</strong><span data-testid="quote-role">{quotes[quote].role}</span></div><div className="quote-controls"><button onClick={() => setQuote((quote - 1 + quotes.length) % quotes.length)} data-testid="previous-quote-button" aria-label="Previous quote"><ChevronLeft /></button><button onClick={() => setQuote((quote + 1) % quotes.length)} data-testid="next-quote-button" aria-label="Next quote"><ChevronRight /></button></div></div></div>
+      <div className="quote-inner"><ChapterMarker number="09" label="VOICES" testId="voices-section-label" /><motion.blockquote key={quote} initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} data-testid="featured-quote">“{quotes[quote].quote}”</motion.blockquote><div className="quote-credit"><div><strong data-testid="quote-person">{quotes[quote].person}</strong><span data-testid="quote-role">{quotes[quote].role}</span></div><div className="quote-controls"><button onClick={() => setQuote((quote - 1 + quotes.length) % quotes.length)} data-testid="previous-quote-button" aria-label="Previous quote"><ChevronLeft /></button><button onClick={() => setQuote((quote + 1) % quotes.length)} data-testid="next-quote-button" aria-label="Next quote"><ChevronRight /></button></div></div></div>
     </section>
 
     <section id="victories" className="archive-section" data-testid="victory-archive-section">
-      <Reveal><SectionHead index="05" label="Victories" title="EVERY WIN. EVERY CITY. EVERY YEAR." light /></Reveal>
+      <Reveal><SectionHead index="10" label="VICTORIES" title="EVERY WIN. EVERY CITY. EVERY YEAR." light /></Reveal>
       <div className="archive-toolbar"><div className="year-filter" data-testid="victory-year-filter">{years.map((item) => <button className={year === item ? "active" : ""} onClick={() => setYear(item)} key={item} data-testid={`filter-year-${String(item).toLowerCase()}-button`}>{item}</button>)}</div><span data-testid="filtered-victory-count">{filtered.length || (year === "All" ? 105 : 0)} VICTORIES</span></div>
       <div className="victory-list" data-testid="victory-list">
         {!!wins.length && <div className="victory-table-head" data-testid="victory-table-header"><span>NO.</span><span>DATE</span><span>GRAND PRIX / CIRCUIT</span><span>TEAM</span><span>GRID</span><span>LAPS</span><span>PTS</span><span>FLAGS</span></div>}
@@ -104,6 +105,6 @@ export const StorySections = ({ archive }) => {
       {filtered.length > 12 && <button className="archive-expand" onClick={() => setShowAll(!showAll)} data-testid="toggle-full-archive-button">{showAll ? "COLLAPSE ARCHIVE" : `OPEN ALL ${filtered.length} VICTORIES`}<ArrowUpRight /></button>}
     </section>
 
-    <footer data-testid="site-footer"><div className="footer-title"><span>STILL</span><span>WE RISE</span></div><div className="footer-bottom"><p data-testid="fan-site-disclaimer">An independent, fan-made celebration of Sir Lewis Hamilton. Not affiliated with Lewis Hamilton, Formula 1, Mercedes-AMG Petronas, McLaren, or Ferrari.</p><button onClick={() => window.__spatialGo?.("top")} data-testid="back-to-top-button">BACK TO TOP <ArrowUpRight /></button></div></footer>
+    <footer data-testid="site-footer"><ChapterMarker number="11" label="STILL WE RISE" className="footer-chapter-marker" testId="footer-section-label" /><div className="footer-title"><span>STILL</span><span>WE RISE</span></div><div className="footer-bottom"><p data-testid="fan-site-disclaimer">An independent, fan-made celebration of Sir Lewis Hamilton. Not affiliated with Lewis Hamilton, Formula 1, Mercedes-AMG Petronas, McLaren, or Ferrari.</p><button onClick={() => window.__spatialGo?.("top")} data-testid="back-to-top-button">BACK TO TOP <ArrowUpRight /></button></div></footer>
   </>;
 };
