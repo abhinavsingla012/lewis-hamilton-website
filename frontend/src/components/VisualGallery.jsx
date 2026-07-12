@@ -130,9 +130,11 @@ export const VisualGallery = ({ activeKey, isActive }) => {
       const upKeys = ["ArrowUp", "PageUp"];
       if (![...downKeys, ...upKeys].includes(event.key)) return;
       if (event.target?.closest?.("input, select, textarea")) return;
+      if (event.repeat) return;
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
+      event.target?.closest?.("button, a")?.blur?.();
       move(downKeys.includes(event.key) ? 1 : -1);
     };
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });

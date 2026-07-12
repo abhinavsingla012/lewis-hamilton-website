@@ -307,11 +307,24 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Verified Cars and Timeline render with zero HUD/progress DOM while Back to Circuit restores both on the circuit overview
 - JavaScript lint and production build passed; the brief preview 502 during build recovered with all services healthy
 
+## Gallery Fashion-Editorial Redesign and Polish — 2026-07-12
+- Replaced the rejected black split-screen Gallery with a 16-look fashion-week editorial issue using six distinct composition systems: contact sheet, diagonal runway, typographic poster, full cover, social collage, and helmet artifact
+- Curated and locally optimized 16 Lewis Hamilton fashion, paddock, helmet, Maranello, and Silverstone images; every look includes year, city/circuit, venue, designer/context, and editorial copy
+- Added slide-specific cobalt, scarlet, silver, acid, ivory, papaya, emerald, cyan, burgundy, and Ferrari-red color worlds so the chapter no longer repeats the Cars design or a single black background
+- Added individual desktop and mobile focal points for all 16 images plus dedicated detail crops for social-collage layouts
+- Preserved internal wheel/touch progression at the exact Gallery stop and only releases to Cars/Records at the first/final boundary; added explicit Lenis ownership so route settling cannot restart scrolling inside Gallery
+- Refined transitions into single-layer, layout-specific cuts with no blank frame, lingering previous slide, invalid clip-path animation, or duplicate stable test IDs
+- Stabilized keyboard progression, theme-switch slide persistence, reverse entry initialization, final route settling, and Back to Circuit lock cleanup
+- Reserved dedicated copy/control zones so headings, credits, index rail, and navigation controls no longer collide across desktop/mobile layouts
+- JavaScript lint and production build passed; self-tests verified single transition layer, deterministic Space/Arrow/Page keys, zero critical overlaps, theme persistence, exact route lock, and settled slide-16 release to Records
+- No APIs or flows are mocked
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified
 
 ### P1
+- Extend the Gallery's chapter-specific color-world principle to the remaining black-background chapters, one approved chapter at a time
 - Refactor the compressed spatial camera and story components into smaller modules without altering the verified coordinate model
 - Add a longer continuous navigation soak test for future spatial-camera changes
 - Fine-tune chapter-marker label spacing for exceptionally narrow mobile screens

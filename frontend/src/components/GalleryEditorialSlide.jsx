@@ -1,16 +1,16 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
 
 const motionState = (direction, layout, reduced) => reduced ? {
-  initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 },
+  initial: { opacity: .92 }, animate: { opacity: 1 },
 } : layout === "artifact" ? {
-  initial: { opacity: 0, scale: .82, rotate: direction * 4 }, animate: { opacity: 1, scale: 1, rotate: 0 }, exit: { opacity: 0, scale: 1.08, rotate: direction * -3 },
+  initial: { opacity: .58, scale: .84, rotate: direction * 4 }, animate: { opacity: 1, scale: 1, rotate: 0 },
 } : layout === "diagonal" ? {
-  initial: { opacity: .2, x: direction > 0 ? "18%" : "-18%", clipPath: direction > 0 ? "inset(0 0 0 75%)" : "inset(0 75% 0 0)" }, animate: { opacity: 1, x: "0%", clipPath: "inset(0 0 0 0)" }, exit: { opacity: 0, x: direction > 0 ? "-9%" : "9%", clipPath: direction > 0 ? "inset(0 75% 0 0)" : "inset(0 0 0 75%)" },
+  initial: { opacity: .52, x: direction > 0 ? "11%" : "-11%", skewX: direction > 0 ? -3 : 3 }, animate: { opacity: 1, x: "0%", skewX: 0 },
 } : layout === "contact" || layout === "social" ? {
-  initial: { opacity: .15, y: direction > 0 ? "14%" : "-14%", rotate: direction * 1.8, scale: .97 }, animate: { opacity: 1, y: "0%", rotate: 0, scale: 1 }, exit: { opacity: 0, y: direction > 0 ? "-8%" : "8%", rotate: direction * -1.2, scale: .985 },
+  initial: { opacity: .54, y: direction > 0 ? "9%" : "-9%", rotate: direction * 1.6, scale: .975 }, animate: { opacity: 1, y: "0%", rotate: 0, scale: 1 },
 } : {
-  initial: { opacity: .12, y: direction > 0 ? "12%" : "-12%", clipPath: direction > 0 ? "inset(100% 0 0 0)" : "inset(0 0 100% 0)" }, animate: { opacity: 1, y: "0%", clipPath: "inset(0 0 0 0)" }, exit: { opacity: 0, y: direction > 0 ? "-6%" : "6%", clipPath: direction > 0 ? "inset(0 0 100% 0)" : "inset(100% 0 0 0)" },
+  initial: { opacity: .56, y: direction > 0 ? "8%" : "-8%", scale: .985 }, animate: { opacity: 1, y: "0%", scale: 1 },
 };
 
 const EditorialImage = ({ item, suffix = "primary" }) => <img src={item.image} alt={item.alt} style={{ objectPosition: item.position, "--image-mobile-position": item.mobilePosition || item.position, "--detail-position": item.detailPosition || item.mobilePosition || item.position }} data-testid={`gallery-image-${item.id}-${suffix}`} />;
@@ -19,14 +19,12 @@ export const GalleryEditorialSlide = ({ item, index, count, direction, reduceMot
   const previous = gallery[(index - 1 + count) % count];
   const next = gallery[(index + 1) % count];
   const state = motionState(direction, item.layout, reduceMotion);
-  return <AnimatePresence initial={false} custom={direction}>
-    <motion.article
+  return <motion.article
       className={`gallery-issue layout-${item.layout}`}
       key={item.id}
       initial={state.initial}
       animate={state.animate}
-      exit={state.exit}
-      transition={{ duration: reduceMotion ? .12 : .56, ease: [0.76, 0, 0.24, 1] }}
+      transition={{ duration: reduceMotion ? .12 : .48, ease: [0.22, 1, 0.36, 1] }}
       data-testid={`gallery-photo-${item.id}`}
     >
       <div className="issue-flash" aria-hidden="true" />
@@ -56,6 +54,5 @@ export const GalleryEditorialSlide = ({ item, index, count, direction, reduceMot
       <div className="issue-credit" data-testid={`gallery-active-credit-${item.id}`}><span>{item.year}</span><b>{item.designer}</b></div>
       <div className="issue-counter" data-testid={`gallery-sequence-label-${item.id}`}><strong>{String(index + 1).padStart(2, "0")}</strong><span>— {String(count).padStart(2, "0")}</span></div>
       <div className="issue-edge-copy" aria-hidden="true">LEWIS HAMILTON / SELF EXPRESSION / LOCATION ARCHIVE / {item.year}</div>
-    </motion.article>
-  </AnimatePresence>;
+    </motion.article>;
 };
