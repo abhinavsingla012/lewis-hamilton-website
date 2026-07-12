@@ -3,7 +3,7 @@ import { Menu, X } from "lucide-react";
 import { TeamThemeSwitcher } from "./TeamThemeSwitcher";
 
 export const Nav = ({ open, setOpen, teamTheme, setTeamTheme }) => {
-  const links = ["Legacy", "Timeline", "Cars", "Tracks", "Victories"];
+  const links = ["Legacy", "Timeline", "Cars", "Gallery", "Tracks", "Victories"];
   const go = (id) => {
     const route = id.toLowerCase();
     window.history.replaceState(null, "", `#route-${route}`);

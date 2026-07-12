@@ -270,6 +270,19 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Final self-test passed all 44 route/viewport combinations at 1366×768, 1920×800, 390×844, and 320×700 with zero Back-to-Circuit intersections, title collisions, clipping, or duplicate test IDs
 - Production build and JavaScript lint passed
 
+## Career-Defining Cars Museum Chapter — 2026-07-12
+- Replaced the four-slide generic Cars carousel with a full-screen seven-car `Machines of Dominance` museum experience
+- Added the user-approved lineup: 2007 McLaren MP4-22, 2008 McLaren MP4-23, 2014 Mercedes W05 Hybrid, 2018 W09 EQ Power+, 2019 W10 EQ Power+, 2020 W11 EQ Performance, and 2025 Ferrari SF-25
+- Added one active car at a time with monumental model typography, dominant full-width machinery photography, semantic historical team cue, significance story, signature moment, season output, title outcome, live win rate, podiums, poles, standing, power unit, and engineering identity
+- Added seven direct year/model selectors, disabled boundary-aware previous/next controls, and active-only ArrowLeft/ArrowRight keyboard navigation
+- Merged factual season performance from the live Jolpica archive while preserving curated technical and historical context
+- Added adjacent-image preloading, active-only animated layers, reduced-motion behavior, and transform/opacity-only transitions
+- Sourced seven exact-model Wikimedia Commons images, optimized them locally to WebP (95KB–460KB), added in-product photo credits, and documented license attribution in `public/images/cars/ATTRIBUTION.md`
+- Added responsive desktop/tablet/mobile reductions that preserve the car, dominance metric, stats, technical identity, all selectors, and controls inside one 100svh spatial stop
+- Iteration 41 passed all seven data/image states, selector and keyboard behavior, responsive matrix, reduced motion, theme independence, direct route, Back to Circuit, and exact camera settling
+- Fixed the one regression surfaced by testing: restored Gallery to the Explore menu and verified the Gallery → Cars route chain
+- JavaScript lint and production build passed; no APIs or flows are mocked
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified
