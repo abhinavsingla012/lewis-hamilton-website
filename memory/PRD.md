@@ -198,9 +198,20 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Fixed programmatic stop drift by using a 12,000px scroll denominator and releasing navigation only after both pixel and normalized progress alignment
 - Iteration 35 passed Legacy visibility plus Timeline 5/5 desktop and 5/5 mobile exact-stop batches, Legacy/Cars exact stops, keyboard routing, overflow, and pointer interception checks
 
+## Monumental Timeline Chapter Redesign — 2026-07-12
+- Rebuilt Timeline as a full-screen, single-season editorial composition with authentic photography, monumental year typography, and an architectural data rail
+- Added championship-position color semantics: gold for 1st, silver for 2nd, bronze for 3rd, and progressively muted steel tones for lower finishes
+- Enriched all 19 season records with Jolpica-derived win, podium, and pole achievement locations, including circuit, locality, country, race, and round
+- Added interactive Wins, Podiums, and Poles location tabs plus direct access to every season through a 19-stop timeline rail
+- Preserved previous/next controls, active-only ArrowLeft/ArrowRight navigation, team theme accents, reduced-motion behavior, and exact Silverstone camera stop `0.305`
+- Optimized Timeline rendering to mount only active season media/data, preload adjacent images, animate transform/opacity only, and avoid scroll-linked year churn
+- Updated the MongoDB archive cache to `hamilton-2025-v4` while continuing to exclude `_id` from returned cached documents
+- Iteration 36 passed all 10 backend tests and Timeline desktop/mobile interaction, styling, theme, routing, wheel, overflow, and performance checks
+- Hardened first-load hash initialization after one non-reproducible reduced-motion race; a targeted 5/5 mobile reduced-motion reload soak passed at the exact Timeline stop
+
 ## Prioritized Backlog
 ### P0
-- None; the post-Legacy overlap, lag, and first-route framing regressions are resolved and verified
+- None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified
 
 ### P1
 - Refactor the compressed spatial camera and story components into smaller modules without altering the verified coordinate model
@@ -216,9 +227,10 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Add image attribution and editorial source notes page
 
 ## Next Tasks
-1. Redesign the Timeline chapter as the next page-by-page visual refinement
+1. Select the next chapter for page-by-page monumental redesign
 2. Multi-minute Silverstone camera soak test and performance profiling
 3. Modularize the circuit camera calculations without altering the verified path
-4. Interactive global victory map
-5. Rich race detail overlays for landmark wins
-6. Shareable fan-stat cards to improve organic reach
+4. Complete remaining authentic season-photo mappings
+5. Interactive global victory map
+6. Rich race detail overlays for landmark wins
+7. Shareable fan-stat cards to improve organic reach
