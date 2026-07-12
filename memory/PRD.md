@@ -283,6 +283,16 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Fixed the one regression surfaced by testing: restored Gallery to the Explore menu and verified the Gallery → Cars route chain
 - JavaScript lint and production build passed; no APIs or flows are mocked
 
+## Cars Chapter User-Image and Storytelling Refinement — 2026-07-12
+- Replaced all seven active Wikimedia photographs with the user-supplied respective-car images for MP4-22, MP4-23, W05, W09, W10, W11, and SF-25
+- Optimized every replacement locally to WebP between 112KB and 372KB while preserving 1600–2000px source width
+- Retuned model-specific focal points for action, front-facing, and side-profile compositions across desktop and mobile
+- Rewrote each narrative around the machine's historical role: The Shockwave, The First Crown, The Power Shift, The Complete Weapon, The Relentless Machine, The Benchmark, and The Reinvention
+- Strengthened desktop significance, engineering, and source-credit readability without increasing mobile density
+- Updated active source credits and `public/images/cars/ATTRIBUTION.md` to reflect the user-supplied archive
+- Iteration 42 passed exact natural dimensions, selector/model mapping, all seven crops, story tones, technical copy, live stats, source links, interactions, route stability, reduced motion, rapid switching, and the six-viewport responsive matrix
+- No mocked flows or APIs; no functional blockers remain
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified
