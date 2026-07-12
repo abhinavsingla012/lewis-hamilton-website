@@ -1,109 +1,154 @@
 {
+  "project_name": "Lewis Hamilton Timeline V4 - Enhancements",
   "theme": "dark",
   "typography": {
-    "strategy": "The Swiss Brutalist mixed with Technical Telemetry",
     "headings": {
-      "family": "Cabinet Grotesk, Oswald, or a strong Display Sans (font-sans)",
-      "style": "Massive scale (text-7xl to text-9xl+ for years), font-black, tracking-tighter, leading-none. Years act as background graphic elements.",
-      "usage": "Used for the active season year and monumental titles."
+      "family": "Cabinet Grotesk, Oswald, sans-serif",
+      "weight": "font-black or font-light (avoid middle weights)",
+      "tracking": "tracking-tighter",
+      "rules": "Never use Inter for headings. Use extreme weight contrast. The overlapping year should be massive but capped at text-6xl+ fluidly or customized specifically as a background element with low opacity."
     },
     "body": {
-      "family": "Inter or standard sans but kept minimal.",
-      "style": "text-sm to text-base, high contrast, clean."
+      "family": "IBM Plex Sans, sans-serif",
+      "weight": "font-normal",
+      "tracking": "tracking-normal",
+      "rules": "Clean, highly legible for narrative copy. Left-aligned."
     },
-    "data_telemetry": {
-      "family": "JetBrains Mono, Roboto Mono, or IBM Plex Mono (font-mono)",
-      "style": "Uppercase, tracking-[0.2em], text-xs to text-sm.",
-      "usage": "Used for stats (Wins, Poles), coordinates, lap times, and location lists."
+    "telemetry_data": {
+      "family": "IBM Plex Mono, monospace",
+      "weight": "font-medium",
+      "tracking": "tracking-tight",
+      "rules": "Must be used for all telemetry data, sector readouts, and timeline years to maintain tabular alignment."
+    },
+    "labels": {
+      "family": "IBM Plex Sans, sans-serif",
+      "weight": "font-bold",
+      "transform": "uppercase",
+      "tracking": "tracking-[0.2em]",
+      "size": "text-xs",
+      "rules": "Overlines, circuit names, and stat labels."
     }
   },
   "colors": {
-    "archetype": "The Performance Pro (Elite Athleticism & Precision)",
-    "base": {
-      "background": "#0A0A0A",
-      "surface_glass": "rgba(10, 10, 10, 0.4)",
-      "text_primary": "#FFFFFF",
-      "text_secondary": "rgba(255, 255, 255, 0.6)"
+    "archetype": "The Performance Pro & Luxury F1 Museum Hybrid",
+    "background": {
+      "primary": "#050505",
+      "secondary": "#0A0A0A"
     },
-    "semantic_championship": {
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#A1A1AA",
+      "tertiary": "#52525B"
+    },
+    "era_markers": {
+      "mclaren": "#FF8700",
+      "mercedes": "#00D2BE",
+      "ferrari": "#DC0000"
+    },
+    "semantic_rank": {
       "p1": "#FFD700",
       "p2": "#C0C0C0",
       "p3": "#CD7F32",
-      "other": "rgba(255, 255, 255, 0.4)"
+      "other": "#3F3F46"
     },
-    "team_themes": {
-      "mercedes": "#00A19B",
-      "mclaren": "#FF8700",
-      "ferrari": "#EF1A2D"
-    },
-    "rules": [
-      "Never use pure black or generic gray gradients. Introduce texture/noise.",
-      "Team accent is strictly for interaction colors (active state on timeline, hover).",
-      "Championship rank defines the semantic color of the main year typography and stat highlights."
-    ]
-  },
-  "layouts": {
-    "strategy": "Cinematic Museum Installation - No Hard Splits",
-    "desktop": {
-      "resolution": "1920x800 base reference",
-      "structure": "Full-width background image with an organic, feathered alpha-mask. The left side (0-60%) shows the image clearly. The right side (40-100%) applies a complex CSS mask (mask-image: linear-gradient(to right, black, transparent)) or a noise-layered backdrop filter so the image dissolves into the data canvas. NO rectangular cards.",
-      "layering": "Layer 0: Authentic full-bleed image. Layer 1: Dark noise/fade gradient dissolving left-to-right. Layer 2: Massive overlapping typography (Year) spanning the seam. Layer 3: Telemetry UI and stats."
-    },
-    "mobile": {
-      "resolution": "390x844 base reference",
-      "structure": "Vertical stacking but with deep layering. Image at the top dissolving into the bottom half where data lives.",
-      "layering": "Image fades out via linear-gradient to the bottom. Stats overlap the bottom edge of the image fade."
-    }
+    "interaction_accent": "Current theme context determines accent (e.g., semantic rank or active era color). Use text shadow or 1px glow to ensure it pops against dark backgrounds.",
+    "rules": "No generic gradients. Use tinted deep grays (obsidian). Era markers must be tiny (e.g., 2px wide vertical lines or 4px dots). Do NOT use teal green for standard dashboard elements, reserve strictly for the Mercedes era marker."
   },
   "visual_enhancers": {
-    "telemetry_identity": [
-      "Ghost Racing Line: A subtle SVG path snaking down the right side, resembling an F1 track or telemetry graph, with a very low opacity (10-20%).",
-      "Scanning Beam: Framer Motion element sweeping vertically across the stats, similar to a radar or wind-tunnel laser.",
-      "Lap-Sector Marks: Small 1px lines or ticks along the ghost path denoting key points (Wins, Poles).",
-      "Coordinates: Display real-world coordinates of key circuits in tiny mono font as decorative anchors (e.g., 52.0786° N, 1.0169° W)."
-    ],
-    "blending": [
-      "Eliminate the hard seam using `mask-image: linear-gradient(to right, black 40%, transparent 90%)` on the full-screen image.",
-      "Use `backdrop-blur-md` on specific stat areas combined with `bg-black/20` to maintain readability without solid borders.",
-      "Mix blend modes (`mix-blend-overlay`, `mix-blend-screen`) on the huge Year typography to interact with the F1 imagery."
-    ]
+    "textures": "Subtle noise overlay on the primary background (`bg-[url('/noise.png')] opacity-5`).",
+    "glassmorphism": "For floating telemetry or sticky timeline spine: `backdrop-blur-2xl bg-black/40 border border-white/5`.",
+    "borders": "1px solid strokes (`border-white/10`) for structural definition, no soft drop shadows. Grid items can use `border-r border-b border-white/5`.",
+    "images": "Feathered photography with `mask-image: linear-gradient(...)` to dissolve seamlessly into the black background. Overlay `bg-black/40` max to keep images visible."
+  },
+  "components": {
+    "era_spine": {
+      "description": "Clickable three-era navigation spine.",
+      "placement": "Fixed vertically alongside the 19-year navigation.",
+      "visuals": "Ultra-thin continuous line segmented by era. Each segment glows slightly with era_marker color when active. Title streaks represented by subtle widening of the line or glowing dots on championship years."
+    },
+    "season_storytelling": {
+      "description": "Editorial band with headline, narrative, and signature moment.",
+      "placement": "Integrated into the left layout column, near the overlapping year.",
+      "visuals": "No cards. Plain text with high typographic contrast. Headline (`text-3xl font-black`), Narrative (`text-sm text-gray-400 max-w-md leading-relaxed`), Signature Moment (`text-xs uppercase tracking-widest text-white border-l-2 pl-3`)."
+    },
+    "interactive_telemetry": {
+      "description": "Animated sector readouts and career-peak comparison.",
+      "placement": "Embedded near circuit lists and ghost path.",
+      "visuals": "Minimalist horizontal bars (1px or 2px height) for peak comparison. Sector readouts are inline block text in monospace, changing values via Framer Motion on hover/focus."
+    }
+  },
+  "grids_layouts": {
+    "desktop": {
+      "structure": "Asymmetric Bento Grid (Mode A / Hybrid). `grid-cols-12 gap-8`. Left col-span-5 for editorial/storytelling. Right col-span-7 for the feathered image dissolve, ghost telemetry path, and circuit list.",
+      "alignment": "Left-aligned content to contrast the vast right-side visual."
+    },
+    "mobile": {
+      "structure": "grid-cols-1, mobile-first.",
+      "rules": "Compress narrative copy (`line-clamp-3`). Retain era spine as a horizontal bar at the bottom. Telemetry becomes swipeable or simplified. Image max-height 50vh, feathered at the bottom."
+    },
+    "anti_crowding": "Use `p-8` to `p-16` padding blocks. Group related data tightly, leave massive negative space between distinct logical blocks."
   },
   "motion": {
-    "strategy": "Sleek and highly dynamic, but constrained for performance (transform/opacity only).",
-    "elements": [
-      "Active-season navigation (prev/next) triggers slide/fade transitions on stats and image using Framer Motion (`initial={{ opacity: 0, x: 20 }}`).",
-      "Scanning beam uses `translateY` looping animation.",
-      "Reduced motion support: `useReducedMotion` must disable the scanning beam and slide effects, reverting to simple opacity fades."
-    ]
+    "philosophy": "Restrained, highly dynamic but active-only.",
+    "transitions": "Use Transform and Opacity only for performance.",
+    "interactions": {
+      "circuit_hover": "Hovering a circuit reveals its sector readouts and highlights its node on the ghost telemetry path. `transition: transform 0.3s ease, opacity 0.3s ease`.",
+      "era_change": "Crossfade backgrounds and text colors when changing eras. Era spine line animates its height/progress."
+    },
+    "rules": "No new infinite loops. Respect `prefers-reduced-motion`. Ensure all grid children handling motion use direct `motion.div` wraps without nesting."
   },
-  "accessibility": [
-    "Ensure contrast ratios (WCAG AA). If stats sit over an image, apply text-shadows or a localized dark radial-gradient behind the text.",
-    "Support keyboard navigation (ArrowLeft/ArrowRight) for season changes.",
-    "All interactive elements MUST have `data-testid` (e.g., `data-testid=\"timeline-season-2020\"`, `data-testid=\"stat-wins\"`).",
-    "Respect `prefers-reduced-motion`."
-  ],
-  "component_path": "/app/frontend/src/components/Timeline.js",
-  "instructions_to_main_agent": [
-    "Refactor the Timeline chapter layout to remove the hard left/right vertical split. Do not use standard card containers.",
-    "Implement the 'hybrid dissolve' effect: Make the background image span 100% width but use `mask-image` or layered gradients to smoothly transition it into a dark, textured area on the right.",
-    "Add 'restrained telemetry' visual elements (SVG ghost paths, mono-font coordinates, small lap-sector ticks) to the data panel area.",
-    "Integrate Framer Motion for a subtle scanning beam effect (opacity and transform only) and season transitions.",
-    "Layer massive, bold year numbers that overlap the transition zone between image and data.",
-    "Retain all existing functionality: active-only DOM rendering, Silverstone 3D camera mathematical precision, and exact `data-testid` mapping.",
-    "Apply team accent colors to interaction states and championship semantic colors to stat highlights.",
-    "Ensure responsive design follows the specific desktop (1920x800) and mobile (390x844) layering rules."
-  ],
-  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
-    "Avoid the 'AI slop' aesthetic: No generic centered layouts, simplistic gradients, or uniform card styling.",
-    "Use 2-3x more spacing than typical for a luxurious, monumental feel.",
-    "Create depth through layered z-index hierarchy and glass-morphism (blur).",
-    "Never use `transition: all`. Target specific properties.",
-    "Do not center-align the main app container.",
+  "accessibility": {
+    "contrast": "Ensure text over images has `text-shadow` or gradients to meet APCA/WCAG standards.",
+    "focus": "Distinct `focus:ring-1 focus:ring-white/50` on era spine buttons and circuit lists.",
+    "testing": "All interactive elements MUST have `data-testid` (e.g., `data-testid=\"era-nav-mercedes\"`, `data-testid=\"circuit-item-silverstone\"`, `data-testid=\"story-headline\"`).",
+    "aria": "Use `aria-hidden=\"true\"` on decorative ghost telemetry SVG paths."
+  },
+  "media": {
+    "image_handling": "Images act as the hero/backdrop on the right side. Do not use generic full-screen overlays; use gradient masks to fade into the data section.",
+    "responsive": "Images must scale proportionally without causing horizontal overflow. Use `object-cover` with precise focal points."
+  },
+  "image_urls": {
+    "hero_car_active": {
+      "url": "https://images.pexels.com/photos/28680795/pexels-photo-28680795.jpeg",
+      "description": "High-speed Formula 1 car in action (Placeholder for active season racing shot)",
+      "category": "Season Background Dissolve"
+    },
+    "hero_sparks": {
+      "url": "https://images.pexels.com/photos/29252117/pexels-photo-29252117.jpeg",
+      "description": "Formula 1 car speeding across finish line emitting sparks",
+      "category": "Signature Race/Moment Visual"
+    },
+    "pit_crew": {
+      "url": "https://images.pexels.com/photos/13857975/pexels-photo-13857975.jpeg",
+      "description": "Pit crew readying car during intense race event",
+      "category": "Contextual Season Photo"
+    },
+    "hamilton_celebration": {
+      "url": "https://images.pexels.com/photos/34926317/pexels-photo-34926317.jpeg",
+      "description": "Joyful celebration at F1 event with Brazilian flag",
+      "category": "Championship Win Moment"
+    }
+  },
+  "instructions_to_main_agent": {
+    "1": "Do not touch the existing SpatialExperience, Lenis setup, or exact camera stop logic. You are injecting UI layers cleanly into the active-only DOM state.",
+    "2": "Create a `data.js` or modify the existing state to include the curated 2007-2025 storytelling map: headline, narrative, signature race.",
+    "3": "Implement the Era Spine component using simple absolutely positioned fixed divs on the edge of the screen, tracking the current selected year.",
+    "4": "Embed the interactive telemetry (sector readouts, peak comparison bars) directly alongside the circuit/locality list. Ensure hover events trigger state updates that highlight the path.",
+    "5": "Do NOT use Shadcn Card components for this layout. Rely on pure HTML/Tailwind divs with semantic HTML5 tags.",
+    "6": "Add `data-testid` to every clickable year, era navigation dot, and interactive circuit item.",
+    "7": "Use `framer-motion` for the telemetry bars expanding on mount/update (using pure scaleX transforms)."
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic outputs. Avoid this: make creative, distinctive frontends.",
+    "Do not use dark colors as gradients. Dark colors look good when used independently.",
+    "Do not make generic centered layouts. Use asymmetrical, intentional positioning.",
+    "Create depth through layered design elements with z-index hierarchy and delicate 1px borders.",
+    "Use glass-morphism effects with `backdrop-blur-xl` and desaturated semi-transparent dark backgrounds.",
+    "NEVER apply `transition: all`. Specify properties to prevent breaking transforms.",
+    "Do NOT center align the app container (`.App { text-align: center; }`). Keep text reading naturally left-aligned.",
     "Every interaction needs micro-animations (hover states, focus).",
-    "Never use AI emoji characters for icons.",
-    "For icons, utilize Lucide-react or Phosphor Icons as appropriate.",
-    "Always maintain strict testing attributes: `data-testid` is mandatory for all buttons, links, form inputs, and key data elements.",
-    "DO NOT use complete `transparent` background in overlays or headers where content sits underneath."
-  ],
-  "image_urls": {}
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Do not use placeholder text for missing images. Use provided image URLs.",
+    "All test ids must follow kebab-case role-based convention."
+  ]
 }
