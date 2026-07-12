@@ -1,36 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { recordCategories } from "../data/records";
+import { reactorRecords } from "../data/reactorRecords";
 
-const formatValue = (value, decimals) => new Intl.NumberFormat("en-GB", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value);
-
-const AnimatedValue = ({ record, testId }) => {
-  const reduceMotion = useReducedMotion();
-  const [display, setDisplay] = useState(record.value);
-  useEffect(() => {
-    if (reduceMotion) { setDisplay(record.value); return undefined; }
-    let frame;
-    const start = performance.now();
-    const decimals = record.value.includes(".") ? 1 : 0;
-    const tick = (time) => {
-      const progress = Math.min((time - start) / 1050, 1);
-      const eased = 1 - Math.pow(1 - progress, 4);
-      setDisplay(formatValue(record.numeric * eased, decimals));
-      if (progress < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [record, reduceMotion]);
-  return <strong data-testid={testId}>{display}{record.suffix && <em>{record.suffix}</em>}</strong>;
+const OdometerCharacter = ({ character, index, reduced }) => {
+  if (!/\d/.test(character)) return <span className="odometer-static" data-testid={`odometer-static-${index}`}>{character}</span>;
+  const digit = Number(character);
+  return <span className="odometer-window" data-testid={`odometer-drum-${index}`}><motion.span className="odometer-column" initial={reduced ? false : { y: "0%" }} animate={{ y: `${digit * -10}%` }} transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 62, damping: 16, mass: 1, delay: index * .035 }}>{Array.from({ length: 10 }, (_, number) => <i key={number}>{number}</i>)}</motion.span></span>;
 };
 
 export const RecordsMonument = ({ isActive }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const indexRef = useRef(0);
+  const reactorRef = useRef(null);
+  const dragRef = useRef({ active: false, x: 0, y: 0, moved: false });
   const reduceMotion = useReducedMotion();
-  const category = recordCategories[activeIndex];
+  const record = reactorRecords[activeIndex];
   const select = useCallback((index) => {
-    const next = (index + recordCategories.length) % recordCategories.length;
+    const next = (index + reactorRecords.length) % reactorRecords.length;
     indexRef.current = next;
     setActiveIndex(next);
   }, []);
@@ -47,33 +33,53 @@ export const RecordsMonument = ({ isActive }) => {
     return () => window.removeEventListener("keydown", onKeyDown, { capture: true });
   }, [isActive, select]);
 
-  return <section className="records-section records-monument" style={{ "--record-bg": category.palette.bg, "--record-ink": category.palette.ink, "--record-accent": category.palette.accent, "--record-plane": category.palette.plane }} data-record-category={category.id} data-testid="career-records-section">
-    <div className="records-architectural-field" aria-hidden="true"><span/><span/><span/><span/></div>
-    <svg className="records-geometry" viewBox="0 0 1000 620" aria-hidden="true"><path d="M60 475 C175 80 420 65 560 260 C704 461 838 472 950 138"/><path d="M-20 340 C200 560 455 548 640 278 C744 126 878 90 1030 184"/><circle cx="555" cy="308" r="214"/><circle cx="555" cy="308" r="127"/></svg>
-    <div className="records-vertical-word" aria-hidden="true">UNTOUCHABLE</div>
+  const onPointerDown = (event) => {
+    if (event.pointerType === "touch" || event.target.closest("button")) return;
+    dragRef.current = { active: true, x: event.clientX, y: event.clientY, moved: false };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const onPointerMove = (event) => {
+    if (!dragRef.current.active || !reactorRef.current) return;
+    if (Math.hypot(event.clientX - dragRef.current.x, event.clientY - dragRef.current.y) < 8) return;
+    dragRef.current.moved = true;
+    const bounds = reactorRef.current.getBoundingClientRect();
+    const angle = (Math.atan2(event.clientY - (bounds.top + bounds.height / 2), event.clientX - (bounds.left + bounds.width / 2)) * 180 / Math.PI + 450) % 360;
+    select(Math.round(angle / 30) % reactorRecords.length);
+  };
+  const onPointerUp = () => { dragRef.current.active = false; };
 
-    <motion.div className="records-sculpture" key={category.id} initial={reduceMotion ? { opacity: 0 } : { opacity: .25, scale: .86, rotateX: 18, y: 40 }} animate={{ opacity: 1, scale: 1, rotateX: 0, y: 0 }} transition={{ duration: reduceMotion ? .15 : .68, ease: [0.22, 1, 0.36, 1] }}>
-      <div className="records-primary" data-testid={`records-primary-${category.id}`}>
-        <span className="records-index">ARCHIVE / {category.index}</span>
-        <div className="records-number-stack" aria-label={`${category.primary.value}${category.primary.suffix || ""} ${category.primary.title}`}>
-          <span aria-hidden="true">{category.primary.value}{category.primary.suffix || ""}</span>
-          <AnimatedValue record={category.primary} testId="records-primary-value" />
-        </div>
-        <h2 data-testid="records-primary-title">{category.primary.title}</h2>
-        <div className="records-primary-context"><b data-testid="records-primary-context">{category.primary.context}</b><span data-testid="records-primary-detail">{category.primary.detail}</span></div>
+  return <section className="records-section record-reactor" data-record-id={record.id} data-testid="career-records-section">
+    <div className="reactor-room" aria-hidden="true"><span/><span/><span/></div>
+    <div className="reactor-top-plate" data-testid="reactor-system-label"><b>UNIT // 44</b><span>FIA ALL-TIME REGISTER</span><i>SYS.ACTIVE</i></div>
+    <div className="reactor-live-status" aria-live="polite" data-testid="reactor-live-status">{record.value} — {record.title}. {record.status}. {record.detail}</div>
+
+    <div className="record-reactor-core" ref={reactorRef} tabIndex={0} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} data-testid="reactor-dial" aria-label="Twelve-position record selector">
+      <motion.div className="reactor-gear-ring" animate={{ rotate: activeIndex * -30 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 50, damping: 20 }}/>
+      <div className="reactor-bolt-ring" aria-hidden="true">{Array.from({ length: 24 }, (_, index) => <i style={{ "--bolt-angle": `${index * 15}deg` }} key={index}/>)}</div>
+      <motion.div className="reactor-selector-arm" animate={{ rotate: activeIndex * 30 + 180 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 58, damping: 18 }} aria-hidden="true"><span/></motion.div>
+
+      <svg className="reactor-gauges" viewBox="0 0 600 600" aria-hidden="true"><circle cx="300" cy="300" r="222"/><motion.circle className="gauge-live" cx="300" cy="300" r="222" pathLength="1" strokeDasharray=".66 .34" animate={{ rotate: activeIndex * 30 }} transition={{ duration: reduceMotion ? 0 : .45 }}/><path d="M138 418 A198 198 0 0 1 463 418"/><path d="M175 153 A198 198 0 0 1 425 153"/></svg>
+
+      <nav className="reactor-node-ring" aria-label="Primary Hamilton records" data-testid="reactor-record-navigation">{reactorRecords.map((item, index) => <button className={index === activeIndex ? "is-active" : ""} style={{ "--node-angle": `${index * 30}deg` }} onClick={() => select(index)} aria-label={`${item.value} ${item.title}`} aria-pressed={index === activeIndex} key={item.id} data-testid={`dial-node-${index + 1}`}><span>{String(index + 1).padStart(2, "0")}</span><i>{item.dial}</i></button>)}</nav>
+
+      <div className="reactor-face">
+        <div className="reactor-face-label"><span>RECORD OUTPUT</span><b data-testid="reactor-record-code">{record.code}</b></div>
+        <div className="reactor-odometer" aria-hidden="true" data-testid="reactor-odometer">{record.value.split("").map((character, index) => <OdometerCharacter character={character} index={index} reduced={reduceMotion} key={`${record.id}-${index}-${character}`}/>)}</div>
+        <div className="reactor-timing-strip" data-testid="timing-strip-label">{record.status}</div>
+        <div className="reactor-warning-lights" aria-hidden="true"><span/><span/><span/><span/><span/></div>
       </div>
+    </div>
 
-      <p className="records-statement" data-testid="records-category-statement">{category.statement}</p>
-      <div className="records-orbit" data-testid="records-orbit-context">{category.orbit.map((item, index) => <span key={item} style={{ "--orbit-index": index }} data-testid={`records-orbit-${category.id}-${index + 1}`}>{item}</span>)}</div>
-      <div className="records-satellites" data-testid="records-secondary-list">{category.records.map((record, index) => <article className={`records-satellite satellite-${index + 1}`} key={record.id} data-testid={`record-${category.id}-${record.id}`}>
-        <strong data-testid={`record-${category.id}-${record.id}-value`}>{record.value}</strong><span data-testid={`record-${category.id}-${record.id}-label`}>{record.label}</span><small data-testid={`record-${category.id}-${record.id}-detail`}>{record.detail}</small>
-      </article>)}</div>
-    </motion.div>
+    <aside className="reactor-specification" data-testid="reactor-record-specification">
+      <div className="spec-rivet" aria-hidden="true"/><div className="spec-rivet" aria-hidden="true"/>
+      <span data-testid="records-selected-count">RECORD {String(activeIndex + 1).padStart(2, "0")} / 12</span>
+      <strong data-testid="records-primary-value">{record.value}</strong>
+      <h2 data-testid="records-primary-title">{record.title}</h2>
+      <b data-testid="records-primary-context">{record.status}</b>
+      <p data-testid="records-primary-detail">{record.detail}</p>
+      <div className="spec-barcode" aria-hidden="true">|||| ||| || |||| | ||| ||</div>
+    </aside>
 
-    <nav className="records-constellation" aria-label="Record categories" data-testid="records-category-navigation">
-      <div className="constellation-line" aria-hidden="true"><motion.span animate={{ scaleX: activeIndex / (recordCategories.length - 1) }} transition={{ duration: reduceMotion ? 0 : .45, ease: [0.22, 1, 0.36, 1] }}/></div>
-      {recordCategories.map((item, index) => <button className={index === activeIndex ? "is-active" : ""} onClick={() => select(index)} aria-pressed={index === activeIndex} aria-label={`Show ${item.label} records`} key={item.id} data-testid={`records-category-${item.id}-button`}><i>{item.index}</i><span data-testid={`records-category-${item.id}-label`}>{item.label}</span></button>)}
-    </nav>
-    <div className="records-count" data-testid="records-selected-count"><strong>{category.index}</strong><span>/ 05</span></div>
+    <div className="reactor-record-rail" data-testid="reactor-record-rail">{reactorRecords.map((item, index) => <span className={index === activeIndex ? "is-active" : ""} key={item.id} data-testid={`reactor-rail-${index + 1}`}><i/>{item.code}</span>)}</div>
   </section>;
 };
