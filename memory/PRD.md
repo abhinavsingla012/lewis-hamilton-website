@@ -230,6 +230,18 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Compressed all three concepts for mobile: editorial story, peak comparisons, horizontal era spine, and active circuit signal remain visible without overflow
 - Iteration 38 passed all 19 stories, title logic, era routing and marker counts, linked telemetry, existing controls/routes/themes, viewport matrix, reduced motion, build, and runtime console checks
 
+## Timeline V5 Visibility and Image-Framing Cleanup — 2026-07-12
+- Responded to user-reported crowding where the oversized year, vertical era spine, story telemetry, and achievement rows obscured one another
+- Restored a strict left image/editorial zone and right championship/data zone while preserving the cinematic dissolve between them
+- Constrained the monumental year to the left 42% of the viewport so it cannot enter the achievement list
+- Reduced the story to a compact headline, two-line narrative, and signature moment; removed peak comparison rails from the active composition
+- Removed the circuit-signal row from the achievement stack and reduced background telemetry to a non-obstructive seam detail
+- Relocated the McLaren/Mercedes/Ferrari era control from the vertical seam to a compact horizontal strip above the season navigation
+- Added explicit framing for every season image: portrait assets use full-subject `contain` with a soft blurred backdrop; landscape assets use tuned `cover` focal points
+- Verified all 19 images load with correct dimensions and framing mode; representative 2008 desktop state has zero year/data, story/data, or year/story overlap
+- Iteration 39 passed desktop/tablet image framing, visibility, routing, interactions, reduced motion, and rapid-switch checks; it identified two remaining mobile stacking failures
+- Corrected 390×844 and 320×700 image/story/year/data zones; targeted self-test now passes strict separation and zero horizontal overflow at both sizes
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified
