@@ -25,6 +25,8 @@ export const VisualGallery = ({ activeKey, isActive }) => {
   const touchLocked = useRef(false);
   const unlockTimer = useRef(null);
   const previousRoute = useRef("top");
+  const wasActive = useRef(false);
+  const releasing = useRef(false);
   const reduceMotion = useReducedMotion();
   const activeItem = gallery[activeIndex];
 
@@ -36,6 +38,8 @@ export const VisualGallery = ({ activeKey, isActive }) => {
   }, []);
 
   const releaseTo = useCallback((key) => {
+    if (releasing.current) return;
+    releasing.current = true;
     window.__galleryScrollLocked = false;
     window.__hamiltonLenis?.start();
     window.__spatialGo?.(key);
@@ -63,14 +67,20 @@ export const VisualGallery = ({ activeKey, isActive }) => {
   }, [activeKey]);
 
   useEffect(() => {
+    if (isActive && !wasActive.current) {
+      const enteredFromLaterChapter = ["records", "milestones", "tracks", "moment", "quotes", "victories", "footer"].includes(previousRoute.current);
+      setGalleryIndex(enteredFromLaterChapter ? gallery.length - 1 : 0);
+    }
+    if (!isActive) releasing.current = false;
+    wasActive.current = isActive;
+  }, [isActive, setGalleryIndex]);
+
+  useEffect(() => {
     if (!isActive) return undefined;
     const runway = document.querySelector("[data-testid='unified-spatial-experience']");
     if (!runway) return undefined;
     const target = runway.offsetTop + GALLERY_STOP * (runway.offsetHeight - window.innerHeight);
-    const enteredFromLaterChapter = ["records", "milestones", "tracks", "moment", "quotes", "victories", "footer"].includes(previousRoute.current);
-    setGalleryIndex(enteredFromLaterChapter ? gallery.length - 1 : 0);
     if (Math.abs(window.scrollY - target) > 1) {
-      setGalleryIndex(window.scrollY > target || enteredFromLaterChapter ? gallery.length - 1 : 0);
       requestAnimationFrame(() => window.__spatialGo?.("gallery"));
     }
 
@@ -82,11 +92,12 @@ export const VisualGallery = ({ activeKey, isActive }) => {
       unlockTimer.current = window.setTimeout(() => {
         wheelLocked.current = false;
         wheelTotal.current = 0;
-      }, reduceMotion ? 320 : 720);
+      }, reduceMotion ? 280 : 620);
     };
     const onWheel = (event) => {
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation();
       if (wheelLocked.current) return;
       wheelTotal.current += event.deltaY;
       if (Math.abs(wheelTotal.current) < 72) return;
@@ -102,6 +113,7 @@ export const VisualGallery = ({ activeKey, isActive }) => {
     const onTouchMove = (event) => {
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation();
       const nextY = event.touches[0]?.clientY;
       if (touchY.current === null || nextY === undefined || touchLocked.current) return;
       const distance = touchY.current - nextY;
@@ -114,15 +126,14 @@ export const VisualGallery = ({ activeKey, isActive }) => {
       window.setTimeout(() => { touchLocked.current = false; }, 180);
     };
     const onKeyDown = (event) => {
-      if (event.target?.closest?.("button, a, input, select, textarea") && !["ArrowDown", "ArrowUp", "PageDown", "PageUp"].includes(event.key)) return;
-      if (["ArrowDown", "PageDown", " "].includes(event.key)) {
-        event.preventDefault();
-        move(1);
-      }
-      if (["ArrowUp", "PageUp"].includes(event.key)) {
-        event.preventDefault();
-        move(-1);
-      }
+      const downKeys = ["ArrowDown", "PageDown", " "];
+      const upKeys = ["ArrowUp", "PageUp"];
+      if (![...downKeys, ...upKeys].includes(event.key)) return;
+      if (event.target?.closest?.("input, select, textarea")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      move(downKeys.includes(event.key) ? 1 : -1);
     };
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });
     window.addEventListener("touchstart", onTouchStart, { passive: true, capture: true });
@@ -146,7 +157,16 @@ export const VisualGallery = ({ activeKey, isActive }) => {
   return <>
     <section className="gallery-section gallery-v3" style={{ "--issue-bg": activeItem.palette.bg, "--issue-ink": activeItem.palette.ink, "--issue-accent": activeItem.palette.accent }} data-active-mode={activeItem.id} data-gallery-active={isActive ? "true" : "false"} data-gallery-route={activeKey} data-testid="visual-gallery-section">
       <div className="gallery-v3-stage" data-testid="gallery-scroll-container">
-        <GalleryEditorialSlide item={activeItem} index={activeIndex} count={gallery.length} direction={direction} reduceMotion={reduceMotion} gallery={gallery} />
+        <div className="gallery-v3-status" aria-live="polite">
+          <span data-testid="gallery-collection-label">44 — THE STYLE ARCHIVE</span>
+          <span data-testid="gallery-active-category">{activeItem.category}</span>
+          <span data-testid="gallery-active-title">{activeItem.title}</span>
+          <span data-testid="gallery-active-description">{activeItem.description}</span>
+          <span data-testid="gallery-active-location">{activeItem.location} — {activeItem.venue}</span>
+          <span data-testid="gallery-active-credit">{activeItem.year} — {activeItem.designer}</span>
+          <span data-testid="gallery-sequence-label">{String(activeIndex + 1).padStart(2, "0")} — {String(gallery.length).padStart(2, "0")}</span>
+        </div>
+        <div className="gallery-v3-live" data-testid="gallery-photo-active"><GalleryEditorialSlide item={activeItem} index={activeIndex} count={gallery.length} direction={direction} reduceMotion={reduceMotion} gallery={gallery} /></div>
 
         <nav className="gallery-v3-index" aria-label="Gallery issue index" data-testid="gallery-mode-navigation">
           <div className="gallery-v3-index-line" aria-hidden="true"><motion.span animate={{ scaleX: (activeIndex + 1) / gallery.length }} transition={{ duration: reduceMotion ? 0 : .45, ease: [0.22, 1, 0.36, 1] }} /></div>
