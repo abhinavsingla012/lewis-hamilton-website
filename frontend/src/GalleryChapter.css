@@ -70,3 +70,115 @@
   .gallery-v2-frame figcaption{bottom:78px}
 }
 @media(prefers-reduced-motion:reduce){.gallery-v2-frame{transition:none}.gallery-v2-controls button,.gallery-v2-rail button{transition:none}}
+
+/* V3 — fashion-week issue */
+.circuit-chapters>.gallery-section.gallery-v3{padding:0;background:var(--issue-bg);color:var(--issue-ink);touch-action:none;overscroll-behavior:none;transition:background-color .45s,color .45s}
+.gallery-v3-stage{position:relative;width:100%;height:100%;overflow:hidden;isolation:isolate}
+.gallery-issue{position:absolute;inset:0;overflow:hidden;background:var(--issue-bg);color:var(--issue-ink)}
+.gallery-issue:before{content:"";position:absolute;z-index:30;inset:0;pointer-events:none;opacity:.16;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E")}
+.gallery-issue:after{content:"";position:absolute;z-index:29;inset:0;pointer-events:none;border:1px solid color-mix(in srgb,var(--issue-ink) 22%,transparent);background-image:linear-gradient(90deg,transparent 49.94%,color-mix(in srgb,var(--issue-ink) 12%,transparent) 50%,transparent 50.06%),linear-gradient(0deg,transparent 49.94%,color-mix(in srgb,var(--issue-ink) 10%,transparent) 50%,transparent 50.06%);background-size:25% 25%}
+.issue-flash{position:absolute;z-index:40;inset:0;pointer-events:none;background:#fff;animation:issue-flash .65s ease-out both}
+@keyframes issue-flash{0%{opacity:.75}18%{opacity:.1}100%{opacity:0}}
+.issue-masthead{position:absolute;z-index:45;top:22px;left:43%;display:flex;align-items:flex-start;gap:10px;font-family:"Space Mono";color:var(--issue-ink)}
+.issue-masthead b{font:800 42px/.76 Unbounded;letter-spacing:0}
+.issue-masthead span{padding-top:1px;font-size:7px;line-height:1.3;letter-spacing:.12em}
+.issue-heading{position:absolute;z-index:38;left:7vw;bottom:11vh;max-width:min(48vw,760px)}
+.issue-heading>span{display:block;margin-bottom:10px;font:700 8px "Space Mono";letter-spacing:.16em}
+.issue-heading h2{max-width:100%;margin:0;font:800 clamp(46px,7.2vw,130px)/.78 Unbounded;letter-spacing:0;text-transform:uppercase;text-wrap:balance}
+.issue-heading p{max-width:470px;margin:18px 0 0;padding-left:44px;border-left:4px solid var(--issue-accent);font-size:clamp(10px,.82vw,13px);font-weight:600;line-height:1.5}
+.issue-location{position:absolute;z-index:46;top:118px;right:28px;display:grid;grid-template-columns:14px auto;gap:3px 8px;max-width:240px;padding:10px 12px;border:1px solid currentColor;background:color-mix(in srgb,var(--issue-bg) 78%,transparent);backdrop-filter:blur(10px);font-family:"Space Mono"}
+.issue-location svg{grid-row:1/3;width:12px;height:12px}
+.issue-location span{font-size:8px;font-weight:700;letter-spacing:.08em}
+.issue-location b{font-size:6px;font-weight:400;letter-spacing:.08em;opacity:.72}
+.issue-credit{position:absolute;z-index:45;right:28px;bottom:86px;display:flex;align-items:baseline;gap:9px;font-family:"Space Mono";writing-mode:vertical-rl;transform:rotate(180deg)}
+.issue-credit span{font-size:8px}.issue-credit b{font-size:7px;letter-spacing:.1em}
+.issue-counter{position:absolute;z-index:46;left:26px;bottom:22px;display:flex;align-items:baseline;gap:6px;font-family:"Space Mono"}
+.issue-counter strong{font:800 30px/1 Unbounded}.issue-counter span{font-size:8px}
+.issue-edge-copy{position:absolute;z-index:44;left:50%;bottom:11px;font:6px "Space Mono";letter-spacing:.18em;transform:translateX(-50%);white-space:nowrap}
+
+/* Cover: free-standing portrait over a giant cover line */
+.issue-cover-visual{position:absolute;inset:0;overflow:hidden}
+.issue-cover-visual:before{content:"";position:absolute;z-index:0;inset:0;background:radial-gradient(circle at 67% 42%,color-mix(in srgb,var(--issue-accent) 52%,transparent),transparent 42%)}
+.issue-cover-visual img{position:absolute;z-index:2;top:4vh;right:10vw;width:44vw;height:92vh;object-fit:cover;clip-path:polygon(12% 0,100% 0,89% 100%,0 100%);filter:contrast(1.04) saturate(.9)}
+.issue-cover-visual span{position:absolute;z-index:1;left:-.04em;top:42%;width:110%;overflow:hidden;color:var(--issue-accent);font:800 clamp(120px,18vw,340px)/.7 Unbounded;letter-spacing:0;white-space:nowrap;transform:translateY(-50%)}
+.layout-cover .issue-heading{left:5vw;bottom:13vh;max-width:53vw}
+.layout-cover .issue-heading h2{font-size:clamp(52px,8.4vw,150px)}
+
+/* Diagonal runway: image becomes the architecture */
+.issue-diagonal-visual{position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 56px,color-mix(in srgb,var(--issue-ink) 9%,transparent) 57px 58px)}
+.issue-diagonal-image{position:absolute;z-index:2;top:-16vh;left:36%;width:40vw;height:132vh;overflow:hidden;border-left:14px solid var(--issue-accent);transform:rotate(11deg);box-shadow:30px 0 0 color-mix(in srgb,var(--issue-ink) 10%,transparent)}
+.issue-diagonal-image img{width:100%;height:100%;object-fit:cover;transform:rotate(-11deg) scale(1.18)}
+.issue-diagonal-visual>span{position:absolute;z-index:3;right:-.03em;bottom:-.02em;color:transparent;font:800 clamp(100px,15vw,280px)/.75 Unbounded;letter-spacing:0;-webkit-text-stroke:2px var(--issue-ink);writing-mode:vertical-rl;opacity:.48}
+.layout-diagonal .issue-heading{left:auto;right:9vw;bottom:10vh;max-width:39vw;text-align:right}
+.layout-diagonal .issue-heading p{margin-left:auto;padding-right:44px;padding-left:0;border-right:4px solid var(--issue-accent);border-left:0}
+
+/* Poster: one photo fighting repeated type */
+.issue-poster-visual{position:absolute;inset:0;overflow:hidden}
+.issue-poster-visual>img{position:absolute;z-index:3;right:0;top:0;width:53%;height:100%;object-fit:cover;filter:grayscale(.18) contrast(1.08);mix-blend-mode:multiply}
+.issue-poster-type{position:absolute;z-index:2;inset:7vh 0 auto -1vw;display:flex;flex-direction:column;overflow:hidden;color:var(--issue-accent);font:800 clamp(66px,11vw,205px)/.74 Unbounded;letter-spacing:0;text-transform:uppercase}
+.issue-poster-type span:nth-child(even){color:transparent;-webkit-text-stroke:2px var(--issue-ink);transform:translateX(9vw)}
+.layout-poster .issue-heading{bottom:8vh;max-width:55vw}.layout-poster .issue-heading h2{font-size:clamp(48px,6.4vw,116px)}
+
+/* Contact sheet: deliberately messy archival sequence */
+.issue-contact-visual{position:absolute;inset:0;perspective:1200px;background:linear-gradient(115deg,var(--issue-bg) 0 55%,color-mix(in srgb,var(--issue-accent) 40%,var(--issue-bg)) 55%)}
+.contact-frame{position:absolute;z-index:2;margin:0;padding:10px 10px 30px;background:#f7f1e4;box-shadow:14px 18px 0 color-mix(in srgb,var(--issue-ink) 22%,transparent)}
+.contact-frame img{width:100%;height:100%;object-fit:cover;filter:saturate(.92) contrast(1.04)}
+.contact-frame>span{position:absolute;left:10px;bottom:7px;color:#171713;font:700 8px "Space Mono"}
+.contact-before{left:30%;top:12vh;width:21vw;height:58vh;transform:rotate(-8deg) translateZ(-80px)}
+.contact-main{z-index:4;left:48%;top:4vh;width:28vw;height:82vh;transform:rotate(3deg)}
+.contact-after{z-index:3;right:-2vw;top:18vh;width:22vw;height:62vh;transform:rotate(10deg) translateZ(-40px)}
+.layout-contact .issue-heading{left:5vw;bottom:13vh;max-width:36vw}.layout-contact .issue-heading h2{font-size:clamp(46px,6vw,108px)}
+
+/* Helmet artifact: object, orbit, annotations */
+.issue-artifact-visual{position:absolute;inset:0;display:grid;place-items:center;background:repeating-radial-gradient(circle at 50% 50%,transparent 0 10vw,color-mix(in srgb,var(--issue-ink) 14%,transparent) calc(10vw + 1px) calc(10vw + 2px))}
+.issue-artifact-visual img{position:relative;z-index:3;width:min(62vw,920px);height:68vh;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.08) drop-shadow(22px 28px 0 color-mix(in srgb,var(--issue-accent) 48%,transparent))}
+.artifact-orbit{position:absolute;z-index:2;width:56vh;height:56vh;border:2px solid var(--issue-accent);border-radius:50%;animation:artifact-orbit 12s linear infinite}
+.artifact-orbit:before,.artifact-orbit:after{content:"";position:absolute;width:14px;height:14px;background:var(--issue-ink);border-radius:50%}.artifact-orbit:before{left:8%;top:14%}.artifact-orbit:after{right:8%;bottom:14%}
+@keyframes artifact-orbit{to{transform:rotate(360deg)}}
+.issue-artifact-visual>span{position:absolute;z-index:1;top:46%;width:100%;overflow:hidden;color:transparent;font:800 12vw/.8 Unbounded;letter-spacing:0;text-align:center;-webkit-text-stroke:1px var(--issue-ink);white-space:nowrap}
+.layout-artifact .issue-heading{bottom:6vh;max-width:43vw}.layout-artifact .issue-heading h2{font-size:clamp(42px,5vw,92px)}
+
+/* Social collage: saved post energy, never a phone mockup */
+.issue-social-visual{position:absolute;inset:0;background:linear-gradient(90deg,var(--issue-accent) 0 18%,transparent 18% 100%)}
+.issue-social-visual figure{position:absolute;margin:0;overflow:hidden;border:3px solid var(--issue-ink);background:var(--issue-bg);box-shadow:18px 18px 0 color-mix(in srgb,var(--issue-ink) 28%,transparent)}
+.issue-social-visual img{width:100%;height:100%;object-fit:cover}
+.social-hero{left:29%;top:5vh;width:35vw;height:82vh;transform:rotate(-3deg)}
+.social-detail{z-index:4;right:8vw;top:16vh;width:23vw;height:51vh;transform:rotate(7deg)}
+.social-detail img{transform:scale(1.7);object-position:50% 24%}
+.social-stamp{position:absolute;z-index:6;right:5vw;bottom:8vh;padding:14px;border:2px solid var(--issue-ink);border-radius:50%;font:800 10px/1.1 Unbounded;text-align:center;transform:rotate(-12deg)}
+.layout-social .issue-heading{left:4.5vw;bottom:8vh;max-width:36vw}.layout-social .issue-heading h2{font-size:clamp(42px,5.4vw,98px)}
+
+.gallery-v3-index{position:absolute;z-index:60;left:28%;bottom:22px;display:grid;grid-template-columns:repeat(16,1fr);gap:5px;width:46vw;padding-top:8px}
+.gallery-v3-index-line{position:absolute;left:0;right:0;top:0;height:2px;background:color-mix(in srgb,var(--issue-ink) 22%,transparent)}
+.gallery-v3-index-line span{display:block;width:100%;height:100%;background:var(--issue-ink);transform-origin:left}
+.gallery-v3-index button{position:relative;height:22px;padding:0;border:0;background:transparent;color:var(--issue-ink);font:600 6px "Space Mono";cursor:pointer;opacity:.42;transition:opacity .2s,transform .2s}
+.gallery-v3-index button:after{content:"";position:absolute;left:50%;bottom:0;width:3px;height:3px;background:currentColor;transform:translateX(-50%)}
+.gallery-v3-index button:hover,.gallery-v3-index button:focus-visible,.gallery-v3-index button.is-active{opacity:1;transform:translateY(-3px)}
+.gallery-v3-index button.is-active:after{width:14px}
+.gallery-v3-controls{position:absolute;z-index:65;right:20px;bottom:18px;display:flex;gap:7px}
+.gallery-v3-controls button{display:flex;align-items:center;justify-content:center;gap:7px;height:35px;padding:0 11px;border:1px solid currentColor;border-radius:0;background:var(--issue-bg);color:var(--issue-ink);font:700 6px "Space Mono";letter-spacing:.1em;cursor:pointer;transition:background-color .2s,color .2s,transform .2s}
+.gallery-v3-controls button:hover,.gallery-v3-controls button:focus-visible{background:var(--issue-ink);color:var(--issue-bg);transform:translateY(-2px)}
+.gallery-v3-controls svg{width:13px;height:13px}
+.circuit-viewport[data-active="gallery"] .global-chapter-marker,.circuit-viewport[data-active="gallery"] .back-to-circuit{color:#fff;mix-blend-mode:difference;text-shadow:none}
+
+@media(max-width:900px){
+  .issue-masthead{top:22px;left:48%;gap:5px}.issue-masthead b{font-size:26px}.issue-masthead span{font-size:5px}
+  .issue-location{top:122px;right:10px;max-width:180px;padding:7px 8px}.issue-location span{font-size:6px}.issue-location b{font-size:5px}
+  .issue-heading,.layout-cover .issue-heading,.layout-diagonal .issue-heading,.layout-poster .issue-heading,.layout-contact .issue-heading,.layout-artifact .issue-heading,.layout-social .issue-heading{left:14px;right:64px;bottom:84px;max-width:none;text-align:left}
+  .issue-heading>span{margin-bottom:6px;font-size:6px}.issue-heading h2,.layout-cover .issue-heading h2,.layout-poster .issue-heading h2,.layout-contact .issue-heading h2,.layout-artifact .issue-heading h2,.layout-social .issue-heading h2{font-size:clamp(35px,11.5vw,58px);line-height:.82}
+  .layout-diagonal .issue-heading p,.issue-heading p{display:-webkit-box;max-width:330px;margin:9px 0 0;padding:7px 0 0;border:0;border-top:3px solid var(--issue-accent);overflow:hidden;font-size:8px;line-height:1.35;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+  .issue-credit{right:9px;bottom:86px}.issue-counter{left:12px;bottom:20px}.issue-counter strong{font-size:22px}
+  .issue-edge-copy{display:none}
+  .gallery-v3-index{left:64px;right:112px;bottom:16px;width:auto;gap:2px}.gallery-v3-index button{height:20px;font-size:0}.gallery-v3-index button:after{width:2px;height:5px}.gallery-v3-index button.is-active:after{width:8px}
+  .gallery-v3-controls{right:9px;bottom:12px}.gallery-v3-controls button{width:38px;height:38px;padding:0}.gallery-v3-controls button span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .issue-cover-visual img{top:9vh;right:-7vw;width:88vw;height:79vh;clip-path:polygon(13% 0,100% 0,90% 100%,0 100%)}.issue-cover-visual span{top:38%;font-size:30vw}
+  .issue-diagonal-image{top:-8vh;left:17%;width:72vw;height:104vh;border-left-width:8px}.issue-diagonal-visual>span{font-size:28vw}
+  .issue-poster-visual>img{right:-18%;width:92%;height:100%}.issue-poster-type{top:22vh;font-size:22vw}.issue-poster-type span:nth-child(even){transform:translateX(12vw)}
+  .contact-frame{padding:6px 6px 20px}.contact-before{left:-8%;top:20vh;width:45vw;height:45vh}.contact-main{left:27%;top:10vh;width:55vw;height:61vh}.contact-after{right:-18%;top:22vh;width:43vw;height:43vh}
+  .issue-artifact-visual img{width:96vw;height:58vh}.artifact-orbit{width:40vh;height:40vh}.issue-artifact-visual>span{font-size:23vw}
+  .social-hero{left:4%;top:12vh;width:68vw;height:61vh}.social-detail{right:-4%;top:20vh;width:43vw;height:40vh}.social-stamp{right:5vw;bottom:24vh;font-size:7px}
+}
+@media(max-width:350px), (max-height:720px) and (max-width:900px){
+  .issue-location{top:124px}.issue-heading,.layout-cover .issue-heading,.layout-diagonal .issue-heading,.layout-poster .issue-heading,.layout-contact .issue-heading,.layout-artifact .issue-heading,.layout-social .issue-heading{bottom:70px}.issue-heading h2,.layout-cover .issue-heading h2,.layout-poster .issue-heading h2,.layout-contact .issue-heading h2,.layout-artifact .issue-heading h2,.layout-social .issue-heading h2{font-size:32px}.issue-heading p{display:none}.issue-credit{bottom:74px}.issue-cover-visual img{height:72vh}.gallery-v3-index{bottom:13px}
+}
+@media(prefers-reduced-motion:reduce){.gallery-section.gallery-v3,.gallery-v3-index button,.gallery-v3-controls button{transition:none}.issue-flash{display:none}.artifact-orbit{animation:none}}

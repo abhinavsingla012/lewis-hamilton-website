@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { gallery, IMAGES } from "../data/content";
+import { GalleryEditorialSlide } from "./GalleryEditorialSlide";
 
 const milestones = [
   { number: "001", year: "2007", race: "CANADA", label: "THE FIRST", note: "Victory in only his sixth Formula 1 start." },
@@ -16,6 +17,7 @@ const GALLERY_STOP = 0.435;
 
 export const VisualGallery = ({ activeKey, isActive }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
   const activeIndexRef = useRef(0);
   const wheelTotal = useRef(0);
   const wheelLocked = useRef(false);
@@ -28,11 +30,13 @@ export const VisualGallery = ({ activeKey, isActive }) => {
 
   const setGalleryIndex = useCallback((index) => {
     const next = Math.max(0, Math.min(gallery.length - 1, index));
+    if (next !== activeIndexRef.current) setDirection(next > activeIndexRef.current ? 1 : -1);
     activeIndexRef.current = next;
     setActiveIndex(next);
   }, []);
 
   const releaseTo = useCallback((key) => {
+    window.__galleryScrollLocked = false;
     window.__hamiltonLenis?.start();
     window.__spatialGo?.(key);
   }, []);
@@ -68,9 +72,9 @@ export const VisualGallery = ({ activeKey, isActive }) => {
     if (Math.abs(window.scrollY - target) > 1) {
       setGalleryIndex(window.scrollY > target || enteredFromLaterChapter ? gallery.length - 1 : 0);
       requestAnimationFrame(() => window.__spatialGo?.("gallery"));
-      return undefined;
     }
 
+    window.__galleryScrollLocked = true;
     window.__hamiltonLenis?.stop();
     const lockWheel = () => {
       wheelLocked.current = true;
@@ -129,6 +133,7 @@ export const VisualGallery = ({ activeKey, isActive }) => {
       window.clearTimeout(unlockTimer.current);
       wheelLocked.current = false;
       wheelTotal.current = 0;
+      window.__galleryScrollLocked = false;
       window.__hamiltonLenis?.start();
       window.removeEventListener("wheel", onWheel, { capture: true });
       window.removeEventListener("touchstart", onTouchStart, { capture: true });
@@ -139,55 +144,12 @@ export const VisualGallery = ({ activeKey, isActive }) => {
   }, [isActive, move, reduceMotion, setGalleryIndex]);
 
   return <>
-    <section className="gallery-section gallery-v2" data-active-mode={activeItem.id} data-gallery-active={isActive ? "true" : "false"} data-gallery-route={activeKey} data-testid="visual-gallery-section">
-      <div className="gallery-v2-grid" data-testid="gallery-scroll-container">
-        <div className="gallery-v2-context">
-          <span className="gallery-v2-overline" data-testid="gallery-collection-label">THE MANY FACES OF 44</span>
-          <h2 data-testid="gallery-section-title"><span>SEVEN</span><i>modes.</i></h2>
-          <div className="gallery-v2-active-copy" aria-live="polite" data-testid="gallery-active-copy">
-            <span data-testid="gallery-active-category">{activeItem.category}</span>
-            <h3 data-testid="gallery-active-title">{activeItem.title}</h3>
-            <p data-testid="gallery-active-description">{activeItem.description}</p>
-          </div>
-          <div className="gallery-v2-sequence" data-testid="gallery-sequence-label">
-            <strong>{String(activeIndex + 1).padStart(2, "0")}</strong>
-            <span>/ {String(gallery.length).padStart(2, "0")}</span>
-          </div>
-        </div>
+    <section className="gallery-section gallery-v3" style={{ "--issue-bg": activeItem.palette.bg, "--issue-ink": activeItem.palette.ink, "--issue-accent": activeItem.palette.accent }} data-active-mode={activeItem.id} data-gallery-active={isActive ? "true" : "false"} data-gallery-route={activeKey} data-testid="visual-gallery-section">
+      <div className="gallery-v3-stage" data-testid="gallery-scroll-container">
+        <GalleryEditorialSlide item={activeItem} index={activeIndex} count={gallery.length} direction={direction} reduceMotion={reduceMotion} gallery={gallery} />
 
-        <div className="gallery-v2-stack" data-testid="gallery-photo-stack">
-          <div className="gallery-v2-ghost-word" aria-hidden="true">{activeItem.ghost}</div>
-          {gallery.map((item, index) => {
-            const state = index === activeIndex ? "active" : index < activeIndex ? "past" : "future";
-            return <motion.figure
-              className={`gallery-v2-frame is-${state}`}
-              key={item.id}
-              initial={false}
-              animate={reduceMotion ? {
-                opacity: state === "active" ? 1 : 0,
-              } : {
-                opacity: state === "active" ? 1 : state === "past" && index === activeIndex - 1 ? .16 : 0,
-                scale: state === "active" ? 1 : state === "past" ? .945 : 1.065,
-                y: state === "active" ? 0 : state === "past" ? -18 : 22,
-                clipPath: state === "future" ? "inset(100% 0 0 0)" : "inset(0% 0 0 0)",
-                filter: state === "active" ? "brightness(1) saturate(.96)" : "brightness(.42) saturate(.45)",
-              }}
-              transition={{ duration: reduceMotion ? .16 : .82, ease: [0.76, 0, 0.24, 1] }}
-              data-testid={state === "active" ? "gallery-photo-active" : `gallery-photo-${item.id}`}
-            >
-              <img src={item.image} alt={item.alt} style={{ objectPosition: item.position }} data-testid={`gallery-image-${item.id}`} />
-              <div className="gallery-v2-image-shade" />
-              <figcaption data-testid={`gallery-caption-${item.id}`}>
-                <span>{item.location}</span>
-                <strong>{item.year}</strong>
-              </figcaption>
-            </motion.figure>;
-          })}
-          <span className="gallery-v2-frame-number" aria-hidden="true">{String(activeIndex + 1).padStart(2, "0")}</span>
-        </div>
-
-        <nav className="gallery-v2-rail" aria-label="Gallery modes" data-testid="gallery-mode-navigation">
-          <div className="gallery-v2-progress" aria-hidden="true"><motion.span animate={{ scaleY: (activeIndex + 1) / gallery.length }} transition={{ duration: reduceMotion ? 0 : .55, ease: [0.22, 1, 0.36, 1] }} /></div>
+        <nav className="gallery-v3-index" aria-label="Gallery issue index" data-testid="gallery-mode-navigation">
+          <div className="gallery-v3-index-line" aria-hidden="true"><motion.span animate={{ scaleX: (activeIndex + 1) / gallery.length }} transition={{ duration: reduceMotion ? 0 : .45, ease: [0.22, 1, 0.36, 1] }} /></div>
           {gallery.map((item, index) => <button
             className={index === activeIndex ? "is-active" : ""}
             key={item.id}
@@ -195,10 +157,10 @@ export const VisualGallery = ({ activeKey, isActive }) => {
             aria-label={`Show ${item.title}`}
             aria-pressed={index === activeIndex}
             data-testid={`gallery-mode-button-${item.id}`}
-          ><span>{String(index + 1).padStart(2, "0")}</span><b>{item.short}</b></button>)}
+          ><span>{String(index + 1).padStart(2, "0")}</span></button>)}
         </nav>
 
-        <div className="gallery-v2-controls">
+        <div className="gallery-v3-controls">
           <button onClick={() => move(-1)} aria-label={activeIndex === 0 ? "Return to Cars" : "Previous gallery mode"} data-testid="gallery-previous-button"><ArrowUp /><span>{activeIndex === 0 ? "CARS" : "PREVIOUS"}</span></button>
           <button onClick={() => move(1)} aria-label={activeIndex === gallery.length - 1 ? "Continue to Records" : "Next gallery mode"} data-testid={activeIndex === gallery.length - 1 ? "gallery-next-release" : "gallery-next-button"}><span>{activeIndex === gallery.length - 1 ? "RECORDS" : "NEXT"}</span><ArrowDown /></button>
         </div>

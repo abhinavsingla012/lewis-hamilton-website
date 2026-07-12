@@ -164,7 +164,7 @@ export const SpatialExperience = ({ archive }) => {
           window.scrollTo({ top, behavior: "auto" });
         }
         requestAnimationFrame(() => {
-          window.__hamiltonLenis?.start();
+          if (!window.__galleryScrollLocked) window.__hamiltonLenis?.start();
           if (navigationLockRef.current?.token !== token) return;
           const denominator = runway.current.offsetHeight - window.innerHeight;
           const exactProgress = denominator > 0 ? (window.scrollY - runway.current.offsetTop) / denominator : item.stop;
