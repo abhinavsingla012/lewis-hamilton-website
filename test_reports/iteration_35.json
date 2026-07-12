@@ -1,0 +1,40 @@
+{
+  "summary": "Frontend-only final acceptance retest completed after navigation-lock RCA fix. All requested marker-stop stabilization checks passed on desktop and mobile.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/frontend/src/components/SpatialExperience.jsx",
+    "/app/frontend/src/components/SilverstoneMap.jsx",
+    "/app/frontend/src/CircuitExperience.css",
+    "/app/frontend/src/LegacyChapter.css",
+    "/app/test_reports/iteration_35.json"
+  ],
+  "action_items": [
+    "No blocker found in requested scope; acceptance criteria validated.",
+    "Optional: run one more CI browser matrix to guard against future regressions in marker settle logic."
+  ],
+  "critical_code_review_comments": [
+    "Navigation lock stabilization behaves deterministically in this run: lock clears only after exact pixel/progress alignment, with uninterrupted active timeline state.",
+    "Public marker testid hit target is clickable and not intercepted; map layer stacking and pointer behavior are correct.",
+    "Legacy chapter redesign remains intact with six stats visible at opacity 1 and no transit residue/overflow observed."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_35.json"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend-only scope)",
+    "frontend": "100%"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Verified in this run: timeline exact stop progress=0.305 (numerator=3660, denominator=12000) with data-traveling=false in desktop 5/5 and mobile 5/5; legacy exact stop=2880/12000; cars exact stop=4440/12000; Enter/Space both open timeline at exact stop; back-to-circuit preserves overview; no pointer interception, overflow, or .error selectors found.",
+  "rca of the issue": "Prior instability was consistent with premature navigation-lock release before exact convergence. Current implementation (exact top+progress gating and multi-RAF settle retries) removed drift in this acceptance retest."
+}

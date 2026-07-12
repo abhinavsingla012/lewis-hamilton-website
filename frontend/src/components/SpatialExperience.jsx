@@ -103,7 +103,9 @@ export const SpatialExperience = ({ archive }) => {
     const lockedRoute = navigationLockRef.current;
     let next = getActiveKey(value);
     if (lockedRoute) {
-      if (Math.abs(value - lockedRoute.stop) <= 0.003) {
+      const pixelAligned = Math.abs(window.scrollY - lockedRoute.top) <= 0.5;
+      const progressAligned = Math.abs(value - lockedRoute.stop) <= 0.0001;
+      if (pixelAligned && progressAligned) {
         navigationLockRef.current = null;
         setIsNavigating(false);
         next = lockedRoute.key;
@@ -129,28 +131,38 @@ export const SpatialExperience = ({ archive }) => {
       const shouldJump = options.immediate || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const token = navigationTokenRef.current + 1;
       navigationTokenRef.current = token;
-      navigationLockRef.current = { key, token, stop: item.stop };
+      navigationLockRef.current = { key, token, stop: item.stop, top };
       const animatedTravel = !shouldJump && Math.abs(window.scrollY - top) >= 2;
       activeRef.current = key;
       setActiveKey(key);
       setIsNavigating(animatedTravel);
       let settleTimer;
+      let settleAttempts = 0;
       const settle = () => {
         if (navigationLockRef.current?.token !== token) return;
         window.clearTimeout(settleTimer);
+        settleAttempts += 1;
         if (window.__hamiltonLenis) {
           window.__hamiltonLenis.stop();
           window.scrollTo({ top, behavior: "auto" });
           window.__hamiltonLenis.scrollTo(top, { immediate: true, force: true });
-          window.__hamiltonLenis.start();
         } else {
           window.scrollTo({ top, behavior: "auto" });
         }
-        navigationLockRef.current = null;
-        setIsNavigating(false);
-        activeRef.current = key;
-        setActiveKey(key);
-        requestAnimationFrame(() => updateCamera(scrollYProgress.get()));
+        requestAnimationFrame(() => {
+          window.__hamiltonLenis?.start();
+          if (navigationLockRef.current?.token !== token) return;
+          const denominator = runway.current.offsetHeight - window.innerHeight;
+          const exactProgress = denominator > 0 ? (window.scrollY - runway.current.offsetTop) / denominator : item.stop;
+          const aligned = Math.abs(window.scrollY - top) <= 0.5 && Math.abs(exactProgress - item.stop) <= 0.0001;
+          if (aligned) {
+            navigationLockRef.current = null;
+            setIsNavigating(false);
+            activeRef.current = key;
+            setActiveKey(key);
+            updateCamera(item.stop);
+          } else if (settleAttempts < 4) settleTimer = window.setTimeout(settle, 32);
+        });
       };
       if (window.__hamiltonLenis) {
         if (shouldJump || Math.abs(window.scrollY - top) < 2) {
