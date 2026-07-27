@@ -33,6 +33,6 @@
   "seed_data_creation": "None",
   "retest_needed": false,
   "should_main_agent_self_test": true,
-  "context_for_next_testing_agent": "Validated on https://lewis-victories.preview.emergentagent.com. Timeline starts at 2007 and key sequence works exactly: ArrowRight->2008, ArrowRight->2009, ArrowLeft->2008. After clicking next button, ArrowRight/ArrowLeft remained stable (+1/-1). Wheel did not change active year. Keyboard remained functional after opening/closing menu and after wheel interaction. Quick smoke passed for full-width Hero start, spatial racetrack map presence, deterministic Cars link, no horizontal overflow, and no page error selectors.",
+  "context_for_next_testing_agent": "Validated on https://ui-revamp-dynamics.preview.emergentagent.com. Timeline starts at 2007 and key sequence works exactly: ArrowRight->2008, ArrowRight->2009, ArrowLeft->2008. After clicking next button, ArrowRight/ArrowLeft remained stable (+1/-1). Wheel did not change active year. Keyboard remained functional after opening/closing menu and after wheel interaction. Quick smoke passed for full-width Hero start, spatial racetrack map presence, deterministic Cars link, no horizontal overflow, and no page error selectors.",
   "rca of the issue": "Iteration 8 failure likely came from unstable keydown listener lifecycle/stale closure behavior. Current implementation using dependency [data.length] plus functional setActiveIndex updates produced deterministic keyboard behavior throughout retest and removed reproduced failure."
 }
