@@ -363,3 +363,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Theme option b: hero background + accents tint with team color (verified Ferrari red / Mercedes teal)
 - New CSS: /app/frontend/src/HeroWhite.css (imported in App.js); old hero-v3 classes untouched
 - Verified: hotspot hover, theme tint, ArrowDown -> circuit navigation still intact
+
+### Hotspot Redesign v2 (June 2026)
+- Replaced big circular buttons with tiny 6px points + SVG angled "graph" callout lines + always-visible stylized cards (numbered tags, accent side-bar)
+- 6 callouts: head (mentality/Still I Rise), shoulders (7 crowns record), heart (his people: Anthony, Carmen, Roscoe), hand (105 trophies), helmet (many lids collection), shoes (104 poles)
+- ≤1280px cards collapse to tag+title (copy on hover); mobile keeps tap → bottom-sheet card
