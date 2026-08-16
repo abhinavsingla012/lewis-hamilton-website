@@ -5,13 +5,34 @@
 .hw-tint{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 50% 56% at 50% 48%,rgba(255,255,255,.14),transparent 72%),radial-gradient(ellipse 130% 95% at 50% 45%,transparent 46%,rgba(0,0,0,.28) 100%)}
 .hw-grain{position:absolute;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");opacity:.05;mix-blend-mode:multiply}
 .hw-ghost-name{position:absolute;z-index:1;inset:0;display:grid;place-items:center;pointer-events:none}
-.hw-ghost-stack{position:relative;transform:translateY(-4vh);text-align:center}
+.hw-ghost-stack{position:relative;transform:translateY(-4vh);text-align:center;animation:hwGhostDrift 26s ease-in-out infinite alternate;transition:opacity .4s}
 .hw-ghost-main,.hw-ghost-echo{display:block;font:900 15.5vw/1 Unbounded;letter-spacing:-.06em;white-space:nowrap}
 .hw-ghost-main{position:relative;background:linear-gradient(180deg,rgba(0,0,0,.34) 0%,rgba(0,0,0,.1) 55%,rgba(0,0,0,0) 92%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hw-ghost-echo{position:absolute;inset:0;transform:translate(.45vw,-.45vw);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.16)}
 .hw-ghost-sub{display:flex;align-items:center;gap:14px;justify-content:center;margin-top:1.6vw;color:rgba(0,0,0,.34);font:700 8px "Space Mono";letter-spacing:.42em;white-space:nowrap}
 .hw-ghost-sub:before,.hw-ghost-sub:after{content:"";flex:0 0 6vw;height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.3));}
 .hw-ghost-sub:after{background:linear-gradient(-90deg,transparent,rgba(0,0,0,.3))}
+@keyframes hwGhostDrift{0%{transform:translateY(-4vh) translateX(-1.6vw)}100%{transform:translateY(-4vh) translateX(1.6vw)}}
+
+/* Atmosphere: particles + floor fx + theme wash */
+.hw-particles{position:absolute;inset:0;z-index:2;overflow:hidden;pointer-events:none}
+.hw-particles span{position:absolute;bottom:-12px;border-radius:50%;background:rgba(255,255,255,.55);filter:blur(.6px);opacity:0;animation-name:hwRise;animation-timing-function:linear;animation-iteration-count:infinite}
+@keyframes hwRise{0%{transform:translateY(0);opacity:0}8%{opacity:.55}62%{opacity:.3}100%{transform:translateY(-92vh);opacity:0}}
+.hw-floor-fx{position:absolute;z-index:0;left:50%;bottom:9vh;width:min(72vw,980px);height:20vh;transform:translateX(-50%);pointer-events:none;background:repeating-linear-gradient(104deg,transparent 0 26px,rgba(0,0,0,.16) 26px 30px,transparent 30px 44px,rgba(0,0,0,.09) 44px 47px),repeating-linear-gradient(76deg,transparent 0 34px,rgba(0,0,0,.1) 34px 37px);opacity:.34;filter:blur(1.5px);mask-image:radial-gradient(ellipse 60% 85% at 50% 78%,#000 20%,transparent 74%);animation:hwHaze 7s ease-in-out infinite alternate}
+@keyframes hwHaze{0%{opacity:.26;filter:blur(1.2px)}100%{opacity:.4;filter:blur(2.4px)}}
+.hw-wash{position:absolute;inset:0;z-index:20;pointer-events:none;background:radial-gradient(ellipse 70% 80% at 50% 45%,rgba(255,255,255,.5),rgba(255,255,255,.12) 55%,transparent 80%)}
+
+/* Spotlight mode: hovering a callout dims everything else and glows the body part */
+.hw-spot-glow{position:absolute;top:0;left:0;z-index:0;width:190px;height:190px;margin:-95px 0 0 -95px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.6) 0%,rgba(255,255,255,.18) 42%,transparent 68%);mix-blend-mode:soft-light;opacity:0;transform:scale(.6);transition:opacity .35s,transform .45s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.hw-spot.is-active .hw-spot-glow{opacity:1;transform:scale(1)}
+.hero-white[data-spotlight="on"] .hw-ghost-stack{opacity:.32}
+.hero-white[data-spotlight="on"] .hw-title,.hero-white[data-spotlight="on"] .hw-stats,.hero-white[data-spotlight="on"] .hw-side-meta,.hero-white[data-spotlight="on"] .hw-cta{opacity:.4}
+.hw-title,.hw-stats,.hw-side-meta,.hw-cta{transition:opacity .35s}
+.hero-white[data-spotlight="on"] .hw-spot:not(.is-active){opacity:.22!important}
+.hw-spot{transition:opacity .3s}
+
+/* Era tag inside stats */
+.hw-stats>.hw-stats-era{display:block;grid-column:1/-1;grid-template-columns:none;padding:6px 12px 2px;line-height:1;border-right:0;color:rgba(255,255,255,.85);font:700 7px "Space Mono";letter-spacing:.3em;white-space:nowrap}
 
 .hw-title{position:absolute;z-index:8;left:3vw;top:13vh;display:flex;flex-direction:column;color:#140a08;font:900 clamp(46px,5.4vw,96px)/.86 Unbounded;letter-spacing:-.09em}
 .hw-title small{margin-bottom:18px;font:700 9px "Space Mono";letter-spacing:.22em;color:rgba(255,255,255,.92)}

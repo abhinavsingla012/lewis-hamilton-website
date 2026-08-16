@@ -1,0 +1,28 @@
+{
+  "summary": "Frontend-only regression for the new HeroStage era-morph feature batch. Tested at desktop 1920x800 and mobile 390x844. Verified theme switching via ArrowRight/ArrowLeft (wraps ferrari->mercedes->mclaren->ferrari), era-matched hotspot card content, era stats morphing, spotlight dimming, atmospheric elements, transition mount, keyboard guard on non-hero views, and mobile swipe regression + layout non-overlap. 10/11 checks PASS. One CSS specificity bug found: the era tag bounding box height is 36px (spec requires <20px) because `.hw-stats>div{padding:15px 12px 10px}` outranks `.hw-stats-era{padding:9px 12px 0}` in HeroWhite.css — the era-tag div is a direct child of .hw-stats so it inherits stats-grid padding. Text stays on a single line (whitespace:nowrap; scrollWidth==clientWidth) so it is a padding/height regression, not a wrap.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "HeroStage era tag", "issue": "hero-era-tag boundingRect.height=36px (>20px spec limit). Padding 15/12/10 comes from `.hw-stats>div` rule overriding `.hw-stats-era` padding due to CSS ordering. Text itself is single-line (scrollWidth=clientWidth=469, whitespace:nowrap).", "selector": "[data-testid='hero-era-tag']", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "In /app/frontend/src/HeroWhite.css raise specificity of the era-tag rule, e.g. `.hw-stats .hw-stats-era{padding:6px 12px 2px;line-height:1}` (or move `.hw-stats-era` rule below `.hw-stats>div` with the same selector strength) so bounding height drops under 20px."
+  ],
+  "critical_code_review_comments": [
+    "HeroStage.jsx L141-151: keyboard useEffect has no dependency array — it adds/removes the listener on every render. Works but is wasteful; use `[teamTheme, setTeamTheme]` deps.",
+    "HeroStage.jsx onMouseLeave uses functional setter but activeSpot is derived from hover only; if user clicks a hotspot dot AND hovers another, click state can be shadowed. Not blocking.",
+    "HeroWhite.css `.hw-stats-era` collides with the generic `.hw-stats>div` selector; consider a distinct wrapper class to avoid future padding/grid inheritance surprises."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "91% (10/11 checks)"},
+  "test_credentials": "None",
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All new HeroStage functionality (theme wrap via ArrowRight/Left, era content/stats morph, spotlight dim, atmosphere particles+floor+ghost animation, transition mount, keyboard guard when active!=top, mobile swipe, mobile no-overlap) is verified working. Only outstanding item: fix CSS so `[data-testid=hero-era-tag]` bounding rect height <20px (currently 36px). After fix, re-run only that measurement.",
+  "rca of the issue": "The `.hw-stats-era{padding:9px 12px 0}` rule (line 35) is defined before `.hw-stats>div{padding:15px 12px 10px}` (line 84). Both selectors have equal specificity (0,1,1), so the later rule wins, and the era tag — a direct div child of .hw-stats — gets 15px top + 10px bottom padding plus 7px font, producing a 36px tall box. Fix by increasing specificity (`.hw-stats .hw-stats-era`) or reordering the rules so the era-tag rule comes last."
+}

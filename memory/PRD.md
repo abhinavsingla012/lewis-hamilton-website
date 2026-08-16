@@ -378,3 +378,12 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Mobile hero layout restructured: title 13vh, figure 47vh bottom-anchored (24vh pad), stats at 12.5vh, CTA left/swipe hint right at bottom — no overlaps (verified via bbox tests, iteration_46 100% pass)
 - Touch swipe left/right on hero cycles team themes (THEME_ORDER ferrari->mercedes->mclaren, wraps); vertical swipe still navigates chapters (SpatialExperience touchmove now yields when horizontal dominates)
 - Mobile hotspot cards render as bottom sheet above stats; swipe hint (data-testid hero-swipe-hint) mobile-only
+
+### Hero Feature Batch (June 2026)
+- Swipe/theme transition: AnimatePresence directional slide+blur on model swap + white radial wash flash
+- Era-matched hotspot content per team (ERA_CONTENT: mclaren rookie era / mercedes dynasty / ferrari new chapter)
+- Hover spotlight: data-spotlight attr dims title/stats/ghost/other spots, glows active body part (.hw-spot-glow)
+- Atmosphere: 14 rising particles, tire-mark floor fx (.hw-floor-fx, hwHaze), ghost HAMILTON drifts (hwGhostDrift 26s)
+- Era stat morphing: ERA_STATS (mclaren 21/1/26, mercedes 84/6/78, ferrari career 105/7/104) + hero-era-tag label
+- ArrowLeft/Right switch themes only when hero active (.circuit-viewport dataset guard)
+- Tested: iteration_47 (10/11 pass), era-tag padding specificity bug fixed (.hw-stats>.hw-stats-era, verified 19px height)

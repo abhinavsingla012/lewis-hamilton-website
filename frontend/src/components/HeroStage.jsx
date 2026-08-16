@@ -1,20 +1,46 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowDownRight, ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
 
 const Counter = ({ value, testId }) => {
   const [display, setDisplay] = useState(0);
-  useEffect(() => { let frame; const start = performance.now(); const tick = (time) => { const p = Math.min(1, (time - start) / 1200); setDisplay(Math.round(value * (1 - Math.pow(1 - p, 3)))); if (p < 1) frame = requestAnimationFrame(tick); }; frame = requestAnimationFrame(tick); return () => cancelAnimationFrame(frame); }, [value]);
+  useEffect(() => { let frame; const start = performance.now(); const from = 0; const tick = (time) => { const p = Math.min(1, (time - start) / 1200); setDisplay(Math.round(from + (value - from) * (1 - Math.pow(1 - p, 3)))); if (p < 1) frame = requestAnimationFrame(tick); }; frame = requestAnimationFrame(tick); return () => cancelAnimationFrame(frame); }, [value]);
   return <strong data-testid={testId}>{display}</strong>;
 };
 
-const HOTSPOT_CONTENT = {
-  head: { tag: "01 / THE MENTALITY", title: "STILL I RISE", copy: "It isn't a slogan — it's an operating system. Attack first, turn pressure into pole laps and chaos into masterclasses." },
-  shoulders: { tag: "02 / THE RECORDS", title: "SEVEN CROWNS", copy: "Shoulders that carry history — 7 world championships and more career points than any driver who has ever raced." },
-  heart: { tag: "03 / THE LOVES", title: "HIS PEOPLE", copy: "Dad Anthony worked four jobs to fund the karting. Mum Carmen kept him grounded. And Roscoe — the paddock's most famous bulldog." },
-  hand: { tag: "04 / THE SILVERWARE", title: "105 TROPHIES", copy: "Hands that have lifted more winner's trophies than anyone in Formula 1 history — across 200+ podium visits." },
-  helmet: { tag: "05 / THE ARMOURY", title: "MANY LIDS", copy: "A collector of identities — childhood yellow, championship purple, Senna tributes. Every helmet tells a chapter of the journey." },
-  shoes: { tag: "06 / THE FOOTWORK", title: "104 POLES", copy: "Footwork tuned to dance on 5G brake zones — 104 pole positions, the greatest single-lap qualifier the sport has seen." },
+const THEME_ORDER = ["ferrari", "mercedes", "mclaren"];
+
+const ERA_STATS = {
+  mclaren: { wins: 21, titles: 1, poles: 26, tag: "MCLAREN ERA · 2007—2012" },
+  mercedes: { wins: 84, titles: 6, poles: 78, tag: "MERCEDES ERA · 2013—2024" },
+  ferrari: { wins: 105, titles: 7, poles: 104, tag: "CAREER TOTAL · 2007—2025" },
+};
+
+const ERA_CONTENT = {
+  mclaren: {
+    head: { tag: "01 / THE MENTALITY", title: "FEARLESS ROOKIE", copy: "Three podiums in his first three races. The 22-year-old who out-qualified a double world champion teammate from day one." },
+    shoulders: { tag: "02 / THE RECORDS", title: "YOUNGEST CHAMPION", copy: "2008 — champion at 23, won at the very last corner in the Brazil rain. The title that stopped Britain's heart." },
+    heart: { tag: "03 / THE LOVES", title: "DAD'S SACRIFICE", copy: "Anthony worked four jobs and knocked on every paddock door. This suit is the receipt for every one of those shifts." },
+    hand: { tag: "04 / THE SILVERWARE", title: "FIRST TROPHIES", copy: "21 wins in silver and rocket-red — the first at Montreal 2007, arms aloft before he could even believe it." },
+    helmet: { tag: "05 / THE ARMOURY", title: "THE YELLOW LID", copy: "The same bright yellow he wore in karts — chosen by his dad so he'd always be visible from the back of the grid." },
+    shoes: { tag: "06 / THE FOOTWORK", title: "RAW SPEED", copy: "26 poles before turning 28. Silverstone 2008 in the rain — won by 68 seconds. Footwork you can't teach." },
+  },
+  mercedes: {
+    head: { tag: "01 / THE MENTALITY", title: "THE GAMBLE", copy: "Everyone said leaving McLaren was madness. He saw the turbo era coming before anyone — the smartest move in modern F1." },
+    shoulders: { tag: "02 / THE RECORDS", title: "THE DYNASTY", copy: "Six championships in eight years. 84 wins in silver and black — the most dominant partnership the sport has ever seen." },
+    heart: { tag: "03 / THE LOVES", title: "STILL WE RISE", copy: "Taking the knee on every grid, Roscoe in the motorhome, and a fanbase that turned Abu Dhabi heartbreak into fuel." },
+    hand: { tag: "04 / THE SILVERWARE", title: "RECORD BREAKER", copy: "Win 92 at Portimão passed Schumacher. These hands rewrote every number the sport thought was permanent." },
+    helmet: { tag: "05 / THE ARMOURY", title: "PURPLE REIGN", copy: "Championship purple lids, Senna-yellow tributes, pride flags — every design a statement louder than an engine." },
+    shoes: { tag: "06 / THE FOOTWORK", title: "THE STANDARD", copy: "78 poles in silver. Qualifying laps so pure that engineers replayed the telemetry just to watch them again." },
+  },
+  ferrari: {
+    head: { tag: "01 / THE MENTALITY", title: "THE NEW CHAPTER", copy: "Every child who ever dreamed of F1 dreamed in red. At 40, he chose the boldest lap of his life — Maranello." },
+    shoulders: { tag: "02 / THE RECORDS", title: "SEVEN CROWNS", copy: "Seven championships carried into the scarlet suit — still chasing the eighth that history owes him." },
+    heart: { tag: "03 / THE LOVES", title: "HIS PEOPLE", copy: "Dad Anthony, mum Carmen, and the memory of Roscoe — the paddock's most famous bulldog — travel in every red suitcase." },
+    hand: { tag: "04 / THE SILVERWARE", title: "105 TROPHIES", copy: "More winner's silver than anyone in Formula 1 history — and hands still hungry for the tifosi's first." },
+    helmet: { tag: "05 / THE ARMOURY", title: "MANY LIDS", copy: "Childhood yellow, championship purple, Senna tributes — now reimagined in giallo modena for the Scuderia." },
+    shoes: { tag: "06 / THE FOOTWORK", title: "104 POLES", copy: "The greatest single-lap qualifier the sport has seen, now dancing on Ferrari brakes at 5G." },
+  },
 };
 
 const LAYOUTS = {
@@ -56,10 +82,29 @@ const LAYOUTS = {
   },
 };
 
+const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
+  left: `${(i * 71 + 13) % 100}%`,
+  size: 2 + (i % 3),
+  delay: `${(i * 1.7) % 9}s`,
+  duration: `${11 + (i % 5) * 3}s`,
+}));
+
+const themeIndex = (theme) => Math.max(0, THEME_ORDER.indexOf(theme));
+
 export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
   const layout = LAYOUTS[teamTheme] || LAYOUTS.ferrari;
+  const content = ERA_CONTENT[teamTheme] || ERA_CONTENT.ferrari;
+  const era = ERA_STATS[teamTheme] || ERA_STATS.ferrari;
   const [activeSpot, setActiveSpot] = useState(null);
   const touchRef = useRef(null);
+  const prevThemeRef = useRef(teamTheme);
+
+  let dir = themeIndex(teamTheme) - themeIndex(prevThemeRef.current);
+  if (dir === 2) dir = -1;
+  if (dir === -2) dir = 1;
+  if (dir === 0) dir = 1;
+  useEffect(() => { prevThemeRef.current = teamTheme; }, [teamTheme]);
+
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
   const smoothX = useSpring(pointerX, { stiffness: 90, damping: 20 });
@@ -74,11 +119,9 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
     pointerY.set(event.clientY / window.innerHeight - 0.5);
   };
 
-  const THEME_ORDER = ["ferrari", "mercedes", "mclaren"];
-  const switchTeam = (dir) => {
+  const switchTeam = (step) => {
     if (!setTeamTheme) return;
-    const index = THEME_ORDER.indexOf(teamTheme);
-    setTeamTheme(THEME_ORDER[(index + dir + THEME_ORDER.length) % THEME_ORDER.length]);
+    setTeamTheme(THEME_ORDER[(themeIndex(teamTheme) + step + THEME_ORDER.length) % THEME_ORDER.length]);
     setActiveSpot(null);
   };
   const onTouchStart = (event) => {
@@ -95,9 +138,22 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
     if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.4) switchTeam(dx < 0 ? 1 : -1);
   };
 
-  return <section id="top" className="hero-white spatial-hero-stage" onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-testid="hero-section">
+  useEffect(() => {
+    const onKey = (event) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      if (event.target?.closest?.("input, textarea, select, [contenteditable='true']")) return;
+      const viewport = document.querySelector(".circuit-viewport");
+      if (viewport && viewport.dataset.active !== "top") return;
+      switchTeam(event.key === "ArrowRight" ? 1 : -1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  return <section id="top" className="hero-white spatial-hero-stage" data-spotlight={activeSpot ? "on" : "off"} onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-testid="hero-section">
     <div className="hw-tint" aria-hidden="true" />
     <div className="hw-grain" aria-hidden="true" />
+    <div className="hw-particles" aria-hidden="true">{PARTICLES.map((particle, index) => <span key={index} style={{ left: particle.left, width: particle.size, height: particle.size, animationDelay: particle.delay, animationDuration: particle.duration }} />)}</div>
     <motion.div className="hw-ghost-name" style={{ x: ghostX }} aria-hidden="true">
       <div className="hw-ghost-stack">
         <span className="hw-ghost-echo">HAMILTON</span>
@@ -115,44 +171,70 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
     <div className="hw-side-meta" aria-hidden="true"><span>LH44</span><i /><span>GBR / STEVENAGE</span><i /><span>51.5072° N</span></div>
 
     <div className="hw-figure-zone">
-      <motion.div key={teamTheme} className="hw-figure" style={{ rotateX, rotateY, aspectRatio: layout.ratio }} initial={{ opacity: 0, y: 90, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1.15, delay: 0.25, ease: [0.22, 1, 0.36, 1] }} data-testid="hero-lewis-cutout">
-        <motion.span className="hw-floor-shadow" style={{ x: shadowX }} aria-hidden="true" />
-        <span className="hw-contact-shadow" aria-hidden="true" />
-        <img src={layout.img} alt="Lewis Hamilton in race suit holding his helmet" className="hw-lewis" data-testid="hero-image" draggable="false" />
-        {layout.spots.map((spot, index) => {
-          const content = HOTSPOT_CONTENT[spot.id];
-          const [, elbow, end] = spot.line;
-          return <motion.div
-            key={spot.id}
-            className={`hw-spot side-${spot.side} ${activeSpot === spot.id ? "is-active" : ""}`}
-            style={{ top: spot.top, left: spot.left }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.1 + index * 0.16, duration: 0.55 }}
-          >
-            <button type="button" className="hw-spot-dot" onClick={() => setActiveSpot((current) => (current === spot.id ? null : spot.id))} aria-label={`${content.title} — details`} aria-expanded={activeSpot === spot.id} data-testid={`hero-hotspot-${spot.id}`}><i /></button>
-            <svg className="hw-spot-svg" aria-hidden="true">
-              <polyline points={spot.line.map(([x, y]) => `${x},${y}`).join(" ")} pathLength="1" style={{ animationDelay: `${1.2 + index * 0.16}s` }} />
-              <circle cx={elbow[0]} cy={elbow[1]} r="1.6" />
-            </svg>
-            <div className="hw-spot-card" style={{ "--card-x": `${end[0]}px`, "--card-y": `${end[1]}px` }} data-testid={`hero-hotspot-card-${spot.id}`}>
-              <span>{content.tag}</span>
-              <strong>{content.title}</strong>
-              <p>{content.copy}</p>
-            </div>
-          </motion.div>;
-        })}
-      </motion.div>
+      <div className="hw-floor-fx" aria-hidden="true" />
+      <AnimatePresence mode="popLayout" custom={dir}>
+        <motion.div
+          key={teamTheme}
+          className="hw-figure"
+          style={{ rotateX, rotateY, aspectRatio: layout.ratio }}
+          custom={dir}
+          variants={{
+            enter: (direction) => ({ x: direction * 160, opacity: 0, filter: "blur(14px)", scale: 0.96 }),
+            center: { x: 0, opacity: 1, filter: "blur(0px)", scale: 1 },
+            exit: (direction) => ({ x: direction * -160, opacity: 0, filter: "blur(14px)", scale: 0.96 }),
+          }}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
+          data-testid="hero-lewis-cutout"
+        >
+          <motion.span className="hw-floor-shadow" style={{ x: shadowX }} aria-hidden="true" />
+          <span className="hw-contact-shadow" aria-hidden="true" />
+          <img src={layout.img} alt="Lewis Hamilton in race suit holding his helmet" className="hw-lewis" data-testid="hero-image" draggable="false" />
+          {layout.spots.map((spot, index) => {
+            const spotContent = content[spot.id];
+            const [, elbow, end] = spot.line;
+            return <motion.div
+              key={spot.id}
+              className={`hw-spot side-${spot.side} ${activeSpot === spot.id ? "is-active" : ""}`}
+              style={{ top: spot.top, left: spot.left }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.75 + index * 0.12, duration: 0.5 }}
+              onMouseEnter={() => setActiveSpot(spot.id)}
+              onMouseLeave={() => setActiveSpot((current) => (current === spot.id ? null : current))}
+            >
+              <span className="hw-spot-glow" aria-hidden="true" />
+              <button type="button" className="hw-spot-dot" onClick={() => setActiveSpot((current) => (current === spot.id ? null : spot.id))} aria-label={`${spotContent.title} — details`} aria-expanded={activeSpot === spot.id} data-testid={`hero-hotspot-${spot.id}`}><i /></button>
+              <svg className="hw-spot-svg" aria-hidden="true">
+                <polyline points={spot.line.map(([x, y]) => `${x},${y}`).join(" ")} pathLength="1" style={{ animationDelay: `${0.85 + index * 0.12}s` }} />
+                <circle cx={elbow[0]} cy={elbow[1]} r="1.6" />
+              </svg>
+              <div className="hw-spot-card" style={{ "--card-x": `${end[0]}px`, "--card-y": `${end[1]}px` }} data-testid={`hero-hotspot-card-${spot.id}`}>
+                <span>{spotContent.tag}</span>
+                <strong>{spotContent.title}</strong>
+                <p>{spotContent.copy}</p>
+              </div>
+            </motion.div>;
+          })}
+        </motion.div>
+      </AnimatePresence>
     </div>
 
+    <AnimatePresence>
+      <motion.div key={`wash-${teamTheme}`} className="hw-wash" initial={{ opacity: 0.5 }} animate={{ opacity: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} aria-hidden="true" />
+    </AnimatePresence>
+
     <motion.div className="hw-stats" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.75 } } }} data-testid="hero-statistics">
-      {[[stats?.wins ?? 105, "GRAND PRIX WINS", "hero-wins-stat"], [stats?.titles ?? 7, "WORLD TITLES", "hero-titles-stat"], [stats?.poles ?? 104, "POLE POSITIONS", "hero-poles-stat"]].map(([value, label, testId], index) => <motion.div key={label} variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } }}><span>0{index + 1}</span><Counter value={value} testId={testId} /><small>{label}</small></motion.div>)}
+      <div className="hw-stats-era" data-testid="hero-era-tag">{era.tag}</div>
+      {[[era.wins ?? stats?.wins ?? 105, "GRAND PRIX WINS", "hero-wins-stat"], [era.titles ?? stats?.titles ?? 7, "WORLD TITLES", "hero-titles-stat"], [era.poles ?? stats?.poles ?? 104, "POLE POSITIONS", "hero-poles-stat"]].map(([value, label, testId], index) => <motion.div key={label} variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } }}><span>0{index + 1}</span><Counter value={value} testId={testId} /><small>{label}</small></motion.div>)}
     </motion.div>
 
     <motion.button className="hw-cta" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.6 }} whileHover={{ y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => window.__spatialGo?.("circuit")} data-testid="explore-legacy-button"><span><ArrowDownRight /></span><div><small>ENTER THE SPATIAL ARCHIVE</small><strong>EXPLORE THE LEGACY</strong></div></motion.button>
 
     <div className="hw-swipe-hint" aria-hidden="true" data-testid="hero-swipe-hint"><ChevronLeft size={11} /><span>SWIPE TO SWITCH TEAM</span><ChevronRight size={11} /></div>
 
-    <div className="hw-telemetry" data-testid="hero-telemetry"><span>HAM / GBR</span><span>HOVER THE POINTS — READ THE DRIVER</span><span><Crosshair size={11} /> PRECISION / PURPOSE / PACE</span></div>
+    <div className="hw-telemetry" data-testid="hero-telemetry"><span>HAM / GBR</span><span>← → SWITCH ERA — HOVER THE POINTS</span><span><Crosshair size={11} /> PRECISION / PURPOSE / PACE</span></div>
   </section>;
 };
