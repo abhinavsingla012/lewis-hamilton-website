@@ -19,7 +19,7 @@
 .hw-particles span{position:absolute;bottom:-12px;border-radius:50%;background:rgba(255,255,255,.55);filter:blur(.6px);opacity:0;animation-name:hwRise;animation-timing-function:linear;animation-iteration-count:infinite}
 @keyframes hwRise{0%{transform:translateY(0);opacity:0}8%{opacity:.55}62%{opacity:.3}100%{transform:translateY(-92vh);opacity:0}}
 /* Silverstone ground silhouette — same rotation (0.22*PI ~ 39.6deg) and tilt as the 3D overview camera */
-.hw-ground-track{position:absolute;z-index:0;left:50%;bottom:-4vh;width:min(56vw,860px);aspect-ratio:326/511;transform:translateX(-50%);perspective:1150px;pointer-events:none}
+.hw-ground-track{position:absolute;z-index:0;left:49%;top:54%;width:min(56vw,870px);aspect-ratio:326/511;transform:translate(-50%,-50%);perspective:1150px;pointer-events:none}
 .hw-ground-track svg{width:100%;height:100%;overflow:visible;transform:rotateX(58deg) rotate(39.6deg) scale(1.06);transform-origin:50% 50%}
 .hw-ground-track path{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .hw-ground-track-halo{stroke:rgba(0,0,0,.28);stroke-width:13;filter:blur(7px)}
@@ -29,8 +29,8 @@
 @keyframes hwTrackPulse{to{stroke-dashoffset:-1240}}
 
 /* Scroll-linked ground bridge: hero silhouette grows into the 3D circuit */
-.circuit-ground-bridge{position:absolute;inset:0;z-index:42;pointer-events:none}
-.cgb-pos{position:absolute;left:50%;top:52%;width:min(56vw,860px);aspect-ratio:326/511;transform:translate(-50%,-50%);perspective:1150px}
+.circuit-ground-bridge{position:absolute;inset:0;z-index:2;pointer-events:none}
+.cgb-pos{position:absolute;left:49%;top:54%;width:min(56vw,870px);aspect-ratio:326/511;transform:translate(-50%,-50%);perspective:1150px}
 .cgb-scale{width:100%;height:100%}
 .cgb-svg{width:100%;height:100%;overflow:visible;transform:rotateX(58deg) rotate(39.6deg) scale(1.06);transform-origin:50% 50%}
 .cgb-svg path{fill:none;stroke-linecap:round;stroke-linejoin:round}

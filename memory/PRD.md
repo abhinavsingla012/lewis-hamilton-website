@@ -402,3 +402,9 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - heroScale locked at 1 (no shrink); heroOpacity fades in place [0,0.045,0.125]->[1,1,0]
 - Bridge silhouette is now the sole connector: opacity [0.03,0.06,0.13,0.175]->[0,1,0.75,0], scale [0.045,0.175]->[1,2.3]; mapOpacity [0.1,0.16]
 - Verified via lenis.scrollTo at p=0.07/0.12/0.17
+
+### Bridge Rework: pure crossfade, position-matched (June 2026)
+- Removed bridge scale growth entirely (no "second circuit growing"); bridge z-index 2 (UNDER circuit-map-layer z3) so opaque 3D canvas covers it as mapOpacity ramps -> clean crossfade
+- Hero silhouette + bridge repositioned to match 3D overview footprint: left 49%, top 54%, width min(56vw,870px) (measured 3D track bbox ~x225-1310/y285-735 @1568 render)
+- bridgeOpacity [0.02,0.05,0.16,0.19]->[0,1,1,0]
+- NOTE: screenshot tool returns black frames when capturing rapidly during WebGL animation (ReadPixels stall) - not an app bug

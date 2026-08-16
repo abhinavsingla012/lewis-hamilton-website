@@ -72,8 +72,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.045, 0.125], [1, 1, 0]);
   const mapOpacity = useTransform(scrollYProgress, [0.1, 0.16], [0, 1]);
-  const bridgeOpacity = useTransform(scrollYProgress, [0.03, 0.06, 0.13, 0.175], [0, 1, 0.75, 0]);
-  const bridgeScale = useTransform(scrollYProgress, [0.045, 0.175], [1, 2.3]);
+  const bridgeOpacity = useTransform(scrollYProgress, [0.02, 0.05, 0.16, 0.19], [0, 1, 1, 0]);
   const hubCopyOpacity = useTransform(scrollYProgress, [0.105, 0.14, 0.185, 0.21], [0, 1, 1, 0]);
 
   /** Feeds the WebGL circuit: position along the racing line + how close the camera is to the car. */
@@ -351,13 +350,13 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
 
       <motion.div className="circuit-ground-bridge" style={{ opacity: bridgeOpacity }} aria-hidden="true" data-testid="circuit-ground-bridge">
         <div className="cgb-pos">
-          <motion.div className="cgb-scale" style={{ scale: bridgeScale }}>
+          <div className="cgb-scale">
             <svg className="cgb-svg" viewBox="87 -5 326 511" preserveAspectRatio="xMidYMid meet">
               <path className="hw-ground-track-halo" d={SILVERSTONE_PATH} />
               <path className="hw-ground-track-echo" d={SILVERSTONE_PATH} />
               <path className="hw-ground-track-line" d={SILVERSTONE_PATH} />
             </svg>
-          </motion.div>
+          </div>
         </div>
       </motion.div>
 
