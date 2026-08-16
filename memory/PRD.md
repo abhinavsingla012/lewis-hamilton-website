@@ -368,3 +368,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Replaced big circular buttons with tiny 6px points + SVG angled "graph" callout lines + always-visible stylized cards (numbered tags, accent side-bar)
 - 6 callouts: head (mentality/Still I Rise), shoulders (7 crowns record), heart (his people: Anthony, Carmen, Roscoe), hand (105 trophies), helmet (many lids collection), shoes (104 poles)
 - ≤1280px cards collapse to tag+title (copy on hover); mobile keeps tap → bottom-sheet card
+
+### Per-Team 3D Models (June 2026)
+- 3 user-supplied photos processed (Gemini 3D-tune + rembg): /images/lewis-mclaren.png (751x1222), /images/lewis-ferrari.png (538x1209), /images/lewis-mercedes.png (538x1186)
+- HeroStage now has LAYOUTS map: per-team image, aspect ratio, and per-team hotspot positions/lines (poses differ); teamTheme prop passed from SpatialExperience
+- Old lewis-hero.png retained but unused

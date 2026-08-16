@@ -342,7 +342,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari" }) => {
         <a className="circuit-attribution" href="https://github.com/julesr0y/f1-circuits-svg" target="_blank" rel="noreferrer" data-testid="circuit-map-attribution-link">Circuit geometry: Jules Roy / CC BY 4.0 · adapted</a>
       </motion.div>
 
-      <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} /></motion.div>
+      <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} teamTheme={teamTheme} /></motion.div>
 
       <div className="circuit-chapters">
         {mounted.map((key) => <ChapterView

@@ -18,7 +18,7 @@
 
 /* Figure */
 .hw-figure-zone{position:absolute;z-index:5;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:13vh;pointer-events:none}
-.hw-figure{position:relative;height:min(74vh,860px);aspect-ratio:400/1151;transform-style:preserve-3d;pointer-events:auto}
+.hw-figure{position:relative;height:min(74vh,860px);aspect-ratio:538/1209;transform-style:preserve-3d;pointer-events:auto}
 .hw-lewis{position:relative;z-index:3;display:block;height:100%;width:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 46px 46px rgba(0,0,0,.44)) drop-shadow(-20px 24px 36px rgba(0,0,0,.24)) drop-shadow(0 4px 8px rgba(0,0,0,.3)) contrast(1.05) saturate(1.05)}
 .hw-floor-shadow{position:absolute;z-index:1;left:50%;bottom:-3.4%;width:190%;height:9%;margin-left:-95%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(0,0,0,.5) 0%,rgba(0,0,0,.22) 42%,transparent 72%);filter:blur(10px)}
 .hw-contact-shadow{position:absolute;z-index:2;left:50%;bottom:-1%;width:78%;height:3%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(0,0,0,.6),transparent 70%);filter:blur(4px)}
