@@ -355,3 +355,11 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 5. Interactive global victory map
 6. Rich race detail overlays for landmark wins
 7. Shareable fan-stat cards to improve organic reach
+
+## Hero Redesign — White Plane + 3D Lewis Cutout (June 2026)
+- User supplied a Lewis Hamilton photo (red Ferrari suit, yellow helmet); background removed via rembg after Gemini 3D-tune pass; saved as /app/frontend/public/images/lewis-hero.png (transparent PNG)
+- HeroStage.jsx fully rebuilt: white hero plane, centered 3D-tuned Lewis cutout with floor/contact shadows, mouse-parallax tilt, giant ghost "HAMILTON" outline behind
+- 5 interactive hotspots (head/heart/arm/helmet/legs) — hover reveals floating card on desktop, tap on mobile (fixed bottom sheet); content: Racecraft IQ, Still We Rise, Precision, No.44, Endurance
+- Theme option b: hero background + accents tint with team color (verified Ferrari red / Mercedes teal)
+- New CSS: /app/frontend/src/HeroWhite.css (imported in App.js); old hero-v3 classes untouched
+- Verified: hotspot hover, theme tint, ArrowDown -> circuit navigation still intact

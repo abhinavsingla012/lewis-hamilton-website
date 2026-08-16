@@ -1,0 +1,146 @@
+/* Spatial V6 — one scroll owner, deterministic chapter staging.
+   Loaded after CircuitExperience.css so it owns the transition system. */
+
+.circuit-chapters > :is(section, footer) {
+  clip-path: none !important;
+  transform: translate3d(0, 3.2vh, 0) scale(.972);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .46s ease, transform .82s cubic-bezier(.16, 1, .3, 1), visibility 0s linear .5s;
+  will-change: transform, opacity;
+  box-shadow: none;
+}
+
+.circuit-viewport[data-active="legacy"] .legacy-section,
+.circuit-viewport[data-active="timeline"] .timeline-section,
+.circuit-viewport[data-active="cars"] .cars-section,
+.circuit-viewport[data-active="gallery"] .gallery-section,
+.circuit-viewport[data-active="records"] .records-section,
+.circuit-viewport[data-active="milestones"] .milestones-section,
+.circuit-viewport[data-active="tracks"] .tracks-section,
+.circuit-viewport[data-active="moment"] .moment-section,
+.circuit-viewport[data-active="quotes"] .quote-section,
+.circuit-viewport[data-active="victories"] .archive-section,
+.circuit-viewport[data-active="footer"] footer {
+  z-index: 30;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  content-visibility: visible;
+  transition: opacity .5s ease, transform .9s cubic-bezier(.16, 1, .3, 1), visibility 0s linear 0s;
+}
+
+.circuit-viewport[data-traveling="true"] .circuit-chapters > :is(section, footer) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translate3d(0, 2vh, 0) scale(.982) !important;
+  transition: opacity .26s ease, transform .4s ease, visibility 0s linear .26s !important;
+}
+
+/* Cinematic arrival sweep — a single cheap element instead of a full-screen clip-path animation. */
+.chapter-sweep {
+  position: absolute;
+  z-index: 78;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.chapter-sweep i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 34vh;
+  background: linear-gradient(180deg, transparent, rgba(var(--accent-rgb), .14) 45%, rgba(var(--accent-rgb), .5) 50%, rgba(var(--accent-rgb), .14) 55%, transparent);
+  filter: blur(.5px);
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circuit-chapters > :is(section, footer) { transition: none !important; }
+  .chapter-sweep { display: none; }
+}
+
+/* ---------- WebGL circuit stage ---------- */
+.circuit-3d { position: absolute; inset: 0; }
+.circuit-3d canvas { display: block; width: 100% !important; height: 100% !important; touch-action: none; }
+.circuit-viewport[data-active="top"] .circuit-3d,
+.circuit-viewport[data-scene-idle="true"] .circuit-3d { visibility: hidden; }
+
+.circuit-3d-labels { position: absolute; inset: 0; pointer-events: none; }
+
+.circuit-pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: opacity .18s linear;
+}
+
+.circuit-pin-body {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  gap: 8px;
+  min-width: 148px;
+  padding: 8px 13px 8px 9px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 3px;
+  background: linear-gradient(140deg, rgba(11, 12, 15, .93), rgba(6, 7, 9, .88));
+  box-shadow: 0 18px 42px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .05);
+  backdrop-filter: blur(9px);
+  text-align: left;
+  transition: border-color .22s, transform .22s, background-color .22s;
+}
+
+.circuit-pin-body > b { color: var(--acid); font: 700 10px "Space Mono"; }
+.circuit-pin-body > span { display: grid; gap: 3px; min-width: 0; }
+.circuit-pin-body strong { color: #f4f3ee; font: 700 9.5px "Space Mono"; letter-spacing: .11em; white-space: nowrap; }
+.circuit-pin-body small { color: #8e8f95; font: 400 8px "Space Mono"; letter-spacing: .02em; white-space: nowrap; }
+
+.circuit-pin-stem {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 26px;
+  background: linear-gradient(180deg, rgba(var(--accent-rgb), .85), transparent);
+}
+
+.circuit-pin-stem::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--acid);
+  box-shadow: 0 0 14px var(--acid);
+  transform: translateX(-50%);
+}
+
+.circuit-pin:hover .circuit-pin-body,
+.circuit-pin:focus-visible .circuit-pin-body {
+  border-color: var(--acid);
+  background: var(--acid);
+  transform: translateY(-3px);
+}
+
+.circuit-pin:hover .circuit-pin-body :is(b, strong, small),
+.circuit-pin:focus-visible .circuit-pin-body :is(b, strong, small) { color: var(--accent-ink); }
+.circuit-pin.is-active .circuit-pin-body { border-color: rgba(var(--accent-rgb), .75); }
+
+@media (max-width: 850px) {
+  .circuit-pin-body { min-width: 118px; padding: 6px 9px 6px 7px; grid-template-columns: 16px 1fr; gap: 6px; }
+  .circuit-pin-body strong { font-size: 8px; }
+  .circuit-pin-body small { display: none; }
+}

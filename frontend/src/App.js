@@ -3,6 +3,7 @@ import "@/App.css";
 import "@/Upgrade.css";
 import "@/TimelineV2.css";
 import "@/HeroV3.css";
+import "@/HeroWhite.css";
 import "@/CircuitExperience.css";
 import "@/TeamThemes.css";
 import "@/LegacyChapter.css";
@@ -10,6 +11,8 @@ import "@/ChapterMarkers.css";
 import "@/CarsChapter.css";
 import "@/GalleryChapter.css";
 import "@/RecordReactor.css";
+import "@/SpatialV6.css";
+import "@/ChapterWorlds.css";
 import axios from "axios";
 import Lenis from "lenis";
 import { Nav } from "@/components/Nav";
@@ -57,7 +60,7 @@ function App() {
     axios.get(`${API}/archive`).then(({ data }) => { setArchive(data); setArchiveError(false); }).catch(() => setArchiveError(true));
     return () => { cancelAnimationFrame(frame); cancelAnimationFrame(routeFrame); lenis.destroy(); delete window.__hamiltonLenis; };
   }, []);
-  return <main className="app-shell" data-testid="hamilton-fan-archive"><Nav open={menuOpen} setOpen={setMenuOpen} teamTheme={teamTheme} setTeamTheme={setTeamTheme}/>{archiveError && <div className="archive-error" style={{ position: "fixed", zIndex: 110, top: 92, left: "50%", transform: "translateX(-50%)", padding: "11px 18px", borderRadius: 999, background: "rgba(12,12,12,.92)", color: "white", font: '10px "Space Mono"' }} role="alert" data-testid="archive-error-message">Live race data is temporarily unavailable. The curated career archive remains on screen.</div>}<SpatialExperience archive={archive}/></main>;
+  return <main className="app-shell" data-testid="hamilton-fan-archive"><Nav open={menuOpen} setOpen={setMenuOpen} teamTheme={teamTheme} setTeamTheme={setTeamTheme}/>{archiveError && <div className="archive-error" style={{ position: "fixed", zIndex: 110, top: 92, left: "50%", transform: "translateX(-50%)", padding: "11px 18px", borderRadius: 999, background: "rgba(12,12,12,.92)", color: "white", font: '10px "Space Mono"' }} role="alert" data-testid="archive-error-message">Live race data is temporarily unavailable. The curated career archive remains on screen.</div>}<SpatialExperience archive={archive} teamTheme={teamTheme}/></main>;
 }
 
 export default App;
