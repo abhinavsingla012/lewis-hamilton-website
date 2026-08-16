@@ -5,7 +5,13 @@
 .hw-tint{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 50% 56% at 50% 48%,rgba(255,255,255,.14),transparent 72%),radial-gradient(ellipse 130% 95% at 50% 45%,transparent 46%,rgba(0,0,0,.28) 100%)}
 .hw-grain{position:absolute;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");opacity:.05;mix-blend-mode:multiply}
 .hw-ghost-name{position:absolute;z-index:1;inset:0;display:grid;place-items:center;pointer-events:none}
-.hw-ghost-name span{font:900 15.5vw/1 Unbounded;letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1.5px rgba(0,0,0,.17);transform:translateY(-4vh);white-space:nowrap}
+.hw-ghost-stack{position:relative;transform:translateY(-4vh);text-align:center}
+.hw-ghost-main,.hw-ghost-echo{display:block;font:900 15.5vw/1 Unbounded;letter-spacing:-.06em;white-space:nowrap}
+.hw-ghost-main{position:relative;background:linear-gradient(180deg,rgba(0,0,0,.34) 0%,rgba(0,0,0,.1) 55%,rgba(0,0,0,0) 92%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hw-ghost-echo{position:absolute;inset:0;transform:translate(.45vw,-.45vw);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.16)}
+.hw-ghost-sub{display:flex;align-items:center;gap:14px;justify-content:center;margin-top:1.6vw;color:rgba(0,0,0,.34);font:700 8px "Space Mono";letter-spacing:.42em;white-space:nowrap}
+.hw-ghost-sub:before,.hw-ghost-sub:after{content:"";flex:0 0 6vw;height:1px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.3));}
+.hw-ghost-sub:after{background:linear-gradient(-90deg,transparent,rgba(0,0,0,.3))}
 
 .hw-title{position:absolute;z-index:8;left:3vw;top:13vh;display:flex;flex-direction:column;color:#140a08;font:900 clamp(46px,5.4vw,96px)/.86 Unbounded;letter-spacing:-.09em}
 .hw-title small{margin-bottom:18px;font:700 9px "Space Mono";letter-spacing:.22em;color:rgba(255,255,255,.92)}
@@ -75,7 +81,10 @@
 
 @media(max-width:850px){
   .hero-white{min-height:100svh}
-  .hw-ghost-name span{font-size:24vw;transform:translateY(-6vh);-webkit-text-stroke-width:1px}
+  .hw-ghost-stack{transform:translateY(-6vh)}
+  .hw-ghost-main,.hw-ghost-echo{font-size:24vw}
+  .hw-ghost-echo{-webkit-text-stroke-width:.8px}
+  .hw-ghost-sub{margin-top:3vw;font-size:5px;letter-spacing:.28em}
   .hw-title{top:13vh;left:16px;right:16px;font-size:9.5vw}
   .hw-title small{margin-bottom:8px;font-size:6.5px;letter-spacing:.18em}
   .hw-title span:last-child{margin-left:6vw}

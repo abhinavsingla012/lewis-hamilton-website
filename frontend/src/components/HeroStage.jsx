@@ -98,7 +98,13 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
   return <section id="top" className="hero-white spatial-hero-stage" onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-testid="hero-section">
     <div className="hw-tint" aria-hidden="true" />
     <div className="hw-grain" aria-hidden="true" />
-    <motion.div className="hw-ghost-name" style={{ x: ghostX }} aria-hidden="true"><span>HAMILTON</span></motion.div>
+    <motion.div className="hw-ghost-name" style={{ x: ghostX }} aria-hidden="true">
+      <div className="hw-ghost-stack">
+        <span className="hw-ghost-echo">HAMILTON</span>
+        <span className="hw-ghost-main">HAMILTON</span>
+        <span className="hw-ghost-sub">EST. 1985 — STEVENAGE / SEVEN-TIME WORLD CHAMPION — No. 44</span>
+      </div>
+    </motion.div>
 
     <div className="hw-title" data-testid="hero-title">
       <motion.small initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }}>THE DEFINITIVE FAN ARCHIVE / 2007—2025</motion.small>
