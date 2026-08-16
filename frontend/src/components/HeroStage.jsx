@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowDownRight, ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
+import { SILVERSTONE_PATH } from "../data/circuitRoute";
 
 const Counter = ({ value, testId }) => {
   const [display, setDisplay] = useState(0);
@@ -171,6 +172,14 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
     <div className="hw-side-meta" aria-hidden="true"><span>LH44</span><i /><span>GBR / STEVENAGE</span><i /><span>51.5072° N</span></div>
 
     <div className="hw-figure-zone">
+      <div className="hw-ground-track" aria-hidden="true" data-testid="hero-ground-track">
+        <svg viewBox="87 -5 326 511" preserveAspectRatio="xMidYMid meet">
+          <path className="hw-ground-track-halo" d={SILVERSTONE_PATH} />
+          <path className="hw-ground-track-echo" d={SILVERSTONE_PATH} />
+          <path className="hw-ground-track-line" d={SILVERSTONE_PATH} />
+          <path className="hw-ground-track-pulse" d={SILVERSTONE_PATH} />
+        </svg>
+      </div>
       <div className="hw-floor-fx" aria-hidden="true" />
       <AnimatePresence mode="popLayout" custom={dir}>
         <motion.div

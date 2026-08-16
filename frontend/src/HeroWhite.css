@@ -18,6 +18,16 @@
 .hw-particles{position:absolute;inset:0;z-index:2;overflow:hidden;pointer-events:none}
 .hw-particles span{position:absolute;bottom:-12px;border-radius:50%;background:rgba(255,255,255,.55);filter:blur(.6px);opacity:0;animation-name:hwRise;animation-timing-function:linear;animation-iteration-count:infinite}
 @keyframes hwRise{0%{transform:translateY(0);opacity:0}8%{opacity:.55}62%{opacity:.3}100%{transform:translateY(-92vh);opacity:0}}
+/* Silverstone ground silhouette — same rotation (0.22*PI ~ 39.6deg) and tilt as the 3D overview camera */
+.hw-ground-track{position:absolute;z-index:0;left:50%;bottom:-4vh;width:min(56vw,860px);aspect-ratio:326/511;transform:translateX(-50%);perspective:1150px;pointer-events:none}
+.hw-ground-track svg{width:100%;height:100%;overflow:visible;transform:rotateX(58deg) rotate(39.6deg) scale(1.06);transform-origin:50% 50%}
+.hw-ground-track path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hw-ground-track-halo{stroke:rgba(0,0,0,.28);stroke-width:13;filter:blur(7px)}
+.hw-ground-track-echo{stroke:rgba(255,255,255,.14);stroke-width:2.2;transform:translate(3px,-3px)}
+.hw-ground-track-line{stroke:rgba(0,0,0,.4);stroke-width:2.6}
+.hw-ground-track-pulse{stroke:rgba(255,255,255,.35);stroke-width:1.3;stroke-dasharray:10 300;animation:hwTrackPulse 7s linear infinite}
+@keyframes hwTrackPulse{to{stroke-dashoffset:-1240}}
+
 .hw-floor-fx{position:absolute;z-index:0;left:50%;bottom:9vh;width:min(72vw,980px);height:20vh;transform:translateX(-50%);pointer-events:none;background:repeating-linear-gradient(104deg,transparent 0 26px,rgba(0,0,0,.16) 26px 30px,transparent 30px 44px,rgba(0,0,0,.09) 44px 47px),repeating-linear-gradient(76deg,transparent 0 34px,rgba(0,0,0,.1) 34px 37px);opacity:.34;filter:blur(1.5px);mask-image:radial-gradient(ellipse 60% 85% at 50% 78%,#000 20%,transparent 74%);animation:hwHaze 7s ease-in-out infinite alternate}
 @keyframes hwHaze{0%{opacity:.26;filter:blur(1.2px)}100%{opacity:.4;filter:blur(2.4px)}}
 .hw-wash{position:absolute;inset:0;z-index:20;pointer-events:none;background:radial-gradient(ellipse 70% 80% at 50% 45%,rgba(255,255,255,.5),rgba(255,255,255,.12) 55%,transparent 80%)}
@@ -111,6 +121,7 @@
   .hw-title span:last-child{margin-left:6vw}
   .hw-side-meta{display:none}
   .hw-figure-zone{align-items:flex-end;padding-bottom:24vh}
+  .hw-ground-track{width:120vw;bottom:8vh}
   .hw-figure{height:47vh}
   .hw-lewis{filter:drop-shadow(0 24px 26px rgba(0,0,0,.42)) drop-shadow(0 3px 6px rgba(0,0,0,.28)) contrast(1.05) saturate(1.05)}
   .hw-spot-dot{width:30px;height:30px;margin:-15px 0 0 -15px}

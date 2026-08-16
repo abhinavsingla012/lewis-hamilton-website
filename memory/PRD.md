@@ -387,3 +387,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Era stat morphing: ERA_STATS (mclaren 21/1/26, mercedes 84/6/78, ferrari career 105/7/104) + hero-era-tag label
 - ArrowLeft/Right switch themes only when hero active (.circuit-viewport dataset guard)
 - Tested: iteration_47 (10/11 pass), era-tag padding specificity bug fixed (.hw-stats>.hw-stats-era, verified 19px height)
+
+### Silverstone Ground Silhouette on Hero (June 2026)
+- Added .hw-ground-track behind Lewis: real SILVERSTONE_PATH SVG (viewBox 87 -5 326 511) with 4 stroke passes (blur halo, white echo, engraved dark line, animated white pulse dash)
+- Matched to CircuitStage overview: CSS rotate(39.6deg) = 3D rotation PI*0.22, rotateX(58deg) = camera elevation ~30deg -> scroll transition reads as one continuous zoom into the 3D track
+- Mobile: 120vw wide at bottom 8vh
