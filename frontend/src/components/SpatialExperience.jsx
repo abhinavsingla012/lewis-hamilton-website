@@ -69,11 +69,11 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   const [coverage, setCoverage] = useState(0);
 
   const { scrollYProgress } = useScroll({ target: runway, offset: ["start start", "end end"] });
-  const heroScale = useTransform(scrollYProgress, [0, 0.06, 0.135, 0.17], [1, 1, 0.28, 0.18]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.105, 0.155, 0.18], [1, 1, 0.72, 0]);
-  const mapOpacity = useTransform(scrollYProgress, [0.085, 0.135], [0, 1]);
-  const bridgeOpacity = useTransform(scrollYProgress, [0.05, 0.08, 0.115, 0.15], [0, 0.9, 0.55, 0]);
-  const bridgeScale = useTransform(scrollYProgress, [0.05, 0.15], [1, 2.15]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.045, 0.125], [1, 1, 0]);
+  const mapOpacity = useTransform(scrollYProgress, [0.1, 0.16], [0, 1]);
+  const bridgeOpacity = useTransform(scrollYProgress, [0.03, 0.06, 0.13, 0.175], [0, 1, 0.75, 0]);
+  const bridgeScale = useTransform(scrollYProgress, [0.045, 0.175], [1, 2.3]);
   const hubCopyOpacity = useTransform(scrollYProgress, [0.105, 0.14, 0.185, 0.21], [0, 1, 1, 0]);
 
   /** Feeds the WebGL circuit: position along the racing line + how close the camera is to the car. */

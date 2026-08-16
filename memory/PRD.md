@@ -397,3 +397,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - circuit-ground-bridge layer (z-42) in SpatialExperience: same Silverstone SVG/orientation as hero, scroll-driven via scrollYProgress
 - bridgeOpacity [0.05,0.08,0.115,0.15]->[0,0.9,0.55,0]; bridgeScale [0.05,0.15]->[1,2.15]; grows over the shrinking hero, fades as 3D map fades in
 - Verified with lenis.scrollTo forced positions (opacity/scale ramps correct); NOTE: native window.scrollTo doesn't work for testing, use window.__hamiltonLenis.scrollTo
+
+### Hero Fade (no zoom) Transition Rework (June 2026)
+- heroScale locked at 1 (no shrink); heroOpacity fades in place [0,0.045,0.125]->[1,1,0]
+- Bridge silhouette is now the sole connector: opacity [0.03,0.06,0.13,0.175]->[0,1,0.75,0], scale [0.045,0.175]->[1,2.3]; mapOpacity [0.1,0.16]
+- Verified via lenis.scrollTo at p=0.07/0.12/0.17
