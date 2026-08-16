@@ -5,7 +5,7 @@ import { HeroStage } from "./HeroStage";
 import { CircuitStage } from "./CircuitStage";
 import { ChapterView } from "./Chapters";
 import { ChapterMarker } from "./ChapterMarker";
-import { CIRCUIT_CHAPTERS, CIRCUIT_HUB, SPATIAL_ROUTE } from "../data/circuitRoute";
+import { CIRCUIT_CHAPTERS, CIRCUIT_HUB, SILVERSTONE_PATH, SPATIAL_ROUTE } from "../data/circuitRoute";
 import { canElementScroll, consumeChapterStep } from "../lib/spatialInput";
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -72,6 +72,8 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   const heroScale = useTransform(scrollYProgress, [0, 0.06, 0.135, 0.17], [1, 1, 0.28, 0.18]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.105, 0.155, 0.18], [1, 1, 0.72, 0]);
   const mapOpacity = useTransform(scrollYProgress, [0.085, 0.135], [0, 1]);
+  const bridgeOpacity = useTransform(scrollYProgress, [0.05, 0.08, 0.115, 0.15], [0, 0.9, 0.55, 0]);
+  const bridgeScale = useTransform(scrollYProgress, [0.05, 0.15], [1, 2.15]);
   const hubCopyOpacity = useTransform(scrollYProgress, [0.105, 0.14, 0.185, 0.21], [0, 1, 1, 0]);
 
   /** Feeds the WebGL circuit: position along the racing line + how close the camera is to the car. */
@@ -346,6 +348,18 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       </motion.div>
 
       <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} teamTheme={teamTheme} setTeamTheme={setTeamTheme} /></motion.div>
+
+      <motion.div className="circuit-ground-bridge" style={{ opacity: bridgeOpacity }} aria-hidden="true" data-testid="circuit-ground-bridge">
+        <div className="cgb-pos">
+          <motion.div className="cgb-scale" style={{ scale: bridgeScale }}>
+            <svg className="cgb-svg" viewBox="87 -5 326 511" preserveAspectRatio="xMidYMid meet">
+              <path className="hw-ground-track-halo" d={SILVERSTONE_PATH} />
+              <path className="hw-ground-track-echo" d={SILVERSTONE_PATH} />
+              <path className="hw-ground-track-line" d={SILVERSTONE_PATH} />
+            </svg>
+          </motion.div>
+        </div>
+      </motion.div>
 
       <div className="circuit-chapters">
         {mounted.map((key) => <ChapterView

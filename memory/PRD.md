@@ -392,3 +392,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Added .hw-ground-track behind Lewis: real SILVERSTONE_PATH SVG (viewBox 87 -5 326 511) with 4 stroke passes (blur halo, white echo, engraved dark line, animated white pulse dash)
 - Matched to CircuitStage overview: CSS rotate(39.6deg) = 3D rotation PI*0.22, rotateX(58deg) = camera elevation ~30deg -> scroll transition reads as one continuous zoom into the 3D track
 - Mobile: 120vw wide at bottom 8vh
+
+### Scroll-Linked Ground Zoom Bridge (June 2026)
+- circuit-ground-bridge layer (z-42) in SpatialExperience: same Silverstone SVG/orientation as hero, scroll-driven via scrollYProgress
+- bridgeOpacity [0.05,0.08,0.115,0.15]->[0,0.9,0.55,0]; bridgeScale [0.05,0.15]->[1,2.15]; grows over the shrinking hero, fades as 3D map fades in
+- Verified with lenis.scrollTo forced positions (opacity/scale ramps correct); NOTE: native window.scrollTo doesn't work for testing, use window.__hamiltonLenis.scrollTo
