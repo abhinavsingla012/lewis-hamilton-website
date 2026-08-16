@@ -20,7 +20,7 @@ const HOTSPOT_CONTENT = {
 const LAYOUTS = {
   ferrari: {
     img: "/images/lewis-ferrari.png",
-    ratio: "538 / 1209",
+    ratio: "536 / 1139",
     spots: [
       { id: "head", top: "3%", left: "37%", side: "left", line: [[0, 0], [-52, -26], [-150, -26]] },
       { id: "shoulders", top: "17%", left: "63%", side: "right", line: [[0, 0], [52, -14], [150, -14]] },
