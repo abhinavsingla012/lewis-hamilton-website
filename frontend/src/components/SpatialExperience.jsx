@@ -47,7 +47,7 @@ const nearestRoute = (value) => SPATIAL_ROUTE.reduce((nearest, route) => (
   Math.abs(route.stop - value) < Math.abs(nearest.stop - value) ? route : nearest
 ), SPATIAL_ROUTE[0]);
 
-export const SpatialExperience = ({ archive, teamTheme = "ferrari" }) => {
+export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme }) => {
   const runway = useRef(null);
   const travelRef = useRef({ progress: 0, follow: 0, coverage: 0 });
 
@@ -251,19 +251,22 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari" }) => {
     };
 
     const onTouchStart = (event) => {
-      touchStart = event.touches[0]?.clientY ?? null;
+      const touch = event.touches[0];
+      touchStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
       touchHandled = false;
     };
     const onTouchMove = (event) => {
-      const current = event.touches[0]?.clientY;
-      if (touchStart === null || current === undefined) return;
-      const delta = touchStart - current;
+      const touch = event.touches[0];
+      if (touchStart === null || !touch) return;
+      const delta = touchStart.y - touch.clientY;
+      const horizontal = Math.abs(touch.clientX - touchStart.x);
       if (event.target?.closest?.(".menu-panel")) return;
       if (nativeScrollTarget(event.target, delta)) {
         event.stopPropagation();
         return;
       }
       event.preventDefault();
+      if (horizontal > Math.abs(delta)) return;
       event.stopPropagation();
       if (touchHandled || travelingRef.current || performance.now() < cooldownRef.current) return;
       if (Math.abs(delta) < 52) return;
@@ -342,7 +345,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari" }) => {
         <a className="circuit-attribution" href="https://github.com/julesr0y/f1-circuits-svg" target="_blank" rel="noreferrer" data-testid="circuit-map-attribution-link">Circuit geometry: Jules Roy / CC BY 4.0 · adapted</a>
       </motion.div>
 
-      <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} teamTheme={teamTheme} /></motion.div>
+      <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} teamTheme={teamTheme} setTeamTheme={setTeamTheme} /></motion.div>
 
       <div className="circuit-chapters">
         {mounted.map((key) => <ChapterView

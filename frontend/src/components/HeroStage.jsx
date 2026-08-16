@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ArrowDownRight, Crosshair } from "lucide-react";
+import { ArrowDownRight, ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
 
 const Counter = ({ value, testId }) => {
   const [display, setDisplay] = useState(0);
@@ -56,9 +56,10 @@ const LAYOUTS = {
   },
 };
 
-export const HeroStage = ({ stats, teamTheme = "ferrari" }) => {
+export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
   const layout = LAYOUTS[teamTheme] || LAYOUTS.ferrari;
   const [activeSpot, setActiveSpot] = useState(null);
+  const touchRef = useRef(null);
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
   const smoothX = useSpring(pointerX, { stiffness: 90, damping: 20 });
@@ -73,7 +74,28 @@ export const HeroStage = ({ stats, teamTheme = "ferrari" }) => {
     pointerY.set(event.clientY / window.innerHeight - 0.5);
   };
 
-  return <section id="top" className="hero-white spatial-hero-stage" onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }} data-testid="hero-section">
+  const THEME_ORDER = ["ferrari", "mercedes", "mclaren"];
+  const switchTeam = (dir) => {
+    if (!setTeamTheme) return;
+    const index = THEME_ORDER.indexOf(teamTheme);
+    setTeamTheme(THEME_ORDER[(index + dir + THEME_ORDER.length) % THEME_ORDER.length]);
+    setActiveSpot(null);
+  };
+  const onTouchStart = (event) => {
+    const touch = event.touches[0];
+    touchRef.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
+  };
+  const onTouchEnd = (event) => {
+    const start = touchRef.current;
+    touchRef.current = null;
+    const touch = event.changedTouches[0];
+    if (!start || !touch) return;
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.4) switchTeam(dx < 0 ? 1 : -1);
+  };
+
+  return <section id="top" className="hero-white spatial-hero-stage" onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-testid="hero-section">
     <div className="hw-tint" aria-hidden="true" />
     <div className="hw-grain" aria-hidden="true" />
     <motion.div className="hw-ghost-name" style={{ x: ghostX }} aria-hidden="true"><span>HAMILTON</span></motion.div>
@@ -122,6 +144,8 @@ export const HeroStage = ({ stats, teamTheme = "ferrari" }) => {
     </motion.div>
 
     <motion.button className="hw-cta" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.6 }} whileHover={{ y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => window.__spatialGo?.("circuit")} data-testid="explore-legacy-button"><span><ArrowDownRight /></span><div><small>ENTER THE SPATIAL ARCHIVE</small><strong>EXPLORE THE LEGACY</strong></div></motion.button>
+
+    <div className="hw-swipe-hint" aria-hidden="true" data-testid="hero-swipe-hint"><ChevronLeft size={11} /><span>SWIPE TO SWITCH TEAM</span><ChevronRight size={11} /></div>
 
     <div className="hw-telemetry" data-testid="hero-telemetry"><span>HAM / GBR</span><span>HOVER THE POINTS — READ THE DRIVER</span><span><Crosshair size={11} /> PRECISION / PURPOSE / PACE</span></div>
   </section>;

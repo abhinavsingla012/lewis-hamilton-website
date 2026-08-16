@@ -373,3 +373,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - 3 user-supplied photos processed (Gemini 3D-tune + rembg): /images/lewis-mclaren.png (751x1222), /images/lewis-ferrari.png (538x1209), /images/lewis-mercedes.png (538x1186)
 - HeroStage now has LAYOUTS map: per-team image, aspect ratio, and per-team hotspot positions/lines (poses differ); teamTheme prop passed from SpatialExperience
 - Old lewis-hero.png retained but unused
+
+### Mobile Hero + Swipe Theme Switch (June 2026)
+- Mobile hero layout restructured: title 13vh, figure 47vh bottom-anchored (24vh pad), stats at 12.5vh, CTA left/swipe hint right at bottom — no overlaps (verified via bbox tests, iteration_46 100% pass)
+- Touch swipe left/right on hero cycles team themes (THEME_ORDER ferrari->mercedes->mclaren, wraps); vertical swipe still navigates chapters (SpatialExperience touchmove now yields when horizontal dominates)
+- Mobile hotspot cards render as bottom sheet above stats; swipe hint (data-testid hero-swipe-hint) mobile-only
