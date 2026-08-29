@@ -13,6 +13,12 @@ const SPACING = 3.1;
 const CENTER = 3;
 const TMP_COLOR = new THREE.Color();
 
+const THEME_PALETTES = {
+  ferrari: { a: "#ff5a3c", b: "#c01207", spark: "#ffd9c8", cone: "#ff9a84", dust: "#ff8570", shards: "MARANELLO RED" },
+  mercedes: { a: "#43e6d5", b: "#00857a", spark: "#dcfff9", cone: "#8ff2e6", dust: "#6fe3d6", shards: "PETRONAS TEAL" },
+  mclaren: { a: "#ffb257", b: "#e05e00", spark: "#ffe9cf", cone: "#ffcf96", dust: "#ffb877", shards: "PAPAYA ORANGE" },
+};
+
 const TITLES = [
   { year: 2008, team: "McLAREN", car: "MP4-23", accent: "#ff7a1f", wins: 5, poles: 7, points: 98, headline: "BY ONE POINT", story: "Fifth place, gained at the very last corner of the very last lap in Brazil. At 23, the youngest world champion the sport had ever seen." },
   { year: 2014, team: "MERCEDES", car: "W05 HYBRID", accent: "#00d2be", wins: 11, poles: 7, points: 384, headline: "THE SILVER WAR", story: "Eleven wins in the first year of the hybrid era, settled in a season-long duel with Rosberg under the Abu Dhabi floodlights." },
@@ -85,7 +91,7 @@ const buildParticleGeometry = () => {
   return geometry;
 };
 
-const buildParticleMaterial = () => new THREE.ShaderMaterial({
+const buildParticleMaterial = (palette) => new THREE.ShaderMaterial({
   transparent: true,
   depthWrite: false,
   depthTest: false,
@@ -97,6 +103,9 @@ const buildParticleMaterial = () => new THREE.ShaderMaterial({
     uMouse: { value: new THREE.Vector2(99, 99) },
     uMouseActive: { value: 0 },
     uPixel: { value: Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 1.6) },
+    uColorA: { value: new THREE.Color(palette.a) },
+    uColorB: { value: new THREE.Color(palette.b) },
+    uSpark: { value: new THREE.Color(palette.spark) },
   },
   vertexShader: `
     uniform float uTime, uMorph, uScatter, uMouseActive, uPixel;
@@ -123,20 +132,23 @@ const buildParticleMaterial = () => new THREE.ShaderMaterial({
     }`,
   fragmentShader: `
     uniform float uScatter;
+    uniform vec3 uColorA, uColorB, uSpark;
     varying float vSeed, vGlow;
     void main() {
       float a = smoothstep(0.5, 0.06, length(gl_PointCoord - 0.5));
-      vec3 gold = mix(vec3(1.0, 0.78, 0.31), vec3(0.98, 0.55, 0.12), fract(vSeed * 7.31));
-      if (vSeed > 0.94) gold = vec3(1.0, 0.96, 0.84);
-      gold += vGlow * vec3(0.5, 0.4, 0.18);
+      vec3 shard = mix(uColorA, uColorB, fract(vSeed * 7.31));
+      if (vSeed > 0.94) shard = uSpark;
+      shard += vGlow * uColorA * 0.55;
       float fade = clamp(1.0 - uScatter * 1.15, 0.0, 1.0);
-      gl_FragColor = vec4(gold, a * (0.7 + vSeed * 0.3) * fade);
+      gl_FragColor = vec4(shard, a * (0.7 + vSeed * 0.3) * fade);
     }`,
 });
 
-const MonumentParticles = ({ isActive, phaseRef }) => {
+const MonumentParticles = ({ isActive, phaseRef, palette }) => {
   const [geometry] = useState(buildParticleGeometry);
-  const material = useMemo(buildParticleMaterial, []);
+  const material = useMemo(() => buildParticleMaterial(palette), []); // eslint-disable-line react-hooks/exhaustive-deps
+  const paletteRef = useRef(palette);
+  paletteRef.current = palette;
   const mouseSeen = useRef(false);
   const { camera, gl } = useThree();
 
@@ -179,6 +191,11 @@ const MonumentParticles = ({ isActive, phaseRef }) => {
     u.uScatter.value = THREE.MathUtils.damp(u.uScatter.value, scatterTarget, scatterTarget ? 4.4 : 10, delta);
     u.uMouse.value.set(state.pointer.x * state.viewport.width / 2, state.pointer.y * state.viewport.height / 2);
     u.uMouseActive.value = THREE.MathUtils.damp(u.uMouseActive.value, phase === "monument" && !IS_MOBILE && mouseSeen.current ? 1 : 0, 4, delta);
+    const pal = paletteRef.current;
+    const blend = Math.min(1, 3.2 * delta);
+    u.uColorA.value.lerp(TMP_COLOR.set(pal.a), blend);
+    u.uColorB.value.lerp(TMP_COLOR.set(pal.b), blend);
+    u.uSpark.value.lerp(TMP_COLOR.set(pal.spark), blend);
   });
 
   return <points geometry={geometry} material={material} frustumCulled={false} />;
@@ -340,8 +357,10 @@ const buildSteelMatcap = () => buildMatcap([
   [0, "#8d939f"], [0.3, "#4c505a"], [0.62, "#26282e"], [1, "#0d0e11"],
 ], "rgba(230,236,248,.5)");
 
-const VaultDust = () => {
+const VaultDust = ({ palette }) => {
   const group = useRef(null);
+  const paletteRef = useRef(palette);
+  paletteRef.current = palette;
   const geometry = useMemo(() => {
     const count = 380;
     const positions = new Float32Array(count * 3);
@@ -359,15 +378,20 @@ const VaultDust = () => {
     depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
   }), []);
   useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
-  useFrame((_, delta) => { if (group.current) group.current.rotation.y += delta * 0.02; });
+  useFrame((_, delta) => {
+    if (group.current) group.current.rotation.y += delta * 0.02;
+    material.color.lerp(TMP_COLOR.set(paletteRef.current.dust), Math.min(1, 3.2 * delta));
+  });
   return <group ref={group}><points geometry={geometry} material={material} frustumCulled={false} /></group>;
 };
 
-const VaultScene = ({ focus, spinRef, onPick }) => {
+const VaultScene = ({ focus, spinRef, onPick, palette }) => {
   const { scene, camera } = useThree();
   const camX = useRef((focus - CENTER) * SPACING);
   const trophyRefs = useRef([]);
   const mirrorRefs = useRef([]);
+  const paletteRef = useRef(palette);
+  paletteRef.current = palette;
 
   useEffect(() => {
     scene.background = new THREE.Color("#050506");
@@ -444,6 +468,7 @@ const VaultScene = ({ focus, spinRef, onPick }) => {
       mirrorGoldMaterials[index].color.copy(goldMaterials[index].color);
       ringMaterials[index].emissiveIntensity = THREE.MathUtils.damp(ringMaterials[index].emissiveIntensity, focused ? 2.3 : 0.35, 4, delta);
       coneMaterials[index].uniforms.uIntensity.value = THREE.MathUtils.damp(coneMaterials[index].uniforms.uIntensity.value, focused ? 0.5 : 0.11, 4, delta);
+      coneMaterials[index].uniforms.uColor.value.lerp(TMP_COLOR.set(paletteRef.current.cone), Math.min(1, 3.2 * delta));
     });
   });
 
@@ -454,7 +479,7 @@ const VaultScene = ({ focus, spinRef, onPick }) => {
       <planeGeometry args={[72, 42]} />
       <meshBasicMaterial color="#050506" transparent opacity={0.72} depthWrite={false} />
     </mesh>
-    <VaultDust />
+    <VaultDust palette={palette} />
     {TITLES.map((title, index) => {
       const x = (index - CENTER) * SPACING;
       return <group key={title.year} position={[x, 0, 0]}>
@@ -513,7 +538,8 @@ const MONUMENT_STATS = [
   ["368", "STARTS", "monument-stat-starts"],
 ];
 
-export const LegacyVault = ({ isActive }) => {
+export const LegacyVault = ({ isActive, teamTheme = "ferrari" }) => {
+  const palette = THEME_PALETTES[teamTheme] || THEME_PALETTES.ferrari;
   const [phase, setPhase] = useState("monument");
   const [scene, setScene] = useState("monument");
   const [doors, setDoors] = useState("open");
@@ -595,17 +621,17 @@ export const LegacyVault = ({ isActive }) => {
         onCreated={({ gl }) => { gl.toneMapping = THREE.ACESFilmicToneMapping; gl.toneMappingExposure = 1.05; }}
       >
         {scene === "monument"
-          ? <MonumentParticles isActive={isActive} phaseRef={phaseRef} />
-          : <VaultScene focus={focus} spinRef={spinRef} onPick={setFocus} />}
+          ? <MonumentParticles isActive={isActive} phaseRef={phaseRef} palette={palette} />
+          : <VaultScene focus={focus} spinRef={spinRef} onPick={setFocus} palette={palette} />}
       </Canvas>
     </div>
 
     <AnimatePresence>
       {phase === "monument" && <motion.div key="mon" className="lv-mon-ui" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.7, delay: 0.3 } }} exit={{ opacity: 0, transition: { duration: 0.35 } }}>
-        <p className="lv-mon-kicker" data-testid="monument-kicker">FORGED FROM {IS_MOBILE ? "6,500" : "14,000"} SHARDS OF GOLD</p>
+        <p className="lv-mon-kicker" data-testid="monument-kicker">FORGED FROM {IS_MOBILE ? "6,500" : "14,000"} SHARDS OF {palette.shards}</p>
         <header className="lv-mon-head">
           <h2 id="legacy-vault-title" data-testid="legacy-section-title">ONE NUMBER.<span>SEVEN CROWNS.</span></h2>
-          <p data-testid="legacy-statement">Every shard of gold in this number was earned on a Sunday. <b>Move through the dust — it remembers.</b> Then open the vault it guards.</p>
+          <p data-testid="legacy-statement">Every shard in this number was earned on a Sunday. <b>Move through the dust — it remembers.</b> Then open the vault it guards.</p>
         </header>
         <div className="lv-mon-stats" data-testid="monument-stats">
           {MONUMENT_STATS.map(([value, label, testId]) => <div key={label} data-testid={testId}><strong>{value}</strong><span>{label}</span></div>)}

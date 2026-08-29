@@ -385,6 +385,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
           chapterKey={key}
           archive={archive}
           direction={direction}
+          teamTheme={teamTheme}
           isActive={key === activeKey && !isTraveling && !isCircuitOverview}
         />)}
       </div>

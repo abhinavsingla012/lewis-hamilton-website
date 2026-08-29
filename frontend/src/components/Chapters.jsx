@@ -159,9 +159,9 @@ const FooterChapter = () => <footer className="footer-world" data-testid="site-f
   <div className="footer-bottom"><p data-testid="fan-site-disclaimer">An independent, fan-made celebration of Sir Lewis Hamilton. Not affiliated with Lewis Hamilton, Formula 1, Mercedes-AMG Petronas, McLaren, or Ferrari.</p><button onClick={() => window.__spatialGo?.("top")} data-testid="back-to-top-button">BACK TO TOP <ArrowUpRight /></button></div>
 </footer>;
 
-export const ChapterView = ({ chapterKey, archive, isActive, direction }) => {
+export const ChapterView = ({ chapterKey, archive, isActive, direction, teamTheme }) => {
   switch (chapterKey) {
-    case "legacy": return <LegacyVault isActive={isActive} />;
+    case "legacy": return <LegacyVault isActive={isActive} teamTheme={teamTheme} />;
     case "timeline": return <SeasonTimeline seasons={archive?.seasons} isActive={isActive} />;
     case "cars": return <CareerCars seasons={archive?.seasons} isActive={isActive} />;
     case "gallery": return <VisualGallery isActive={isActive} direction={direction} />;

@@ -451,3 +451,11 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Materials: procedural silver + gold canvas matcaps, brushed-metal multiply map (zero lighting cost, safe on low-end GPUs)
 - "Alive" motion: gentle float bob, slight sway, breathing scale pulse on the focused trophy, auto-rotate + drag-spin, faux mirror reflections fully synced (position/rotation/scale)
 - Verified via desktop + mobile screenshots: silhouette matches reference, focus dimming works, no console errors
+
+## Legacy Chapter — Team Theme Integration (June 2026)
+- The whole Legacy chapter now reacts live to the global team theme switcher (Ferrari / Mercedes / McLaren)
+- Monument particles: shader palette uniforms (uColorA/uColorB/uSpark) smoothly lerp per theme — Maranello red, Petronas teal, Papaya orange; kicker copy names the shard colour per theme
+- Vault: light cones and dust lerp to the theme accent; pedestal rings intentionally stay per-title (2008 McLaren orange, 2014-20 Mercedes teal); trophy stays realistic silver/gold
+- All DOM accents (CTA, doors, lock wheel, seam, year rail, story year, seal button) use global CSS vars (--acid, --accent-rgb, --accent-ink, --accent-shadow) so they follow the theme with zero JS
+- teamTheme prop threaded: SpatialExperience → ChapterView → LegacyVault
+- Verified via screenshots: all three themes on the monument, themed doors/lock, and a live theme switch while inside the vault
