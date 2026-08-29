@@ -99,10 +99,34 @@ const TracksChapter = ({ archive }) => {
   </section>;
 };
 
-const MomentChapter = () => <section className="moment-section" data-testid="silverstone-moment-section">
+const SILVERSTONE_WINS = [
+  { year: "2008", note: "IN THE RAIN" }, { year: "2014", note: "SILVER ERA BEGINS" }, { year: "2015", note: "BACK TO BACK" },
+  { year: "2016", note: "THE HAT-TRICK" }, { year: "2017", note: "RECORD EQUALLED" }, { year: "2019", note: "CROWD-SURF DAY" },
+  { year: "2020", note: "THREE-WHEEL WIN" }, { year: "2021", note: "THE COMEBACK" }, { year: "2024", note: "945 DAYS ENDED" },
+];
+
+const MomentChapter = () => <section className="moment-section moment-world" data-testid="silverstone-moment-section">
   <Marquee className="moment-marquee" speed={55} autoFill><span>HOME. HISTORY. HAMILTON.&nbsp;</span></Marquee>
   <img src={IMAGES.silverstone} alt="Lewis Hamilton at Silverstone" data-testid="silverstone-moment-image" />
-  <div className="moment-copy"><h2>“GET IN THERE, LEWIS.”</h2><p data-testid="silverstone-moment-description">Nine wins at one circuit. A record no Formula 1 driver had ever held before.</p></div>
+  <div className="moment-shade" aria-hidden="true" />
+  <span className="moment-side-label" aria-hidden="true">SILVERSTONE / 52.0733° N — THE HOME FORTRESS</span>
+  <div className="moment-copy">
+    <span className="moment-kicker">CH. 08 / THE HOME FORTRESS</span>
+    <h2>“GET IN THERE, LEWIS.”</h2>
+    <p data-testid="silverstone-moment-description">Nine wins at one circuit. A record no Formula 1 driver had ever held before.</p>
+    <div className="moment-stats" data-testid="moment-stats">
+      <div><strong>9</strong><span>HOME WINS</span></div>
+      <div><strong>7</strong><span>HOME POLES</span></div>
+      <div><strong>15</strong><span>HOME PODIUMS</span></div>
+      <div><strong>480K</strong><span>FANS / WEEKEND</span></div>
+    </div>
+  </div>
+  <aside className="moment-years" data-testid="moment-years-rail">
+    <span className="moment-years-head">NINE WINS AT HOME</span>
+    {SILVERSTONE_WINS.map((win, index) => <div key={win.year} className="moment-year" style={{ "--my-delay": `${index * 0.06}s` }} data-testid={`moment-year-${win.year}`}>
+      <span>{String(index + 1).padStart(2, "0")}</span><strong>{win.year}</strong><small>{win.note}</small>
+    </div>)}
+  </aside>
 </section>;
 
 const QuotesChapter = () => {

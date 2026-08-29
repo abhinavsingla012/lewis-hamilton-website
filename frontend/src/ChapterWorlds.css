@@ -235,3 +235,35 @@
   hyphens: auto;
 }
 .records-section .reactor-specification p { overflow-wrap: anywhere; }
+
+/* ── Moment world: Silverstone home fortress ─────────────────────────── */
+.moment-world .moment-shade{position:absolute;z-index:2;inset:0;background:linear-gradient(90deg,rgba(5,5,5,.82) 0%,rgba(5,5,5,.25) 45%,rgba(5,5,5,.15) 62%,rgba(5,5,5,.72) 100%),linear-gradient(0deg,rgba(5,5,5,.88) 0%,transparent 34%)}
+.moment-world .moment-side-label{position:absolute;z-index:5;right:2vw;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;color:rgba(255,255,255,.34);font:700 8px "Space Mono";letter-spacing:.3em}
+.moment-world .moment-copy{bottom:8%;max-width:760px}
+.moment-world .moment-kicker{display:block;margin-bottom:6px;color:var(--acid);font:700 9px "Space Mono";letter-spacing:.24em}
+.moment-world .moment-copy p[data-testid]{max-width:520px;color:rgba(255,255,255,.78)}
+.moment-world .moment-stats{display:flex;gap:0;margin-top:26px;border-top:1px solid rgba(255,255,255,.22);max-width:560px}
+.moment-world .moment-stats>div{flex:1;padding:14px 16px 0 0;border-right:1px solid rgba(255,255,255,.14);margin-right:16px}
+.moment-world .moment-stats>div:last-child{border-right:0;margin-right:0}
+.moment-world .moment-stats strong{display:block;font:800 clamp(22px,2.2vw,36px) Unbounded;color:#fff}
+.moment-world .moment-stats span{color:rgba(255,255,255,.5);font:700 7px "Space Mono";letter-spacing:.14em}
+.moment-world .moment-years{position:absolute;z-index:5;right:6vw;bottom:8%;width:min(300px,24vw);display:flex;flex-direction:column}
+.moment-world .moment-years-head{margin-bottom:12px;color:var(--acid);font:700 8px "Space Mono";letter-spacing:.26em}
+.moment-world .moment-year{display:grid;grid-template-columns:26px 64px 1fr;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.14);opacity:0;transform:translateX(24px);transition:border-color .3s}
+.circuit-viewport[data-active="moment"]:not([data-traveling="true"]) .moment-year{animation:momentYearIn .6s cubic-bezier(.22,1,.36,1) calc(.35s + var(--my-delay)) both}
+.moment-world .moment-year:hover{border-color:rgba(239,255,0,.6)}
+.moment-world .moment-year span{color:rgba(255,255,255,.38);font:700 8px "Space Mono"}
+.moment-world .moment-year strong{font:800 17px Unbounded;color:#fff;letter-spacing:-.03em}
+.moment-world .moment-year small{color:rgba(255,255,255,.52);font:700 7.5px "Space Mono";letter-spacing:.12em;text-align:right}
+@keyframes momentYearIn{to{opacity:1;transform:translateX(0)}}
+@media(max-width:850px){
+  .moment-world .moment-years{position:static;width:auto;margin:18px 20px 0;order:3}
+  .moment-world{display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:9vh}
+  .moment-world .moment-copy{position:static;order:2;margin:0 20px}
+  .moment-world img{position:absolute;inset:0}
+  .moment-world .moment-side-label{display:none}
+  .moment-world .moment-stats{flex-wrap:wrap}
+  .moment-world .moment-stats>div{flex:1 1 40%;margin-right:0;border-right:0;padding-right:0}
+  .moment-world .moment-year{grid-template-columns:22px 52px 1fr;padding:5px 0}
+  .moment-world .moment-year strong{font-size:14px}
+}

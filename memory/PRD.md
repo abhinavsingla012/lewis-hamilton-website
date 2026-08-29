@@ -408,3 +408,9 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Hero silhouette + bridge repositioned to match 3D overview footprint: left 49%, top 54%, width min(56vw,870px) (measured 3D track bbox ~x225-1310/y285-735 @1568 render)
 - bridgeOpacity [0.02,0.05,0.16,0.19]->[0,1,1,0]
 - NOTE: screenshot tool returns black frames when capturing rapidly during WebGL animation (ReadPixels stall) - not an app bug
+
+### Chapter Worlds Polish + Travel Watchdog (June 2026)
+- ROOT CAUSE of "empty chapters": intermittent stuck travel (data-traveling='true' never clearing) kept chapters clip-hidden. Fixed with non-resettable watchdog in goTo (force-lands on targetRef after TRAVEL_DURATION+1.1s)
+- Moment chapter redesigned as "Home Fortress" world: kicker, 4-stat row (9 wins/7 poles/15 podiums/480K fans), 9-entry Silverstone wins year rail (2008-2024) with staggered entrance; new CSS in ChapterWorlds.css (.moment-world)
+- All 11 chapters audited via screenshots: legacy/timeline/cars/gallery/records/milestones/tracks/quotes/victories/footer already polished from previous session
+- iteration_48: 100% pass (11-chapter soak, keyboard walk, legacy reveal, moment redesign, hero regression)

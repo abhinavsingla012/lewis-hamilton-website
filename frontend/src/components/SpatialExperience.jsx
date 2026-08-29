@@ -117,13 +117,31 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
     const distance = Math.abs(window.scrollY - top);
     const animated = !immediate && distance > 6;
     if (animated) {
+      const wasTraveling = travelingRef.current;
       travelingRef.current = true;
       setIsTraveling(true);
+      if (!wasTraveling) {
+        window.clearTimeout(timersRef.current.watchdog);
+        timersRef.current.watchdog = window.setTimeout(() => {
+          if (!travelingRef.current) return;
+          const target = targetRef.current;
+          const lenisNow = window.__hamiltonLenis;
+          if (lenisNow) lenisNow.scrollTo(target.top, { immediate: true, force: true });
+          else window.scrollTo(0, target.top);
+          travelingRef.current = false;
+          activeRef.current = target.key;
+          setIsTraveling(false);
+          setActiveKey(target.key);
+          cooldownRef.current = performance.now() + 240;
+          requestAnimationFrame(() => updateCamera(target.stop));
+        }, TRAVEL_DURATION * 1000 + 1100);
+      }
     }
 
     const arrive = () => {
       if (tokenRef.current !== token) return;
       window.clearTimeout(timersRef.current.fallback);
+      window.clearTimeout(timersRef.current.watchdog);
       const lenis = window.__hamiltonLenis;
       if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
       else window.scrollTo(0, top);
