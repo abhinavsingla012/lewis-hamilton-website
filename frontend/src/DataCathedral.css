@@ -1,0 +1,78 @@
+/* ── Data Cathedral: every race as a light bar ───────────────────────── */
+.cathedral{background:#040404!important}
+.cath-scan{position:absolute;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 88px),linear-gradient(180deg,transparent 55%,rgba(255,215,130,.03) 100%)}
+.cath-ghost{position:absolute;z-index:0;right:2vw;top:1vh;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.05);font:900 min(24vw,380px)/.8 Unbounded;letter-spacing:-.1em;pointer-events:none}
+
+.cath-head{position:absolute;z-index:4;left:4vw;top:16vh}
+.cath-kicker{margin:0 0 2vh;color:var(--acid);font:700 8.5px "Space Mono";letter-spacing:.22em}
+.cath-head h2{margin:0;color:#f5f4ef;font:900 clamp(40px,4.6vw,84px)/.84 Unbounded;letter-spacing:-.07em}
+.cath-head h2 span{color:transparent;-webkit-text-stroke:1px rgba(245,244,239,.65)}
+.cath-sub{margin:2.4vh 0 0;max-width:480px;color:#9a9a9e;font-size:clamp(12px,.95vw,15px);line-height:1.6}
+.cath-sub b{color:#ffd875;font-weight:600}
+
+.cath-stats{position:absolute;z-index:4;right:4vw;top:10vh;display:flex;flex-direction:column;gap:0;min-width:200px}
+.cath-stats>div{display:grid;grid-template-columns:auto 1fr;align-items:baseline;gap:12px;padding:9px 0;border-top:1px solid rgba(255,255,255,.14)}
+.cath-stats strong{font:800 clamp(22px,2vw,34px) Unbounded;color:#f5f4ef;letter-spacing:-.05em}
+.cath-stats .is-gold strong{color:#ffd875;text-shadow:0 0 26px rgba(255,215,130,.35)}
+.cath-stats span{color:#8a8a8e;font:700 7px "Space Mono";letter-spacing:.16em;text-align:right}
+
+.cath-field{position:absolute;z-index:3;left:4vw;right:4vw;bottom:13vh;top:44vh;display:flex;align-items:flex-end;gap:.55%;cursor:crosshair}
+.cath-field:before{content:"";position:absolute;left:0;right:0;bottom:22px;height:1px;background:rgba(255,255,255,.18)}
+.cath-sweep{position:absolute;z-index:5;top:-6%;bottom:16px;left:-12%;width:9%;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,244,214,.07) 45%,rgba(255,244,214,.12) 50%,rgba(255,244,214,.07) 55%,transparent);animation:cathSweep 7.5s linear infinite}
+@keyframes cathSweep{to{left:112%}}
+
+.cath-season{position:relative;flex:var(--flex,1);display:flex;flex-direction:column;height:100%;min-width:0}
+.cath-bars{display:flex;align-items:flex-end;gap:1.5px;flex:1;padding-bottom:22px}
+.cath-year{position:absolute;left:0;bottom:0;color:#77777b;font:700 8px "Space Mono";letter-spacing:.08em}
+.cath-crown{position:absolute;right:0;bottom:0;display:flex;color:#ffd875;opacity:.9}
+.cath-crown svg{width:10px;height:10px}
+.cath-season.is-title .cath-year{color:#ffd875}
+.cath-season.is-title:after{content:"";position:absolute;left:0;right:6px;bottom:20px;height:2px;background:linear-gradient(90deg,rgba(255,215,130,.55),rgba(255,215,130,.12))}
+
+.cath-bar{position:relative;flex:1;min-width:2px;height:var(--h);border-radius:1px 1px 0 0;transform-origin:bottom;opacity:0;transition:filter .2s,transform .2s,opacity .3s}
+.circuit-viewport[data-active="legacy"]:not([data-traveling="true"]) .cath-bar{animation:cathRise .55s cubic-bezier(.22,1,.36,1) calc(.25s + var(--d)) both}
+@keyframes cathRise{0%{opacity:0;transform:scaleY(0)}100%{opacity:1;transform:scaleY(1)}}
+.cath-bar.era-mclaren{background:linear-gradient(180deg,#ffab45,#c76400)}
+.cath-bar.era-mercedes{background:linear-gradient(180deg,#3fe8d2,#00776b)}
+.cath-bar.era-ferrari{background:linear-gradient(180deg,#ff5040,#8f0e02)}
+.cath-bar.is-podium.era-mclaren{background:linear-gradient(180deg,#ffd29a,#ff8700)}
+.cath-bar.is-podium.era-mercedes{background:linear-gradient(180deg,#a5fff2,#00d2be)}
+.cath-bar.is-podium.era-ferrari{background:linear-gradient(180deg,#ffa79d,#e10600)}
+.cath-bar.is-win{background:linear-gradient(180deg,#fff3d0,#ffd875 40%,#c9962e);box-shadow:0 0 14px rgba(255,215,130,.55),0 0 3px rgba(255,240,200,.8)}
+.cath-bar.is-win:after{content:"";position:absolute;top:-4px;left:50%;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:#fff3d0;box-shadow:0 0 8px rgba(255,235,170,.9)}
+.cath-bar.is-dnf{background:rgba(255,255,255,.14);box-shadow:inset 0 -2px 0 rgba(255,70,50,.7)}
+.cath-field:hover .cath-bar{filter:brightness(.55) saturate(.85)}
+.cath-field .cath-bar:hover{filter:brightness(1.4);transform:scaleY(1.05)}
+
+.cath-tip{position:fixed;z-index:80;bottom:26vh;transform:translateX(-50%);display:flex;flex-direction:column;gap:3px;padding:11px 14px;border:1px solid rgba(255,255,255,.14);border-bottom:2px solid #ffd875;background:rgba(10,10,10,.95);pointer-events:none;white-space:nowrap}
+.cath-tip strong{color:#f5f4ef;font:800 12px Unbounded;letter-spacing:-.02em}
+.cath-tip span{color:#ffd875;font:700 9px "Space Mono";letter-spacing:.14em}
+.cath-tip span.is-plain{color:#b9b9bd}
+.cath-tip em{color:#8a8a8e;font:700 7px "Space Mono";letter-spacing:.18em;font-style:normal}
+
+.cath-legend{position:absolute;z-index:4;left:4vw;right:4vw;bottom:4.5vh;display:flex;gap:26px;color:#9a9a9e;font:700 7.5px "Space Mono";letter-spacing:.14em}
+.cath-legend span{display:flex;align-items:center;gap:7px}
+.cath-legend i{width:9px;height:9px;border-radius:1px}
+.cath-legend .lg-gold{background:#ffd875;box-shadow:0 0 8px rgba(255,215,130,.6)}
+.cath-legend .lg-mcl{background:#ff8700}
+.cath-legend .lg-mer{background:#00d2be}
+.cath-legend .lg-fer{background:#e10600}
+.cath-legend .lg-dnf{background:rgba(255,255,255,.2);box-shadow:inset 0 -2px 0 rgba(255,70,50,.7)}
+.cath-legend b{color:#ffd875;display:flex}
+.cath-legend b svg{width:10px;height:10px}
+
+@media(max-width:850px){
+  .cath-head{left:16px;right:16px;top:11vh}
+  .cath-head h2{font-size:9vw}
+  .cath-sub{display:none}
+  .cath-stats{position:absolute;left:16px;right:16px;top:auto;bottom:4vh;flex-direction:row;min-width:0}
+  .cath-stats>div{flex:1;grid-template-columns:1fr;gap:2px;padding:8px 6px 0;border-top:1px solid rgba(255,255,255,.14)}
+  .cath-stats span{text-align:left;font-size:5.5px}
+  .cath-field{left:12px;right:12px;top:34vh;bottom:17vh;gap:.35%}
+  .cath-bars{gap:1px}
+  .cath-year{font-size:6px}
+  .cath-season:nth-child(even) .cath-year{display:none}
+  .cath-legend{display:none}
+  .cath-tip{bottom:20vh}
+  .cath-ghost{font-size:34vw;right:4vw;top:2vh}
+}

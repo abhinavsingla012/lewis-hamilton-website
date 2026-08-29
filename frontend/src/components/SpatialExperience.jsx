@@ -196,7 +196,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       if (travelingRef.current || overviewRef.current) return;
       const current = scrollYProgress.get();
       if (Math.abs(current - targetRef.current.stop) < 0.004) return;
-      goTo(nearestRoute(current).key);
+      goTo(nearestRoute(current).key, { immediate: true });
     }, 220);
   });
 

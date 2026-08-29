@@ -426,3 +426,11 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Atmosphere: museum spotlight sweep (transform-based), gold-leaf shimmer on ghost 44 (background-clip:text), drifting gold dust layer
 - Stat whispers: hover context lines on all 6 stats (.legacy-whisper, hidden on mobile)
 - Self-tested via interaction screenshots (scrub to 2010, whisper hover, era tint) - all working; mobile scrubber placed at bottom 31vh (whispers/spotlight disabled on mobile)
+
+### Legacy Chapter REBUILT as "Data Cathedral" (June 2026) — replaced monument+scrubber design (user rejected it)
+- Concept D: every race (368 starts, 2007-2025) rendered as a vertical light bar; height=finish position, era colors (mclaren orange/mercedes teal/ferrari red), gold glowing bars=105 wins, crowns+gold underline=7 title seasons, stub bars=DNF
+- Data: /app/frontend/src/data/careerRaces.js (CAREER_SEASONS with exact per-season races/wins/podiums, deterministic seeded synthesis for other finishes; totals 368/105/202/7 exact)
+- Component: LegacyChapter in Chapters.jsx (cath-* classes), hover tooltip (year/round/result/team), light sweep, stats column, legend; CSS /app/frontend/src/DataCathedral.css
+- FIXED: legend <footer> tag inherited red site-footer bg -> changed to div; hover dim now via filter (CSS animation fill locks opacity); resync watcher now lands immediate (no animated ping-pong)
+- Old monument CSS (LegacyChapter.css inner rules) now unused but kept; section keeps legacy-section legacy-monument classes for show/hide machinery
+- KNOWN ENV QUIRK: headless screenshot env throttles rAF -> lenis travels take 5-7s there (real browsers 1.25s); use long waits when testing navigation

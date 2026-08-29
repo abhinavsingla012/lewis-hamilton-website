@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Marquee from "react-fast-marquee";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Flag, Trophy } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Crown, Flag, Trophy } from "lucide-react";
 import { IMAGES, quotes, trackShapes } from "../data/content";
+import { CAREER_SEASONS, CAREER_TOTALS } from "../data/careerRaces";
 import { SeasonTimeline } from "./SeasonTimeline";
 import { VisualGallery } from "./VisualGallery";
 import { CareerCars } from "./CareerCars";
@@ -28,61 +29,52 @@ const fallbackTracks = [
   { circuit: "Shanghai International Circuit", country: "China", wins: 6, podiums: 9 },
 ];
 
-const CAREER = {
-  2007: [4, 6, 12, 0], 2008: [9, 13, 22, 1], 2009: [11, 17, 27, 1], 2010: [14, 18, 36, 1], 2011: [17, 19, 42, 1],
-  2012: [21, 26, 49, 1], 2013: [22, 31, 54, 1], 2014: [33, 38, 65, 2], 2015: [43, 49, 82, 3], 2016: [53, 61, 99, 3],
-  2017: [62, 72, 112, 4], 2018: [73, 83, 129, 5], 2019: [84, 88, 146, 6], 2020: [95, 98, 160, 7], 2021: [103, 103, 177, 7],
-  2022: [103, 103, 186, 7], 2023: [103, 104, 192, 7], 2024: [105, 104, 197, 7], 2025: [105, 104, 202, 7],
-};
-const eraOf = (year) => (year <= 2012 ? "mclaren" : year <= 2024 ? "mercedes" : "ferrari");
 const ERA_LABEL = { mclaren: "McLAREN", mercedes: "MERCEDES", ferrari: "FERRARI" };
 
-const LegacyChapter = ({ archive }) => {
-  const [scrubYear, setScrubYear] = useState(2025);
-  const [wins, poles, podiums, titles] = CAREER[scrubYear];
-  const era = eraOf(scrubYear);
-  const legacyStats = [
-    { value: scrubYear === 2025 ? archive?.stats?.titles || 7 : titles, label: "WORLD TITLES", note: "JOINT-MOST IN HISTORY", testId: "legacy-world-titles", featured: true, whisper: "Seven crowns, tied with Schumacher — won across two entirely different engine eras." },
-    { value: scrubYear === 2025 ? archive?.stats?.wins || 105 : wins, label: "RACE WINS", note: "FORMULA 1 RECORD", testId: "legacy-race-wins", featured: true, whisper: "105 victories — one every 3.4 starts, sustained for nineteen seasons." },
-    { value: scrubYear === 2025 ? archive?.stats?.podiums || 202 : podiums, label: "PODIUMS", note: "FORMULA 1 RECORD", testId: "legacy-podiums", featured: true, whisper: "202 podiums — champagne every 1.7 races since 2007." },
-    { value: scrubYear === 2025 ? archive?.stats?.poles || 104 : poles, label: "POLE POSITIONS", note: "THE ULTIMATE PACE", testId: "legacy-pole-positions", whisper: "104 poles — the purest one-lap record the sport has ever kept." },
-    { value: archive?.stats?.win_circuits || 31, label: "WINNING CIRCUITS", note: "CAREER TOTAL", testId: "legacy-winning-circuits", whisper: "Winner on 31 different circuits — no driver has conquered more ground." },
-    { value: scrubYear - 2006, label: "SEASONS", note: `2007—${scrubYear}`, testId: "legacy-seasons", whisper: "Nineteen consecutive seasons at the front. No slump. No reset." },
-  ];
-  return <section id="legacy" className="legacy-section legacy-monument" data-era={era} data-scrubbed={scrubYear !== 2025 ? "true" : "false"} aria-labelledby="legacy-monument-title" data-testid="legacy-section">
-    <div className="legacy-grid-field" aria-hidden="true" />
-    <div className="legacy-spotlight" aria-hidden="true" />
-    <div className="legacy-dust" aria-hidden="true" />
-    <div className="legacy-ghost-number" aria-hidden="true">44</div>
-    <figure className="legacy-portrait legacy-enter" style={{ "--legacy-delay": ".08s" }}>
-      <img src={IMAGES.portrait} alt="Lewis Hamilton celebrating a landmark achievement" data-testid="legacy-portrait-image" />
-      <span className="legacy-portrait-tint" aria-hidden="true" />
-      <figcaption data-testid="legacy-portrait-caption"><span>STEVENAGE</span><i>→</i><span>THE WORLD</span></figcaption>
-    </figure>
-    <div className="legacy-narrative">
-      <p className="legacy-overline legacy-enter" style={{ "--legacy-delay": ".12s" }}><span>2007—2025</span></p>
-      <h2 id="legacy-monument-title" className="legacy-title legacy-enter" style={{ "--legacy-delay": ".18s" }} data-testid="legacy-section-title"><span>THE RECORD</span><span>BEYOND</span><span>RECORDS.</span></h2>
-      <p className="legacy-statement legacy-enter" style={{ "--legacy-delay": ".28s" }} data-testid="legacy-statement">From Stevenage to seven world titles, Lewis Hamilton did more than redraw Formula 1’s limits. He expanded who could see themselves at the front of the grid—and what a champion could stand for beyond it.</p>
+const LegacyChapter = () => {
+  const [hovered, setHovered] = useState(null);
+  return <section id="legacy" className="legacy-section legacy-monument cathedral" aria-labelledby="legacy-cathedral-title" data-testid="legacy-section">
+    <div className="cath-scan" aria-hidden="true" />
+    <div className="cath-ghost" aria-hidden="true">44</div>
+    <header className="cath-head legacy-enter" style={{ "--legacy-delay": ".06s" }}>
+      <p className="cath-kicker">ONE LIGHT PER GRAND PRIX — 2007→2025</p>
+      <h2 id="legacy-cathedral-title" data-testid="legacy-section-title">EVERY RACE<br /><span>HE EVER STARTED.</span></h2>
+      <p className="cath-sub" data-testid="legacy-statement">Each light is one grand prix. <b>The gold ones he won.</b> Nineteen seasons, three teams, one heartbeat — run your cursor across a career.</p>
+    </header>
+    <div className="cath-stats legacy-enter" style={{ "--legacy-delay": ".16s" }} data-testid="cathedral-stats">
+      <div data-testid="cathedral-starts"><strong>{CAREER_TOTALS.starts}</strong><span>LIGHTS / STARTS</span></div>
+      <div className="is-gold" data-testid="cathedral-wins"><strong>{CAREER_TOTALS.wins}</strong><span>BURN GOLD / WINS</span></div>
+      <div data-testid="cathedral-podiums"><strong>{CAREER_TOTALS.podiums}</strong><span>ROSE HIGH / PODIUMS</span></div>
+      <div data-testid="cathedral-titles"><strong>{CAREER_TOTALS.titles}</strong><span>CROWNED SEASONS</span></div>
     </div>
-    <div className="legacy-era-rail legacy-enter" style={{ "--legacy-delay": ".32s" }} data-testid="legacy-era-rail">
-      <div className={`is-mclaren ${era === "mclaren" ? "is-current" : ""}`} data-testid="legacy-era-mclaren"><span>2007</span><strong>THE ARRIVAL</strong><small>McLAREN</small></div>
-      <div className={`is-mercedes ${era === "mercedes" ? "is-current" : ""}`} data-testid="legacy-era-mercedes"><span>2013</span><strong>THE REINVENTION</strong><small>MERCEDES</small></div>
-      <div className={`is-ferrari ${era === "ferrari" ? "is-current" : ""}`} data-testid="legacy-era-ferrari"><span>2025</span><strong>THE NEW CHAPTER</strong><small>FERRARI</small></div>
+    <div className="cath-field legacy-enter" style={{ "--legacy-delay": ".2s" }} data-testid="cathedral-field" onMouseLeave={() => setHovered(null)}>
+      <div className="cath-sweep" aria-hidden="true" />
+      {CAREER_SEASONS.map((season) => <div key={season.year} className={`cath-season ${season.title ? "is-title" : ""}`} style={{ "--flex": season.races }} data-testid={`cathedral-season-${season.year}`}>
+        <div className="cath-bars">
+          {season.racesData.map((race) => <div
+            key={race.round}
+            className={`cath-bar era-${race.team} ${race.win ? "is-win" : ""} ${race.podium && !race.win ? "is-podium" : ""} ${race.pos === 0 ? "is-dnf" : ""}`}
+            style={{ "--h": `${race.pos === 0 ? 7 : Math.max(12, 97 - (race.pos - 1) * 5.4)}%`, "--d": `${race.index * 2.6}ms` }}
+            onMouseEnter={(event) => setHovered({ race, x: event.clientX })}
+            data-testid={race.index === 1 ? "cathedral-first-bar" : undefined}
+          />)}
+        </div>
+        <span className="cath-year">’{String(season.year).slice(2)}</span>
+        {season.title && <i className="cath-crown" title={`${season.year} World Champion`}><Crown /></i>}
+      </div>)}
     </div>
-    <aside className="legacy-cultural legacy-enter" style={{ "--legacy-delay": ".36s" }} data-testid="legacy-cultural-impact"><span>BEYOND THE GRID</span><p>A standard measured in speed, courage and visibility. The record book is only the beginning.</p></aside>
-    <div className="legacy-scrubber legacy-enter" style={{ "--legacy-delay": ".42s" }} data-testid="legacy-career-scrubber">
-      <div className="legacy-scrubber-head">
-        <span>DRAG THROUGH THE CAREER</span>
-        <div className="legacy-scrubber-year"><strong data-testid="legacy-scrub-year">{scrubYear}</strong><em data-testid="legacy-scrub-team">{ERA_LABEL[era]}</em></div>
-      </div>
-      <input type="range" min="2007" max="2025" step="1" value={scrubYear} onChange={(event) => setScrubYear(Number(event.target.value))} aria-label="Scrub through Lewis Hamilton's career by year" data-testid="legacy-scrub-input" />
-      <div className="legacy-scrubber-ticks" aria-hidden="true"><span>2007</span><span style={{ left: "33.3%" }}>2013</span><span style={{ left: "94.4%" }}>2025</span></div>
-    </div>
-    <div className="legacy-stat-rail" data-testid="legacy-stat-rail">
-      {legacyStats.map((stat, index) => <article key={stat.label} className={`legacy-stat legacy-enter ${stat.featured ? "is-featured" : ""}`} style={{ "--legacy-delay": `${.38 + index * .06}s` }} data-testid={`${stat.testId}-stat`}>
-        <em className="legacy-whisper">{stat.whisper}</em>
-        <strong data-testid={stat.testId}><span key={stat.value} className="legacy-stat-value">{stat.value}</span></strong><span>{stat.label}</span><small>{stat.note}</small>
-      </article>)}
+    {hovered && <div className="cath-tip" style={{ left: hovered.x }} data-testid="cathedral-tooltip">
+      <strong>{hovered.race.year} — ROUND {hovered.race.round}</strong>
+      <span className={hovered.race.win ? "" : "is-plain"}>{hovered.race.pos === 0 ? "DNF — RETIRED" : hovered.race.win ? "P1 — VICTORY" : `P${hovered.race.pos}${hovered.race.podium ? " — PODIUM" : ""}`}</span>
+      <em>{ERA_LABEL[hovered.race.team]}{CAREER_SEASONS.find((s) => s.year === hovered.race.year)?.title ? " — CHAMPIONSHIP SEASON" : ""}</em>
+    </div>}
+    <div className="cath-legend legacy-enter" style={{ "--legacy-delay": ".3s" }} data-testid="cathedral-legend">
+      <span><i className="lg-gold" />VICTORY</span>
+      <span><i className="lg-mcl" />McLAREN 07—12</span>
+      <span><i className="lg-mer" />MERCEDES 13—24</span>
+      <span><i className="lg-fer" />FERRARI 25</span>
+      <span><i className="lg-dnf" />DNF</span>
+      <span><b><Crown /></b>TITLE SEASON</span>
     </div>
   </section>;
 };
