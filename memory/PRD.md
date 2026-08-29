@@ -419,3 +419,10 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - ChapterFlair.jsx + ChapterFlair.css: signature arrival overlay per chapter, mounts when traveling flips false, lives 1.75s, z-70, pointer-events none, reduced-motion hidden
 - Effects: legacy paparazzi flash, timeline tick scrub, cars headlight beam, gallery flash+aperture ring, records gold shimmer, milestones checkered wipe, tracks sector sweep (purple/green/yellow), moment rain streaks, quotes radio waveform, victories gold confetti, footer dawn glow
 - iteration_49: 100% pass (all 11 flairs, re-entry replay, interaction safety, reduced-motion, hero regression)
+
+### Legacy Chapter Enhancement (June 2026)
+- Career Scrubber: range input 2007-2025 (data-testid legacy-scrub-input), CAREER cumulative table in Chapters.jsx; morphs titles/wins/podiums/poles/seasons live with pop animation; era-gradient track (mclaren/mercedes/ferrari segments); year+team readout (legacy-scrub-year/team)
+- data-era + data-scrubbed attrs on .legacy-monument drive: portrait duotone era tint (mix-blend color, hover=full color), era rail is-current highlight, team-colored readout
+- Atmosphere: museum spotlight sweep (transform-based), gold-leaf shimmer on ghost 44 (background-clip:text), drifting gold dust layer
+- Stat whispers: hover context lines on all 6 stats (.legacy-whisper, hidden on mobile)
+- Self-tested via interaction screenshots (scrub to 2010, whisper hover, era tint) - all working; mobile scrubber placed at bottom 31vh (whispers/spotlight disabled on mobile)

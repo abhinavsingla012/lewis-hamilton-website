@@ -14,3 +14,54 @@
 @media(max-width:850px){.legacy-narrative{top:max(132px,18.5vh)}}
 @media(min-width:851px) and (max-height:720px){.legacy-narrative{top:154px}}
 .legacy-era-rail .is-mclaren span{color:#ff6200}
+/* ── Legacy enhancements: scrubber / spotlight / gold 44 / duotone portrait / whispers ── */
+.legacy-spotlight{position:absolute;z-index:2;top:0;bottom:0;left:-28%;width:58%;pointer-events:none;background:radial-gradient(ellipse 52% 56% at 50% 38%,rgba(255,244,214,.1),rgba(255,244,214,.03) 55%,transparent 75%);animation:legacySpot 11s ease-in-out infinite alternate}
+@keyframes legacySpot{to{transform:translateX(215%)}}
+.legacy-dust{position:absolute;z-index:2;inset:0;pointer-events:none;background-image:radial-gradient(circle 1.5px at 18% 82%,rgba(255,222,140,.5) 98%,transparent),radial-gradient(circle 1px at 42% 64%,rgba(255,255,255,.35) 98%,transparent),radial-gradient(circle 1.5px at 63% 88%,rgba(255,222,140,.4) 98%,transparent),radial-gradient(circle 1px at 82% 70%,rgba(255,240,190,.4) 98%,transparent),radial-gradient(circle 1px at 30% 94%,rgba(255,222,140,.35) 98%,transparent);background-size:900px 700px;animation:legacyDust 16s linear infinite;opacity:.8}
+@keyframes legacyDust{to{background-position:60px -700px}}
+.legacy-ghost-number{-webkit-text-stroke:0;background:linear-gradient(115deg,rgba(255,215,130,.12) 20%,rgba(255,236,180,.34) 42%,rgba(255,215,130,.1) 60%,rgba(255,215,130,.12) 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;animation:legacyGold 7s ease-in-out infinite alternate}
+@keyframes legacyGold{to{background-position:100% 0}}
+
+.legacy-portrait img{filter:grayscale(.88) contrast(1.16) saturate(.9)}
+.legacy-portrait-tint{position:absolute;inset:0;z-index:1;mix-blend-mode:color;opacity:.55;transition:opacity .8s,background-color .8s;background-color:#e10600}
+.legacy-monument[data-era="mclaren"] .legacy-portrait-tint{background-color:#ff8700}
+.legacy-monument[data-era="mercedes"] .legacy-portrait-tint{background-color:#00d2be}
+.legacy-portrait:hover img{filter:grayscale(0) contrast(1.1) saturate(1)}
+.legacy-portrait:hover .legacy-portrait-tint{opacity:0}
+
+.legacy-era-rail>div{opacity:.45;transition:opacity .45s}
+.legacy-era-rail>div.is-current{opacity:1}
+.legacy-era-rail>div.is-current strong{color:var(--acid)}
+
+.legacy-scrubber{position:absolute;z-index:7;left:4vw;bottom:calc(3.5vh + 150px);width:min(44vw,760px)}
+.legacy-scrubber-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px}
+.legacy-scrubber-head>span{color:#858589;font:700 7.5px "Space Mono";letter-spacing:.22em}
+.legacy-scrubber-year{display:flex;align-items:baseline;gap:10px}
+.legacy-scrubber-year strong{font:800 26px Unbounded;letter-spacing:-.04em;color:#f5f4ef}
+.legacy-scrubber-year em{font:700 8px "Space Mono";letter-spacing:.18em;font-style:normal;color:var(--acid)}
+.legacy-monument[data-era="mclaren"] .legacy-scrubber-year em{color:#ff8700}
+.legacy-monument[data-era="mercedes"] .legacy-scrubber-year em{color:#00d2be}
+.legacy-monument[data-era="ferrari"] .legacy-scrubber-year em{color:#ff4438}
+.legacy-scrubber input[type="range"]{width:100%;height:22px;margin:0;appearance:none;-webkit-appearance:none;background:transparent;cursor:grab}
+.legacy-scrubber input[type="range"]:active{cursor:grabbing}
+.legacy-scrubber input[type="range"]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(90deg,#ff8700 0 33.3%,#00d2be 33.3% 94.4%,#e10600 94.4% 100%);opacity:.9}
+.legacy-scrubber input[type="range"]::-moz-range-track{height:4px;border-radius:4px;background:linear-gradient(90deg,#ff8700 0 33.3%,#00d2be 33.3% 94.4%,#e10600 94.4% 100%)}
+.legacy-scrubber input[type="range"]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:18px;height:18px;margin-top:-7px;border:2px solid #0a0a0a;border-radius:50%;background:#f5f4ef;box-shadow:0 0 0 3px rgba(245,244,239,.25),0 4px 14px rgba(0,0,0,.6);transition:transform .2s}
+.legacy-scrubber input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.25)}
+.legacy-scrubber input[type="range"]::-moz-range-thumb{width:16px;height:16px;border:2px solid #0a0a0a;border-radius:50%;background:#f5f4ef;box-shadow:0 0 0 3px rgba(245,244,239,.25)}
+.legacy-scrubber-ticks{position:relative;height:12px;margin-top:4px;color:#6f6f73;font:700 6.5px "Space Mono";letter-spacing:.12em}
+.legacy-scrubber-ticks span{position:absolute;left:0;top:0}
+
+.legacy-stat{position:relative}
+.legacy-whisper{position:absolute;left:0;bottom:calc(100% + 12px);z-index:9;width:min(230px,20vw);padding:10px 12px;border-left:2px solid var(--acid);background:rgba(12,12,12,.94);color:#d9d9d4;font:400 10.5px/1.55 Manrope,system-ui;font-style:normal;opacity:0;transform:translateY(8px);transition:opacity .3s,transform .35s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.legacy-stat:hover .legacy-whisper{opacity:1;transform:translateY(0)}
+.legacy-stat-value{display:inline-block;animation:legacyStatPop .35s cubic-bezier(.22,1,.36,1)}
+@keyframes legacyStatPop{0%{transform:translateY(6px) scale(.96);opacity:.4}100%{transform:translateY(0) scale(1);opacity:1}}
+.legacy-monument[data-scrubbed="true"] .legacy-cultural{opacity:.35;transition:opacity .4s}
+
+@media(max-width:850px){
+  .legacy-scrubber{left:16px;right:16px;width:auto;bottom:31vh}
+  .legacy-scrubber-year strong{font-size:20px}
+  .legacy-whisper{display:none}
+  .legacy-spotlight{display:none}
+}
