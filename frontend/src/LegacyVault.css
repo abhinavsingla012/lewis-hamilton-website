@@ -56,7 +56,7 @@
 .lv-nav-prev{left:2.6vw}
 .lv-nav-next{right:2.6vw}
 .lv-story{position:absolute;left:4vw;bottom:8vh;max-width:430px;pointer-events:auto}
-.lv-story:before{content:"";position:absolute;inset:-70px -90px -60px -70px;z-index:-1;background:radial-gradient(70% 65% at 40% 55%,rgba(3,3,4,.82),transparent 75%);pointer-events:none}
+.lv-story:before{content:"";position:absolute;inset:-80px -110px -70px -80px;z-index:-1;background:radial-gradient(72% 68% at 40% 55%,rgba(3,3,4,.94),rgba(3,3,4,.55) 55%,transparent 78%);pointer-events:none}
 .lv-story-year{font:900 clamp(52px,5.6vw,92px)/.85 Unbounded;letter-spacing:-.05em;color:var(--acid);text-shadow:0 0 60px rgba(var(--accent-rgb),.3)}
 .lv-story-meta{display:flex;align-items:center;gap:9px;margin:12px 0 4px;color:#8f8a80;font:700 8.5px "Space Mono";letter-spacing:.22em}
 .lv-story-meta i{width:9px;height:9px;border-radius:2px;background:var(--accent,#00d2be);box-shadow:0 0 10px var(--accent,#00d2be)}

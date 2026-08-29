@@ -417,6 +417,7 @@ const VaultScene = ({ focus, spinRef, onPick, palette }) => {
   const ringMaterials = useMemo(() => TITLES.map((title) => new THREE.MeshStandardMaterial({ color: "#060606", emissive: new THREE.Color(title.accent), emissiveIntensity: 0.4, metalness: 0.4, roughness: 0.5 })), []);
   const coneMaterials = useMemo(() => TITLES.map(buildConeMaterial), []);
   const plateTextures = useMemo(() => TITLES.map((title) => buildPlateTexture(title.year)), []);
+  const plateMaterials = useMemo(() => TITLES.map((_, index) => new THREE.MeshBasicMaterial({ map: plateTextures[index], transparent: true, opacity: 0.12, depthWrite: false })), [plateTextures]);
   const pedestalMaterial = useMemo(() => new THREE.MeshMatcapMaterial({ matcap: steelMatcap, color: "#585c66" }), [steelMatcap]);
   const mirrorPedestalMaterial = useMemo(() => new THREE.MeshMatcapMaterial({ matcap: steelMatcap, color: "#585c66", transparent: true, opacity: 0.14, depthWrite: false, side: THREE.BackSide }), [steelMatcap]);
   const pillarMaterial = useMemo(() => new THREE.MeshMatcapMaterial({ matcap: steelMatcap, color: "#3c4048" }), [steelMatcap]);
@@ -432,15 +433,15 @@ const VaultScene = ({ focus, spinRef, onPick, palette }) => {
     mirrorPedestalMaterial.dispose();
     pillarMaterial.dispose();
     emblemCoreMaterial.dispose();
-    [silverMaterials, goldMaterials, bandMaterials, mirrorSilverMaterials, mirrorGoldMaterials, ringMaterials, coneMaterials].forEach((set) => set.forEach((mat) => mat.dispose()));
+    [silverMaterials, goldMaterials, bandMaterials, mirrorSilverMaterials, mirrorGoldMaterials, ringMaterials, coneMaterials, plateMaterials].forEach((set) => set.forEach((mat) => mat.dispose()));
     plateTextures.forEach((texture) => texture.dispose());
-  }, [parts, goldMatcap, steelMatcap, silverMatcap, brushedMap, checkerMap, pedestalMaterial, mirrorPedestalMaterial, pillarMaterial, emblemCoreMaterial, silverMaterials, goldMaterials, bandMaterials, mirrorSilverMaterials, mirrorGoldMaterials, ringMaterials, coneMaterials, plateTextures]);
+  }, [parts, goldMatcap, steelMatcap, silverMatcap, brushedMap, checkerMap, pedestalMaterial, mirrorPedestalMaterial, pillarMaterial, emblemCoreMaterial, silverMaterials, goldMaterials, bandMaterials, mirrorSilverMaterials, mirrorGoldMaterials, ringMaterials, coneMaterials, plateMaterials, plateTextures]);
 
   useFrame((state, delta) => {
     const time = state.clock.elapsedTime;
     camX.current = THREE.MathUtils.damp(camX.current, (focus - CENTER) * SPACING, 2.6, delta);
     camera.position.set(camX.current, IS_MOBILE ? 1.9 : 1.78, IS_MOBILE ? 8.8 : 6.5);
-    camera.lookAt(camX.current, 1.22, 0);
+    camera.lookAt(camX.current, IS_MOBILE ? 1.44 : 1.52, 0);
     const spin = spinRef.current;
     const dragTurn = spin.delta * 0.0075;
     if (spin.delta !== 0) { spin.vel = dragTurn; spin.delta = 0; }
@@ -467,6 +468,7 @@ const VaultScene = ({ focus, spinRef, onPick, palette }) => {
       mirrorSilverMaterials[index].color.copy(silverMaterials[index].color);
       mirrorGoldMaterials[index].color.copy(goldMaterials[index].color);
       ringMaterials[index].emissiveIntensity = THREE.MathUtils.damp(ringMaterials[index].emissiveIntensity, focused ? 2.3 : 0.35, 4, delta);
+      plateMaterials[index].opacity = THREE.MathUtils.damp(plateMaterials[index].opacity, focused ? 1 : 0.12, 4, delta);
       coneMaterials[index].uniforms.uIntensity.value = THREE.MathUtils.damp(coneMaterials[index].uniforms.uIntensity.value, focused ? 0.5 : 0.11, 4, delta);
       coneMaterials[index].uniforms.uColor.value.lerp(TMP_COLOR.set(paletteRef.current.cone), Math.min(1, 3.2 * delta));
     });
@@ -489,9 +491,8 @@ const VaultScene = ({ focus, spinRef, onPick, palette }) => {
         <mesh material={ringMaterials[index]} position={[0, 0.735, 0]} rotation-x={-Math.PI / 2}>
           <torusGeometry args={[0.86, 0.022, 12, 64]} />
         </mesh>
-        <mesh position={[0, 0.4, 0.94]}>
+        <mesh position={[0, 0.4, 0.94]} material={plateMaterials[index]}>
           <planeGeometry args={[1.06, 0.53]} />
-          <meshBasicMaterial map={plateTextures[index]} transparent depthWrite={false} />
         </mesh>
         <group
           ref={(node) => { trophyRefs.current[index] = node; }}
