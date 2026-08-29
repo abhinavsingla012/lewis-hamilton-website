@@ -444,3 +444,10 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Performance hardening: replaced PMREM RoomEnvironment + Reflector (froze the main thread on software/low-end GPUs) with procedural canvas matcap gold/steel shading and mirrored-mesh reflections; mobile camera pull-back and layout pass
 - Files: frontend/src/components/LegacyVault.jsx, frontend/src/LegacyVault.css (DataCathedral.css removed)
 - Tested: testing agent iteration_50 (95% pass, all flows) + manual screenshots desktop/mobile; mobile year-rail overlap fixed; freeze fixed and re-verified
+
+## Vault Trophies — Real F1 Championship Trophy Remodel (June 2026)
+- Remodelled all 7 vault trophies procedurally from the user-supplied reference photo of the real F1 World Championship trophy
+- Model parts: brushed-silver concave trumpet body (LatheGeometry), gold spiral coil wrapping the body (TubeGeometry on a custom helix following the wall radius), black/gold checkered collar (canvas texture cylinder), gold lip trim, gold emblem medallion seated on the flare, rounded silver foot
+- Materials: procedural silver + gold canvas matcaps, brushed-metal multiply map (zero lighting cost, safe on low-end GPUs)
+- "Alive" motion: gentle float bob, slight sway, breathing scale pulse on the focused trophy, auto-rotate + drag-spin, faux mirror reflections fully synced (position/rotation/scale)
+- Verified via desktop + mobile screenshots: silhouette matches reference, focus dimming works, no console errors

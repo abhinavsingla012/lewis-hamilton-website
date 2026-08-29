@@ -186,14 +186,90 @@ const MonumentParticles = ({ isActive, phaseRef }) => {
 
 /* ── Vault: seven championship trophies ──────────────────────────────── */
 
-const buildTrophyGeometry = () => {
+const buildSilverMatcap = () => buildMatcap([
+  [0, "#ffffff"], [0.22, "#e6e9ee"], [0.5, "#a7abb4"], [0.75, "#585d66"], [1, "#202329"],
+], "rgba(255,255,255,.95)");
+
+/* Real F1 championship trophy: silver trumpet, gold spiral, checkered collar */
+const BODY_WALL = [[0.40, 0.135], [0.46, 0.145], [0.55, 0.155], [0.72, 0.17], [0.90, 0.19], [1.08, 0.215], [1.24, 0.25], [1.38, 0.30], [1.46, 0.34], [1.55, 0.40], [1.65, 0.47]];
+const bodyRadiusAt = (y) => {
+  for (let i = 1; i < BODY_WALL.length; i += 1) {
+    if (y <= BODY_WALL[i][0]) {
+      const [y0, r0] = BODY_WALL[i - 1];
+      const [y1, r1] = BODY_WALL[i];
+      return r0 + (r1 - r0) * ((y - y0) / (y1 - y0));
+    }
+  }
+  return BODY_WALL.at(-1)[1];
+};
+
+class TrophySpiral extends THREE.Curve {
+  getPoint(t, target = new THREE.Vector3()) {
+    const y = 0.52 + t * 0.96;
+    const r = bodyRadiusAt(y) + 0.02;
+    const angle = t * Math.PI * 16;
+    return target.set(Math.cos(angle) * r, y, Math.sin(angle) * r);
+  }
+}
+
+const buildTrophyParts = () => {
   const profile = [
-    [0.001, 0], [0.5, 0], [0.52, 0.03], [0.52, 0.1], [0.44, 0.13], [0.3, 0.15], [0.28, 0.24],
-    [0.115, 0.3], [0.09, 0.48], [0.1, 0.6], [0.155, 0.68], [0.1, 0.76], [0.115, 0.84],
-    [0.24, 0.96], [0.335, 1.1], [0.385, 1.28], [0.395, 1.46], [0.375, 1.6],
-    [0.415, 1.7], [0.445, 1.78], [0.42, 1.795], [0.36, 1.72], [0.335, 1.62],
+    [0.001, 0], [0.40, 0], [0.415, 0.025], [0.40, 0.05], [0.30, 0.09], [0.205, 0.14],
+    [0.15, 0.20], [0.125, 0.27], [0.12, 0.33], [0.135, 0.40], [0.145, 0.46],
+    [0.155, 0.55], [0.17, 0.72], [0.19, 0.90], [0.215, 1.08], [0.25, 1.24],
+    [0.30, 1.38], [0.38, 1.52], [0.47, 1.66], [0.555, 1.77], [0.575, 1.805],
+    [0.55, 1.815], [0.51, 1.77], [0.45, 1.68], [0.40, 1.60],
   ].map(([x, y]) => new THREE.Vector2(x, y));
-  return new THREE.LatheGeometry(profile, 64);
+  return {
+    body: new THREE.LatheGeometry(profile, 72),
+    spiral: new THREE.TubeGeometry(new TrophySpiral(), 420, 0.016, 8),
+    band: new THREE.CylinderGeometry(0.155, 0.178, 0.13, 40),
+    rim: new THREE.TorusGeometry(0.555, 0.013, 10, 64),
+    emblemRing: new THREE.TorusGeometry(0.05, 0.015, 10, 32),
+    emblemCore: new THREE.CircleGeometry(0.038, 24),
+  };
+};
+
+const buildBrushedTexture = () => {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 420; i += 1) {
+    const x = Math.random() * 256;
+    const shade = Math.random();
+    ctx.fillStyle = shade > 0.5 ? `rgba(120,128,142,${0.04 + Math.random() * 0.09})` : `rgba(255,255,255,${0.05 + Math.random() * 0.08})`;
+    ctx.fillRect(x, 0, 0.6 + Math.random() * 1.4, 256);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(4, 1);
+  return texture;
+};
+
+const buildCheckerTexture = () => {
+  const canvas = document.createElement("canvas");
+  canvas.width = 360;
+  canvas.height = 48;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#0c0b09";
+  ctx.fillRect(0, 0, 360, 48);
+  ctx.fillStyle = "#e3b64f";
+  ctx.fillRect(0, 0, 360, 4);
+  ctx.fillRect(0, 44, 360, 4);
+  for (let row = 0; row < 2; row += 1) {
+    for (let col = 0; col < 30; col += 1) {
+      if ((row + col) % 2 === 0) ctx.fillRect(col * 12, 8 + row * 16, 12, 16);
+    }
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.repeat.set(3, 1);
+  return texture;
 };
 
 const buildPlateTexture = (year) => {
@@ -302,11 +378,18 @@ const VaultScene = ({ focus, spinRef, onPick }) => {
     };
   }, [scene]);
 
-  const trophyGeometry = useMemo(buildTrophyGeometry, []);
+  const parts = useMemo(buildTrophyParts, []);
   const goldMatcap = useMemo(buildGoldMatcap, []);
   const steelMatcap = useMemo(buildSteelMatcap, []);
-  const goldMaterials = useMemo(() => TITLES.map(() => new THREE.MeshMatcapMaterial({ matcap: goldMatcap, color: "#8f7a4d" })), [goldMatcap]);
-  const mirrorGoldMaterials = useMemo(() => TITLES.map(() => new THREE.MeshMatcapMaterial({ matcap: goldMatcap, color: "#8f7a4d", transparent: true, opacity: 0.2, depthWrite: false, side: THREE.BackSide })), [goldMatcap]);
+  const silverMatcap = useMemo(buildSilverMatcap, []);
+  const brushedMap = useMemo(buildBrushedTexture, []);
+  const checkerMap = useMemo(buildCheckerTexture, []);
+  const silverMaterials = useMemo(() => TITLES.map(() => new THREE.MeshMatcapMaterial({ matcap: silverMatcap, map: brushedMap, color: "#dfe1e6" })), [silverMatcap, brushedMap]);
+  const goldMaterials = useMemo(() => TITLES.map(() => new THREE.MeshMatcapMaterial({ matcap: goldMatcap, color: "#ffffff" })), [goldMatcap]);
+  const bandMaterials = useMemo(() => TITLES.map(() => new THREE.MeshBasicMaterial({ map: checkerMap, color: "#ffffff" })), [checkerMap]);
+  const emblemCoreMaterial = useMemo(() => new THREE.MeshBasicMaterial({ color: "#14161c" }), []);
+  const mirrorSilverMaterials = useMemo(() => TITLES.map(() => new THREE.MeshMatcapMaterial({ matcap: silverMatcap, color: "#eceef1", transparent: true, opacity: 0.18, depthWrite: false, side: THREE.BackSide })), [silverMatcap]);
+  const mirrorGoldMaterials = useMemo(() => TITLES.map(() => new THREE.MeshMatcapMaterial({ matcap: goldMatcap, color: "#ffffff", transparent: true, opacity: 0.16, depthWrite: false, side: THREE.BackSide })), [goldMatcap]);
   const ringMaterials = useMemo(() => TITLES.map((title) => new THREE.MeshStandardMaterial({ color: "#060606", emissive: new THREE.Color(title.accent), emissiveIntensity: 0.4, metalness: 0.4, roughness: 0.5 })), []);
   const coneMaterials = useMemo(() => TITLES.map(buildConeMaterial), []);
   const plateTextures = useMemo(() => TITLES.map((title) => buildPlateTexture(title.year)), []);
@@ -315,20 +398,22 @@ const VaultScene = ({ focus, spinRef, onPick }) => {
   const pillarMaterial = useMemo(() => new THREE.MeshMatcapMaterial({ matcap: steelMatcap, color: "#3c4048" }), [steelMatcap]);
 
   useEffect(() => () => {
-    trophyGeometry.dispose();
+    Object.values(parts).forEach((geometry) => geometry.dispose());
     goldMatcap.dispose();
     steelMatcap.dispose();
+    silverMatcap.dispose();
+    brushedMap.dispose();
+    checkerMap.dispose();
     pedestalMaterial.dispose();
     mirrorPedestalMaterial.dispose();
     pillarMaterial.dispose();
-    goldMaterials.forEach((mat) => mat.dispose());
-    mirrorGoldMaterials.forEach((mat) => mat.dispose());
-    ringMaterials.forEach((mat) => mat.dispose());
-    coneMaterials.forEach((mat) => mat.dispose());
+    emblemCoreMaterial.dispose();
+    [silverMaterials, goldMaterials, bandMaterials, mirrorSilverMaterials, mirrorGoldMaterials, ringMaterials, coneMaterials].forEach((set) => set.forEach((mat) => mat.dispose()));
     plateTextures.forEach((texture) => texture.dispose());
-  }, [trophyGeometry, goldMatcap, steelMatcap, pedestalMaterial, mirrorPedestalMaterial, pillarMaterial, goldMaterials, mirrorGoldMaterials, ringMaterials, coneMaterials, plateTextures]);
+  }, [parts, goldMatcap, steelMatcap, silverMatcap, brushedMap, checkerMap, pedestalMaterial, mirrorPedestalMaterial, pillarMaterial, emblemCoreMaterial, silverMaterials, goldMaterials, bandMaterials, mirrorSilverMaterials, mirrorGoldMaterials, ringMaterials, coneMaterials, plateTextures]);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
+    const time = state.clock.elapsedTime;
     camX.current = THREE.MathUtils.damp(camX.current, (focus - CENTER) * SPACING, 2.6, delta);
     camera.position.set(camX.current, IS_MOBILE ? 1.9 : 1.78, IS_MOBILE ? 8.8 : 6.5);
     camera.lookAt(camX.current, 1.22, 0);
@@ -341,9 +426,21 @@ const VaultScene = ({ focus, spinRef, onPick }) => {
       if (!trophy) return;
       const focused = index === focus;
       trophy.rotation.y += focused ? 0.32 * delta + (spin.dragging ? dragTurn : spin.vel) : 0.1 * delta;
+      trophy.rotation.z = Math.sin(time * 0.9 + index * 1.7) * 0.012;
+      trophy.position.y = 0.735 + Math.sin(time * 1.3 + index * 1.1) * (focused ? 0.024 : 0.011);
+      const breathe = focused ? 1.05 + Math.sin(time * 2.1) * 0.006 : 1.02;
+      trophy.scale.setScalar(THREE.MathUtils.damp(trophy.scale.x, breathe, 4, delta));
       const mirror = mirrorRefs.current[index];
-      if (mirror) mirror.rotation.y = trophy.rotation.y;
-      goldMaterials[index].color.lerp(TMP_COLOR.set(focused ? "#ffffff" : "#7a6a48"), Math.min(1, 4 * delta));
+      if (mirror) {
+        mirror.rotation.y = trophy.rotation.y;
+        mirror.rotation.z = trophy.rotation.z;
+        mirror.position.y = trophy.position.y;
+        mirror.scale.copy(trophy.scale);
+      }
+      silverMaterials[index].color.lerp(TMP_COLOR.set(focused ? "#eff0f3" : "#575b63"), Math.min(1, 4 * delta));
+      goldMaterials[index].color.lerp(TMP_COLOR.set(focused ? "#ffffff" : "#6f6146"), Math.min(1, 4 * delta));
+      bandMaterials[index].color.copy(silverMaterials[index].color);
+      mirrorSilverMaterials[index].color.copy(silverMaterials[index].color);
       mirrorGoldMaterials[index].color.copy(goldMaterials[index].color);
       ringMaterials[index].emissiveIntensity = THREE.MathUtils.damp(ringMaterials[index].emissiveIntensity, focused ? 2.3 : 0.35, 4, delta);
       coneMaterials[index].uniforms.uIntensity.value = THREE.MathUtils.damp(coneMaterials[index].uniforms.uIntensity.value, focused ? 0.5 : 0.11, 4, delta);
@@ -377,7 +474,14 @@ const VaultScene = ({ focus, spinRef, onPick }) => {
           scale={1.05}
           onClick={(event) => { event.stopPropagation(); onPick(index); }}
         >
-          <mesh geometry={trophyGeometry} material={goldMaterials[index]} />
+          <mesh geometry={parts.body} material={silverMaterials[index]} />
+          <mesh geometry={parts.spiral} material={goldMaterials[index]} />
+          <mesh geometry={parts.band} material={bandMaterials[index]} position={[0, 0.4, 0]} />
+          <mesh geometry={parts.rim} material={goldMaterials[index]} position={[0, 1.8, 0]} rotation-x={-Math.PI / 2} />
+          <group position={[0, 1.6, 0.455]} rotation-x={-0.34}>
+            <mesh geometry={parts.emblemRing} material={goldMaterials[index]} />
+            <mesh geometry={parts.emblemCore} material={emblemCoreMaterial} position={[0, 0, -0.004]} />
+          </group>
         </group>
         {/* faux reflection: mirrored copies under the floor */}
         <group scale={[1, -1, 1]}>
@@ -385,7 +489,8 @@ const VaultScene = ({ focus, spinRef, onPick }) => {
             <cylinderGeometry args={[0.85, 0.95, 0.72, 40]} />
           </mesh>
           <group ref={(node) => { mirrorRefs.current[index] = node; }} position={[0, 0.735, 0]} scale={1.05}>
-            <mesh geometry={trophyGeometry} material={mirrorGoldMaterials[index]} renderOrder={1} />
+            <mesh geometry={parts.body} material={mirrorSilverMaterials[index]} renderOrder={1} />
+            <mesh geometry={parts.spiral} material={mirrorGoldMaterials[index]} renderOrder={1} />
           </group>
         </group>
         <mesh material={coneMaterials[index]} position={[0, 3.4, 0]}>
