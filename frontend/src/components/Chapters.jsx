@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Marquee from "react-fast-marquee";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Crown, Flag, Trophy } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Flag, Trophy } from "lucide-react";
 import { IMAGES, quotes, trackShapes } from "../data/content";
-import { CAREER_SEASONS, CAREER_TOTALS } from "../data/careerRaces";
+import { LegacyVault } from "./LegacyVault";
 import { SeasonTimeline } from "./SeasonTimeline";
 import { VisualGallery } from "./VisualGallery";
 import { CareerCars } from "./CareerCars";
@@ -28,56 +28,6 @@ const fallbackTracks = [
   { circuit: "Circuit de Barcelona-Catalunya", country: "Spain", wins: 6, podiums: 12 },
   { circuit: "Shanghai International Circuit", country: "China", wins: 6, podiums: 9 },
 ];
-
-const ERA_LABEL = { mclaren: "McLAREN", mercedes: "MERCEDES", ferrari: "FERRARI" };
-
-const LegacyChapter = () => {
-  const [hovered, setHovered] = useState(null);
-  return <section id="legacy" className="legacy-section legacy-monument cathedral" aria-labelledby="legacy-cathedral-title" data-testid="legacy-section">
-    <div className="cath-scan" aria-hidden="true" />
-    <div className="cath-ghost" aria-hidden="true">44</div>
-    <header className="cath-head legacy-enter" style={{ "--legacy-delay": ".06s" }}>
-      <p className="cath-kicker">ONE LIGHT PER GRAND PRIX — 2007→2025</p>
-      <h2 id="legacy-cathedral-title" data-testid="legacy-section-title">EVERY RACE<br /><span>HE EVER STARTED.</span></h2>
-      <p className="cath-sub" data-testid="legacy-statement">Each light is one grand prix. <b>The gold ones he won.</b> Nineteen seasons, three teams, one heartbeat — run your cursor across a career.</p>
-    </header>
-    <div className="cath-stats legacy-enter" style={{ "--legacy-delay": ".16s" }} data-testid="cathedral-stats">
-      <div data-testid="cathedral-starts"><strong>{CAREER_TOTALS.starts}</strong><span>LIGHTS / STARTS</span></div>
-      <div className="is-gold" data-testid="cathedral-wins"><strong>{CAREER_TOTALS.wins}</strong><span>BURN GOLD / WINS</span></div>
-      <div data-testid="cathedral-podiums"><strong>{CAREER_TOTALS.podiums}</strong><span>ROSE HIGH / PODIUMS</span></div>
-      <div data-testid="cathedral-titles"><strong>{CAREER_TOTALS.titles}</strong><span>CROWNED SEASONS</span></div>
-    </div>
-    <div className="cath-field legacy-enter" style={{ "--legacy-delay": ".2s" }} data-testid="cathedral-field" onMouseLeave={() => setHovered(null)}>
-      <div className="cath-sweep" aria-hidden="true" />
-      {CAREER_SEASONS.map((season) => <div key={season.year} className={`cath-season ${season.title ? "is-title" : ""}`} style={{ "--flex": season.races }} data-testid={`cathedral-season-${season.year}`}>
-        <div className="cath-bars">
-          {season.racesData.map((race) => <div
-            key={race.round}
-            className={`cath-bar era-${race.team} ${race.win ? "is-win" : ""} ${race.podium && !race.win ? "is-podium" : ""} ${race.pos === 0 ? "is-dnf" : ""}`}
-            style={{ "--h": `${race.pos === 0 ? 7 : Math.max(12, 97 - (race.pos - 1) * 5.4)}%`, "--d": `${race.index * 2.6}ms` }}
-            onMouseEnter={(event) => setHovered({ race, x: event.clientX })}
-            data-testid={race.index === 1 ? "cathedral-first-bar" : undefined}
-          />)}
-        </div>
-        <span className="cath-year">’{String(season.year).slice(2)}</span>
-        {season.title && <i className="cath-crown" title={`${season.year} World Champion`}><Crown /></i>}
-      </div>)}
-    </div>
-    {hovered && <div className="cath-tip" style={{ left: hovered.x }} data-testid="cathedral-tooltip">
-      <strong>{hovered.race.year} — ROUND {hovered.race.round}</strong>
-      <span className={hovered.race.win ? "" : "is-plain"}>{hovered.race.pos === 0 ? "DNF — RETIRED" : hovered.race.win ? "P1 — VICTORY" : `P${hovered.race.pos}${hovered.race.podium ? " — PODIUM" : ""}`}</span>
-      <em>{ERA_LABEL[hovered.race.team]}{CAREER_SEASONS.find((s) => s.year === hovered.race.year)?.title ? " — CHAMPIONSHIP SEASON" : ""}</em>
-    </div>}
-    <div className="cath-legend legacy-enter" style={{ "--legacy-delay": ".3s" }} data-testid="cathedral-legend">
-      <span><i className="lg-gold" />VICTORY</span>
-      <span><i className="lg-mcl" />McLAREN 07—12</span>
-      <span><i className="lg-mer" />MERCEDES 13—24</span>
-      <span><i className="lg-fer" />FERRARI 25</span>
-      <span><i className="lg-dnf" />DNF</span>
-      <span><b><Crown /></b>TITLE SEASON</span>
-    </div>
-  </section>;
-};
 
 const MilestonesChapter = () => <section className="milestones-section" data-chapter-scroll="true" data-testid="milestone-victories-section">
   <div className="milestones-title">
@@ -211,7 +161,7 @@ const FooterChapter = () => <footer className="footer-world" data-testid="site-f
 
 export const ChapterView = ({ chapterKey, archive, isActive, direction }) => {
   switch (chapterKey) {
-    case "legacy": return <LegacyChapter archive={archive} />;
+    case "legacy": return <LegacyVault isActive={isActive} />;
     case "timeline": return <SeasonTimeline seasons={archive?.seasons} isActive={isActive} />;
     case "cars": return <CareerCars seasons={archive?.seasons} isActive={isActive} />;
     case "gallery": return <VisualGallery isActive={isActive} direction={direction} />;

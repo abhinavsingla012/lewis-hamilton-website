@@ -434,3 +434,13 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - FIXED: legend <footer> tag inherited red site-footer bg -> changed to div; hover dim now via filter (CSS animation fill locks opacity); resync watcher now lands immediate (no animated ping-pong)
 - Old monument CSS (LegacyChapter.css inner rules) now unused but kept; section keeps legacy-section legacy-monument classes for show/hide machinery
 - KNOWN ENV QUIRK: headless screenshot env throttles rAF -> lenis travels take 5-7s there (real browsers 1.25s); use long waits when testing navigation
+
+## Legacy Chapter — Particle Monument + Championship Vault (June 2026)
+- Replaced the rejected "Data Cathedral" with a two-act WebGL experience combining the Particle Monument and Trophy Vault concepts
+- Act 1 (Monument): ~14,000 gold GPU shader particles assemble from chaos into a giant "44"; the cursor is a gravity well that tears through the dust (activates only after real pointer movement); stats + kicker + unlock CTA overlays
+- Act 2 (Vault): scroll-down or CTA triggers particles scattering, titanium doors closing with a spinning gold "7" lock wheel, then splitting open into a 3D hall of 7 championship trophies (2008–2020) on pedestals with year plaques, accent light rings, volumetric light cones, dust, and faux mirror-floor reflections
+- Vault navigation: year rail, prev/next chevrons, Arrow keys, click-a-trophy, drag-to-rotate the focused cup; story panel per title (team, car, headline, story, wins/poles/points); "Seal the Vault" or scroll-up returns to the monument
+- Scroll engine integration via useChapterStep: one step opens vault, next step advances to Timeline; scroll-up in vault seals back
+- Performance hardening: replaced PMREM RoomEnvironment + Reflector (froze the main thread on software/low-end GPUs) with procedural canvas matcap gold/steel shading and mirrored-mesh reflections; mobile camera pull-back and layout pass
+- Files: frontend/src/components/LegacyVault.jsx, frontend/src/LegacyVault.css (DataCathedral.css removed)
+- Tested: testing agent iteration_50 (95% pass, all flows) + manual screenshots desktop/mobile; mobile year-rail overlap fixed; freeze fixed and re-verified

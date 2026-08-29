@@ -14,7 +14,7 @@ import "@/RecordReactor.css";
 import "@/SpatialV6.css";
 import "@/ChapterWorlds.css";
 import "@/ChapterFlair.css";
-import "@/DataCathedral.css";
+import "@/LegacyVault.css";
 import axios from "axios";
 import Lenis from "lenis";
 import { Nav } from "@/components/Nav";

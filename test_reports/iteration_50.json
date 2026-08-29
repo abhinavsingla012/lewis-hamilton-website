@@ -1,0 +1,50 @@
+{
+  "summary": "Frontend-only functional testing of the rebuilt Legacy chapter (Particle Monument + Trophy Vault). Verified all required testids, phase transitions, year selection, prev/next navigation, arrow keys, seal transition, scroll-engine integration and chapter regression. All core behaviour works. One real mobile overlap bug detected in the vault phase (top-left chapter marker / BACK TO CIRCUIT pill overlaps the vault year-rail).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Legacy vault (mobile 390x844)",
+        "issues": [
+          "In vault phase the top-left overlay ('BACK TO CIRCUIT' pill + 'CH.01 / THE LEGACY' marker) sits at y~130-170 and overlaps the first row of the vault-year-rail (year buttons start at y=154, x=16-374). The '2008' year button is visually obscured by the CH marker. Consider pushing the year rail further down on <=850px viewports, or hiding the chapter marker while phase='vault'."
+        ]
+      }
+    ]
+  },
+  "verified_flows": [
+    "Navigate to /#route-legacy renders data-testid=legacy-section with data-phase=monument, title 'ONE NUMBER. SEVEN CROWNS.', legacy-statement, monument-stats (105 WINS / 202 PODIUMS / 104 POLES / 368 STARTS), open-vault-button and canvas inside legacy-canvas-wrap.",
+    "Clicking open-vault-button transitions monument -> opening (vault-doors gets class 'lv-doors is-closed is-unlocking') within 480ms and lands on data-phase=vault after ~2.6s; default vault-story-year=2017.",
+    "vault-year-rail renders all 7 buttons (2008/2014/2015/2017/2018/2019/2020). Clicking vault-year-2020 (with sufficient AnimatePresence wait) updates story-year to '2020', headline to 'SEVEN. EQUAL OF LEGEND.', stats to 11 WINS / 10 POLES / 347 POINTS / 07/07 TITLE, and the button receives is-active class.",
+    "vault-prev-button disabled at 2008 (index 0) and vault-next-button disabled at 2020 (index 6); enabled otherwise. Clicking prev/next moves focus to adjacent year and updates story panel.",
+    "ArrowRight / ArrowLeft keyboard shortcuts move focus within the vault while phase=vault.",
+    "seal-vault-button triggers closing sequence and returns to phase=monument within ~2s with open-vault-button visible again.",
+    "Scroll engine integration: from monument, a single wheel-down (deltaY=140 on window) opens the vault instead of navigating to the next chapter. From vault, wheel-up seals back to monument. From vault, wheel-down advances chapter routing (viewport data-active moves off legacy).",
+    "Regression: window.__spatialGo('cars'|'gallery'|'records'|'victories'|'timeline'|'legacy') all render without JS crash; returning to legacy remounts at phase=monument.",
+    "No React/THREE console errors captured (only ignorable WebGL performance warnings)."
+  ],
+  "notes_and_observations": [
+    "Chapter travel is ~1.5-2.5s and the [data-testid='circuit-spatial-viewport'] data-active reflects the settled activeKey; when driving multiple wheel gestures back-to-back you must wait >2.5s between them or you will observe the previous chapter still on data-active (this is expected).",
+    "Vault story AnimatePresence uses mode='wait' with exit(0.2s)+enter(0.45s) so text assertions on vault-story-year should wait >=800ms after clicking a year button. First attempt with 700ms captured a stale year but correct headline/stats — not a bug, just a testing timing note.",
+    "Default focus is CENTER=3 (index 3 in TITLES) which is 2017 — matches spec.",
+    "Mobile monument (390x844) shows kicker, title, statement, stats and unlock button without overlap; the '44' particle sculpture renders."
+  ],
+  "critical_code_review_comments": [
+    "LegacyVault.jsx is 535 lines — approaching the 700-line threshold; consider splitting MonumentParticles + VaultScene into sibling files for maintainability.",
+    "On mobile, .lv-vault-head sits at the top of the section while global overlays (BackToCircuitButton + ChapterMarker) also occupy the top-left. Add a mobile-only offset or z-order rule when data-phase='vault'.",
+    "PARTICLE_COUNT + IS_MOBILE captured at module init — the choice is fixed at first import and won't update if viewport is resized across the 850px break. Acceptable, just document.",
+    "openVault/sealVault use fixed setTimeout schedule; if the component unmounts mid-transition, timersRef cleanup runs (good), but busyRef is left true — not observable currently, minor."
+  ],
+  "test_report_links": [],
+  "action_items": [
+    "Fix mobile vault overlap: hide or reposition BackToCircuitButton + '.chapter-marker' (CH.01 THE LEGACY) when LegacyVault data-phase='vault' at viewports <=850px, or push .lv-years down (e.g., padding-top ~80px on mobile)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped per request)", "frontend": "95%"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "LegacyVault chapter is functionally solid. Only mobile UX overlap remains. All required data-testids present and match spec. When retesting scroll integration, dispatch WheelEvent on window with bubbles:true and wait >=2500ms between successive gestures to let chapter travel settle before reading data-active.",
+  "rca of the issue": "Mobile overlap: the global chapter navigation overlay (BackToCircuitButton + ChapterMarker) is rendered by SpatialExperience/Nav above every chapter and is anchored top-left. LegacyVault's .lv-vault-head is also anchored to the top of the section on mobile, so both compete for the top-left region between y=0-180px. Fix in CSS: @media (max-width: 850px) { .legacy-vault[data-phase='vault'] .lv-vault-head { padding-top: 96px; } } or hide the marker while in vault phase."
+}
