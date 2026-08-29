@@ -5,6 +5,7 @@ import { HeroStage } from "./HeroStage";
 import { CircuitStage } from "./CircuitStage";
 import { ChapterView } from "./Chapters";
 import { ChapterMarker } from "./ChapterMarker";
+import { ChapterFlair } from "./ChapterFlair";
 import { CIRCUIT_CHAPTERS, CIRCUIT_HUB, SILVERSTONE_PATH, SPATIAL_ROUTE } from "../data/circuitRoute";
 import { canElementScroll, consumeChapterStep } from "../lib/spatialInput";
 
@@ -387,6 +388,8 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
           isActive={key === activeKey && !isTraveling && !isCircuitOverview}
         />)}
       </div>
+
+      <ChapterFlair activeKey={displayKey} traveling={isTraveling} />
 
       {chapterKeys.has(activeKey) && !isCircuitOverview && !isTraveling && <div className="chapter-sweep" key={`sweep-${activeKey}`} aria-hidden="true">
         <motion.i initial={{ y: "-40vh", opacity: 0 }} animate={{ y: "110vh", opacity: [0, .85, 0] }} transition={{ duration: .95, ease: [0.22, 1, 0.36, 1] }} />

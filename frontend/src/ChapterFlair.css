@@ -1,0 +1,61 @@
+/* ── Signature chapter arrival effects ───────────────────────────────── */
+.chapter-flair{position:absolute;inset:0;z-index:70;pointer-events:none;overflow:hidden;animation:flairFade 1.75s ease-out forwards}
+@keyframes flairFade{0%,62%{opacity:1}100%{opacity:0}}
+.chapter-flair:before,.chapter-flair:after{content:"";position:absolute}
+
+/* Moment — Silverstone rain streaks */
+.flair-moment:before{inset:-110% -14% -10% -14%;background:repeating-linear-gradient(101deg,transparent 0 22px,rgba(255,255,255,.34) 22px 23px,transparent 23px 41px);animation:flairRain .52s linear infinite;mask-image:linear-gradient(180deg,transparent 4%,#000 30%,#000 82%,transparent)}
+.flair-moment:after{inset:-110% -14% -10% -14%;background:repeating-linear-gradient(99deg,transparent 0 47px,rgba(255,255,255,.16) 47px 49px,transparent 49px 88px);animation:flairRain .8s linear infinite reverse}
+@keyframes flairRain{to{transform:translate3d(-5vw,52%,0)}}
+
+/* Milestones — checkered flag wipe */
+.flair-milestones:before{top:-10%;bottom:-10%;left:-130%;width:120%;background:repeating-conic-gradient(#0a0a0a 0 25%,#f4f4f0 0 50%);background-size:64px 64px;opacity:.92;transform:skewX(-12deg);animation:flairCheck 1.05s cubic-bezier(.72,0,.18,1) forwards;box-shadow:0 0 80px rgba(0,0,0,.5)}
+@keyframes flairCheck{45%{left:-8%}100%{left:135%}}
+
+/* Tracks — timing sector sweep (purple/green/yellow) */
+.flair-tracks i{position:absolute;left:-38%;width:34%;height:3px;border-radius:3px;animation:flairSector .95s cubic-bezier(.6,0,.2,1) forwards}
+.flair-tracks i:nth-child(1){top:32%;background:#b44bff;box-shadow:0 0 18px rgba(180,75,255,.9)}
+.flair-tracks i:nth-child(2){top:50%;background:#00d26a;box-shadow:0 0 18px rgba(0,210,106,.9);animation-delay:.12s}
+.flair-tracks i:nth-child(3){top:68%;background:#efff00;box-shadow:0 0 18px rgba(239,255,0,.9);animation-delay:.24s}
+@keyframes flairSector{to{left:112%}}
+
+/* Gallery — camera flash + aperture ring */
+.flair-gallery:before{inset:0;background:radial-gradient(ellipse 70% 70% at 50% 46%,rgba(255,255,255,.95),rgba(255,255,255,.35) 55%,transparent 80%);opacity:0;animation:flairFlash 1s ease-out forwards}
+.flair-gallery .flair-ring{position:absolute;left:50%;top:46%;width:120px;height:120px;border:1.5px solid rgba(255,255,255,.75);border-radius:50%;transform:translate(-50%,-50%) scale(.4);opacity:0;animation:flairRing .9s cubic-bezier(.22,1,.36,1) .1s forwards}
+@keyframes flairFlash{6%{opacity:1}16%{opacity:.05}26%{opacity:.55}44%{opacity:0}}
+@keyframes flairRing{20%{opacity:.9}100%{transform:translate(-50%,-50%) scale(3.4);opacity:0}}
+
+/* Cars — garage headlight beam sweep */
+.flair-cars:before{top:-40%;bottom:-40%;left:-55%;width:42%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.24) 45%,rgba(255,255,255,.4) 50%,rgba(255,255,255,.24) 55%,transparent);transform:rotate(14deg);filter:blur(6px);animation:flairBeam 1.15s cubic-bezier(.6,0,.25,1) forwards}
+@keyframes flairBeam{to{left:125%}}
+
+/* Records — gold engraving shimmer */
+.flair-records:before{top:-40%;bottom:-40%;left:-60%;width:52%;background:linear-gradient(90deg,transparent,rgba(255,208,110,.16) 40%,rgba(255,226,150,.32) 50%,rgba(255,208,110,.16) 60%,transparent);transform:rotate(-16deg);filter:blur(4px);animation:flairBeam 1.35s cubic-bezier(.55,0,.25,1) forwards}
+
+/* Legacy — paparazzi flash flicker */
+.flair-legacy:before{inset:0;background:radial-gradient(ellipse 90% 85% at 60% 35%,rgba(255,255,255,.85),rgba(255,255,255,.2) 55%,transparent 78%);opacity:0;animation:flairPaparazzi 1.15s ease-out forwards}
+@keyframes flairPaparazzi{5%{opacity:.85}11%{opacity:.06}17%{opacity:.5}24%{opacity:.02}30%{opacity:.28}45%{opacity:0}}
+
+/* Timeline — season tick scrub */
+.flair-timeline:before{top:0;bottom:0;left:0;width:300%;background:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 1px,transparent 1px 9vw);mask-image:linear-gradient(180deg,transparent 18%,#000 40%,#000 62%,transparent 84%);animation:flairScrub 1.2s cubic-bezier(.5,0,.2,1) forwards}
+@keyframes flairScrub{to{transform:translateX(-66%)}}
+
+/* Quotes — team radio waveform */
+.flair-quotes i{position:absolute;left:18%;right:18%;height:2px;background:linear-gradient(90deg,transparent,rgba(214,178,255,.85),transparent);transform:scaleX(0);animation:flairWave .78s cubic-bezier(.22,1,.36,1) forwards}
+.flair-quotes i:nth-child(1){top:41%;animation-delay:.02s}
+.flair-quotes i:nth-child(2){top:45.5%;animation-delay:.1s}
+.flair-quotes i:nth-child(3){top:50%;height:3px;animation-delay:.18s}
+.flair-quotes i:nth-child(4){top:54.5%;animation-delay:.26s}
+.flair-quotes i:nth-child(5){top:59%;animation-delay:.34s}
+@keyframes flairWave{55%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+
+/* Victories — champagne-gold confetti fall */
+.flair-victories:before{inset:-60% 0 0 0;background-image:radial-gradient(circle 3px at 12% 18%,rgba(255,215,130,.9) 98%,transparent),radial-gradient(circle 2px at 34% 62%,rgba(255,255,255,.8) 98%,transparent),radial-gradient(circle 3px at 55% 30%,rgba(255,196,92,.9) 98%,transparent),radial-gradient(circle 2px at 71% 74%,rgba(255,235,180,.85) 98%,transparent),radial-gradient(circle 3px at 88% 40%,rgba(255,215,130,.9) 98%,transparent);background-size:340px 300px;animation:flairConfetti 1.5s linear forwards}
+.flair-victories:after{inset:-60% 0 0 0;background-image:radial-gradient(circle 2px at 22% 44%,rgba(255,255,255,.7) 98%,transparent),radial-gradient(circle 3px at 48% 80%,rgba(255,215,130,.8) 98%,transparent),radial-gradient(circle 2px at 64% 16%,rgba(255,196,92,.8) 98%,transparent),radial-gradient(circle 2px at 92% 66%,rgba(255,235,180,.75) 98%,transparent);background-size:260px 240px;animation:flairConfetti 1.5s linear .1s forwards}
+@keyframes flairConfetti{to{transform:translateY(46%)}}
+
+/* Footer — dawn glow rise */
+.flair-footer:before{inset:0;background:radial-gradient(ellipse 90% 55% at 50% 108%,rgba(239,255,0,.2),rgba(239,255,0,.05) 55%,transparent 80%);transform:translateY(24%);opacity:0;animation:flairDawn 1.5s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes flairDawn{35%{opacity:1}100%{transform:translateY(0);opacity:0}}
+
+@media(prefers-reduced-motion:reduce){.chapter-flair{display:none}}

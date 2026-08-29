@@ -414,3 +414,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Moment chapter redesigned as "Home Fortress" world: kicker, 4-stat row (9 wins/7 poles/15 podiums/480K fans), 9-entry Silverstone wins year rail (2008-2024) with staggered entrance; new CSS in ChapterWorlds.css (.moment-world)
 - All 11 chapters audited via screenshots: legacy/timeline/cars/gallery/records/milestones/tracks/quotes/victories/footer already polished from previous session
 - iteration_48: 100% pass (11-chapter soak, keyboard walk, legacy reveal, moment redesign, hero regression)
+
+### Chapter Transition Flair (June 2026)
+- ChapterFlair.jsx + ChapterFlair.css: signature arrival overlay per chapter, mounts when traveling flips false, lives 1.75s, z-70, pointer-events none, reduced-motion hidden
+- Effects: legacy paparazzi flash, timeline tick scrub, cars headlight beam, gallery flash+aperture ring, records gold shimmer, milestones checkered wipe, tracks sector sweep (purple/green/yellow), moment rain streaks, quotes radio waveform, victories gold confetti, footer dawn glow
+- iteration_49: 100% pass (all 11 flairs, re-entry replay, interaction safety, reduced-motion, hero regression)
