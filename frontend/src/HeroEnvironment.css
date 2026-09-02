@@ -1,0 +1,56 @@
+/* ------------------------------------------------------------------
+   Era environments. Colour becomes a place: sky stack, committed horizon
+   with pin lights and their wet reflection, a floor that mirrors the
+   horizon glow, and one weather system per era. Gradients + two
+   transform-only weather tiles; nothing here repaints per frame.
+   ------------------------------------------------------------------ */
+.hero-white{--horizon:60%}
+.hw-env{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.hw-env>*{position:absolute}
+.hw-env-sky{inset:0}
+
+/* Horizon hairline + pin lights (grandstand / marina) + their reflection on the floor. */
+.hw-env-horizon{left:0;right:0;top:var(--horizon);height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1) 18%,rgba(255,255,255,.1) 82%,transparent)}
+.hw-env-lights{left:0;right:0;top:calc(var(--horizon) - 5px);height:6px;background-image:radial-gradient(circle at 50% 50%,rgba(255,240,205,.95) 0,rgba(255,240,205,.85) .9px,transparent 2px);background-size:34px 6px;background-repeat:repeat-x;-webkit-mask-image:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);opacity:.7;animation:envTwinkle 3.4s ease-in-out infinite alternate}
+.hw-env-lights-reflection{left:0;right:0;top:calc(var(--horizon) + 2px);height:22px;background-image:radial-gradient(ellipse 1.4px 11px at 50% 0,rgba(255,240,205,.7),transparent 100%);background-size:34px 22px;background-repeat:repeat-x;filter:blur(1.2px);-webkit-mask-image:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);opacity:.35}
+@keyframes envTwinkle{from{opacity:.55}to{opacity:.85}}
+
+/* Caption sits on the horizon like a map label. */
+.hw-env-caption{right:6.5vw;top:calc(var(--horizon) + 10px);color:rgba(255,255,255,.62);font:8px "Space Mono";letter-spacing:.22em;white-space:nowrap}
+
+/* —— Ferrari · Maranello dawn —— */
+.hw-env[data-era="ferrari"] .hw-env-sky{background:radial-gradient(ellipse 70% 34% at 66% var(--horizon),rgba(255,182,120,.5),transparent 72%),linear-gradient(112deg,transparent 36%,rgba(255,226,198,.22) 48%,transparent 60%),linear-gradient(to bottom,rgba(140,0,0,.36) 0%,transparent 32%,transparent calc(var(--horizon) - 1%),rgba(105,8,0,.34) calc(var(--horizon) + 1%),rgba(120,12,0,.14) 100%)}
+.hw-env-sun{left:66%;top:calc(var(--horizon) - 8%);width:13vw;height:13vw;border-radius:50%;background:radial-gradient(circle,rgba(255,246,222,.9) 0,rgba(255,214,160,.5) 24%,rgba(255,186,120,.18) 50%,transparent 70%);filter:blur(7px);transform:translate(-50%,-50%)}
+.hw-env-mist{left:-20%;right:-20%;top:calc(var(--horizon) - 3%);height:15vh;background:radial-gradient(ellipse 48% 60% at 50% 55%,rgba(255,236,222,.32),transparent 70%),radial-gradient(ellipse 30% 50% at 18% 60%,rgba(255,236,222,.2),transparent 70%),radial-gradient(ellipse 26% 50% at 82% 50%,rgba(255,236,222,.18),transparent 70%);filter:blur(18px);animation:envDrift 24s ease-in-out infinite alternate}
+@keyframes envDrift{from{transform:translateX(-3.5%)}to{transform:translateX(3.5%)}}
+.hw-env[data-era="ferrari"] .hw-env-lights{opacity:.28}
+.hw-env[data-era="ferrari"] .hw-env-lights-reflection{opacity:.12}
+
+/* —— Mercedes · Yas Marina twilight —— */
+.hw-env[data-era="mercedes"] .hw-env-sky{background:radial-gradient(ellipse 52% 12% at 50% var(--horizon),rgba(165,105,255,.38),transparent 70%),radial-gradient(ellipse 48% 10% at 50% calc(var(--horizon) + 3%),rgba(165,105,255,.22),transparent 70%),linear-gradient(to bottom,rgba(0,60,80,.36) 0%,transparent 30%,rgba(84,44,156,.44) calc(var(--horizon) - 9%),rgba(255,150,92,.38) calc(var(--horizon) - .35%),rgba(0,58,54,.56) calc(var(--horizon) + .6%),rgba(0,92,84,.26) 100%)}
+.hw-env-stars{left:0;right:0;top:0;height:calc(var(--horizon) - 14%);background-image:radial-gradient(circle at 8% 22%,rgba(255,255,255,.9) 0 .9px,transparent 1.9px),radial-gradient(circle at 19% 61%,rgba(255,255,255,.8) 0 1px,transparent 2px),radial-gradient(circle at 31% 35%,rgba(255,255,255,.85) 0 1px,transparent 2px),radial-gradient(circle at 44% 14%,rgba(255,255,255,.7) 0 .75px,transparent 1.6px),radial-gradient(circle at 57% 48%,rgba(255,255,255,.9) 0 .9px,transparent 1.9px),radial-gradient(circle at 66% 22%,rgba(255,255,255,.75) 0 1px,transparent 2px),radial-gradient(circle at 78% 66%,rgba(255,255,255,.85) 0 .9px,transparent 1.9px),radial-gradient(circle at 87% 30%,rgba(255,255,255,.8) 0 1px,transparent 2px),radial-gradient(circle at 93% 55%,rgba(255,255,255,.7) 0 .75px,transparent 1.6px),radial-gradient(circle at 50% 80%,rgba(255,255,255,.6) 0 .75px,transparent 1.6px);opacity:.9;animation:envTwinkle 2.6s ease-in-out infinite alternate-reverse}
+.hw-env[data-era="mercedes"] .hw-env-lights{background-size:26px 6px;opacity:.85}
+.hw-env[data-era="mercedes"] .hw-env-lights-reflection{background-size:26px 22px;opacity:.42}
+
+/* —— McLaren · Interlagos 2008, rain —— */
+.hw-env[data-era="mclaren"] .hw-env-sky{background:radial-gradient(ellipse 82% 18% at 50% var(--horizon),rgba(255,192,84,.42),transparent 70%),radial-gradient(ellipse 60% 14% at 50% calc(var(--horizon) + 4%),rgba(255,192,84,.22),transparent 70%),linear-gradient(to bottom,rgba(48,14,0,.46) 0%,rgba(80,26,0,.16) 26%,transparent 40%,transparent calc(var(--horizon) - 6%),rgba(255,204,96,.2) calc(var(--horizon) - .4%),rgba(58,18,0,.56) calc(var(--horizon) + .5%),rgba(108,36,0,.3) calc(var(--horizon) + 22%),rgba(150,56,0,.16) 100%)}
+.hw-env-wet{left:0;right:0;top:var(--horizon);bottom:0;background:repeating-linear-gradient(90deg,transparent 0 11px,rgba(255,255,255,.075) 11px 12px,transparent 12px 27px,rgba(255,255,255,.04) 27px 28px);filter:blur(.8px);-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 72%);mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 72%)}
+.hw-env-rain{left:-6%;right:-6%;bottom:0;background-repeat:repeat;will-change:transform}
+.hw-env-rain.is-far{top:-320px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='320'><g stroke='white' stroke-linecap='round' stroke-width='1'><line x1='28' y1='18' x2='22' y2='86' stroke-opacity='.28'/><line x1='84' y1='140' x2='78' y2='214' stroke-opacity='.22'/><line x1='56' y1='250' x2='50' y2='306' stroke-opacity='.18'/></g></svg>");background-size:120px 320px;opacity:.6;animation:envRain 1.15s linear infinite}
+.hw-env-rain.is-near{top:-260px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='260'><g stroke='white' stroke-linecap='round' stroke-width='1.4'><line x1='40' y1='10' x2='31' y2='118' stroke-opacity='.34'/><line x1='132' y1='120' x2='123' y2='236' stroke-opacity='.3'/></g></svg>");background-size:170px 260px;opacity:.55;animation:envRainNear .62s linear infinite}
+@keyframes envRain{to{transform:translateY(320px)}}
+@keyframes envRainNear{to{transform:translateY(260px)}}
+.hw-env[data-era="mclaren"] .hw-env-lights{opacity:.5;filter:blur(.6px)}
+.hw-env[data-era="mclaren"] .hw-env-lights-reflection{opacity:.5;filter:blur(2px);height:34px;background-size:34px 34px}
+[data-team-theme="mclaren"] .hw-particles{display:none}
+
+@media(max-width:850px){
+  .hero-white{--horizon:62%}
+  .hw-env-caption{display:none}
+  .hw-env-rain.is-far{display:none}
+  .hw-env-sun{width:34vw;height:34vw}
+  .hw-env-mist{filter:blur(12px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .hw-env-lights,.hw-env-stars,.hw-env-mist,.hw-env-rain.is-far,.hw-env-rain.is-near{animation:none}
+}

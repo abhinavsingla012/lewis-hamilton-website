@@ -352,6 +352,12 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - HeroStage THEME_ORDER aligned to the switcher order so arrows, swipes, figure slide and wipe agree; figure enter/exit no longer animates filter blur (transform + opacity, 550ms); white `hw-wash` flash removed
 - Figures: PNG → WebP q90 (828→117KB etc.), decoded at boot and kept referenced (`lib/boot.js warmImages`), `decoding="sync"` on all plates → new figure is complete on its first frame
 - Switcher shows the pressed state optimistically (instant feedback)
+- Wipe intensity later reduced on request: 1px hairline at .5 with an 8px halo, 22vw band at .14
+
+## Hero Era Environments — 2026-09-02
+- `components/EraEnvironment.jsx` + `HeroEnvironment.css`: each team colour is now a place behind the figure — McLaren = Interlagos 2008 (storm-dark top, sodium-lit horizon, two parallax rain tile layers, wet-asphalt streaks; rising particles hidden), Mercedes = Yas Marina twilight (violet band, warm horizon line, LED glow + reflection, twinkling stars), Ferrari = Maranello dawn (hazy low sun, god-ray, drifting mist)
+- Shared system: committed horizon at `--horizon:60%` (62% mobile) with a faint hairline, pin lights and their reflection, floor that mirrors the horizon glow; mono caption on the horizon (`hero-era-place`, hidden on mobile)
+- Weightless: gradients + transform-only SVG-tile rain; environments crossfade 0.7s via AnimatePresence in step with the slide-wipe; reduced motion freezes weather; text legibility preserved (floor darkens at the horizon, not under the stats)
 
 ## Prioritized Backlog
 ### P0

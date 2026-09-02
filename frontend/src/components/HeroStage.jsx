@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { EraEnvironment } from "./EraEnvironment";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowDownRight, ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
 import { SILVERSTONE_PATH } from "../data/circuitRoute";
@@ -165,6 +166,7 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
   const unpinOutside = (event) => { if (pinnedSpot && !event.target.closest?.(".hw-spot")) setPinnedSpot(null); };
 
   return <motion.section id="top" className="hero-white spatial-hero-stage" style={{ "--lx": lightX, "--ly": lightY }} data-spotlight={activeSpot ? "on" : "off"} onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }} onPointerDown={unpinOutside} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-testid="hero-section">
+    <EraEnvironment teamTheme={teamTheme} />
     <div className="hw-tint" aria-hidden="true" />
     <div className="hw-grain" aria-hidden="true" />
     <div className="hw-particles" aria-hidden="true">{PARTICLES.map((particle, index) => <span key={index} style={{ left: particle.left, width: particle.size, height: particle.size, animationDelay: particle.delay, animationDuration: particle.duration }} />)}</div>
