@@ -358,6 +358,7 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - `components/EraEnvironment.jsx` + `HeroEnvironment.css`: each team colour is now a place behind the figure — McLaren = Interlagos 2008 (storm-dark top, sodium-lit horizon, two parallax rain tile layers, wet-asphalt streaks; rising particles hidden), Mercedes = Yas Marina twilight (violet band, warm horizon line, LED glow + reflection, twinkling stars), Ferrari = Maranello dawn (hazy low sun, god-ray, drifting mist)
 - Shared system: committed horizon at `--horizon:60%` (62% mobile) with a faint hairline, pin lights and their reflection, floor that mirrors the horizon glow; mono caption on the horizon (`hero-era-place`, hidden on mobile)
 - Weightless: gradients + transform-only SVG-tile rain; environments crossfade 0.7s via AnimatePresence in step with the slide-wipe; reduced motion freezes weather; text legibility preserved (floor darkens at the horizon, not under the stats)
+- v2 after user feedback ("that white looks ugly", esp. Ferrari): principle changed to depth-from-darkness + light in the team's own hue — no white/pale washes anywhere. Ferrari: deep shadow overhead, molten amber sun/glow in the sky stack (mist, sun disc and god-ray removed), lights nearly off. Mercedes: navy overhead, deeper violet band, single ember horizon line. McLaren: deeper storm, saturated sodium glow, rain .5/.45. Rule for future hero work: never lay white or pastel gradients over saturated team colours
 
 ## Prioritized Backlog
 ### P0
