@@ -44,7 +44,7 @@ const getInitialTeamTheme = () => {
   }
 };
 
-const HERO_IMAGES = ["/images/lewis-ferrari.png", "/images/lewis-mercedes.png", "/images/lewis-mclaren.png"];
+const HERO_IMAGES = ["/images/lewis-ferrari.webp", "/images/lewis-mercedes.webp", "/images/lewis-mclaren.webp"];
 
 function App() {
   const [archive, setArchive] = useState(null);
@@ -67,9 +67,9 @@ function App() {
   const onReveal = useCallback(() => setRevealed(true), []);
   const onBootDone = useCallback(() => { setRevealed(true); setBooted(true); }, []);
   /** Every theme change goes through the paint-sweep so the world recolours as one gesture. */
-  const changeTeamTheme = useCallback((next, origin) => {
+  const changeTeamTheme = useCallback((next) => {
     if (!teamThemes.has(next)) return;
-    switchThemeWithSweep(next, setTeamTheme, origin);
+    switchThemeWithSweep(next, setTeamTheme);
   }, []);
   useEffect(() => {
     document.documentElement.dataset.teamTheme = teamTheme;

@@ -22,9 +22,14 @@ export const fontsReady = () => {
   return Promise.all(faces.map((face) => fonts.load(face).catch(() => undefined))).then(() => fonts.ready).catch(() => undefined);
 };
 
+/* Decoded bitmaps stay referenced for the life of the page so a theme switch never re-decodes. */
+const warmImages = [];
 export const decodeImages = (sources) => Promise.all(sources.map((src) => new Promise((resolve) => {
   const image = new Image();
+  image.decoding = "sync";
   image.onload = () => { if (image.decode) image.decode().then(resolve, resolve); else resolve(); };
   image.onerror = () => resolve();
   image.src = src;
+  warmImages.push(image);
 })));
+export const warmImageCount = () => warmImages.length;

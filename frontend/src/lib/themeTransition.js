@@ -1,70 +1,52 @@
-import { flushSync } from "react-dom";
-
 /**
- * Theme paint-sweep.
- * Switching team colour repaints the whole world as a radial wave that starts at the
- * pressed brand mark. Uses the View Transitions API (old world outside the circle, new
- * world inside) and degrades to a translucent wash on browsers without it.
+ * Theme slide-wipe.
+ * Switching team is a directional gesture: a thin accent hairline with a soft translucent band
+ * sweeps across the viewport in the direction of travel (toward the chosen team on the switcher),
+ * and the world recolours the moment the leading edge crosses centre. Two composited
+ * pseudo-elements, transform-only — no page snapshots, no radial reveal.
  */
-const SWEEP_MS = 820;
+const ORDER = ["mclaren", "mercedes", "ferrari"]; // switcher order, left → right
+const ACCENTS = { ferrari: "#e10600", mercedes: "#00d2be", mclaren: "#ff6200" };
+const WIPE_MS = 520;
+const APPLY_AT_MS = 220;
 
 const prefersReducedMotion = () => Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
 
-const defaultOrigin = (theme) => {
-  const button = document.querySelector(`.team-theme-button[data-team="${theme}"]`);
-  if (button) {
-    const rect = button.getBoundingClientRect();
-    if (rect.width > 0) return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-  }
-  return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+export const themeDirection = (from, to) => {
+  let dir = ORDER.indexOf(to) - ORDER.indexOf(from);
+  if (dir === 2) dir = -1;
+  if (dir === -2) dir = 1;
+  return dir || 1;
 };
 
-const spawnWave = (point, wash) => {
-  const wave = document.createElement("div");
-  wave.className = `theme-sweep-wave${wash ? " is-wash" : ""}`;
-  wave.setAttribute("aria-hidden", "true");
-  wave.dataset.testid = "theme-sweep-wave";
-  wave.style.setProperty("--sweep-x", `${point.x}px`);
-  wave.style.setProperty("--sweep-y", `${point.y}px`);
-  document.body.appendChild(wave);
-  const remove = () => wave.remove();
-  wave.addEventListener("animationend", remove, { once: true });
-  window.setTimeout(remove, SWEEP_MS + 600);
-};
-
-export const switchThemeWithSweep = (nextTheme, setTheme, origin) => {
+export const switchThemeWithSweep = (nextTheme, setTheme) => {
   const root = document.documentElement;
-  if (root.dataset.teamTheme === nextTheme) return;
-  const point = origin || defaultOrigin(nextTheme);
-  root.style.setProperty("--sweep-x", `${point.x}px`);
-  root.style.setProperty("--sweep-y", `${point.y}px`);
+  const current = root.dataset.teamTheme;
+  if (current === nextTheme) return;
+  const dir = themeDirection(current, nextTheme);
+  root.dataset.themeDir = dir > 0 ? "right" : "left";
 
   const apply = () => {
     root.dataset.teamTheme = nextTheme;
-    flushSync(() => setTheme(nextTheme));
+    setTheme(nextTheme);
   };
-
   if (prefersReducedMotion()) {
     apply();
     return;
   }
-  const supported = typeof document.startViewTransition === "function";
-  if (!supported || root.dataset.themeSweep === "true") {
-    apply();
-    spawnWave(point, true);
-    return;
-  }
+
+  const wipe = document.createElement("div");
+  wipe.className = "theme-wipe";
+  wipe.dataset.dir = dir > 0 ? "right" : "left";
+  wipe.dataset.testid = "theme-wipe";
+  wipe.setAttribute("aria-hidden", "true");
+  wipe.style.setProperty("--wipe", ACCENTS[nextTheme] || "#fff");
+  document.body.appendChild(wipe);
+  const remove = () => wipe.remove();
+  wipe.addEventListener("animationend", remove, { once: true });
+  window.setTimeout(remove, WIPE_MS + 250);
+
   root.dataset.themeSweep = "true";
-  const release = () => { delete root.dataset.themeSweep; };
-  try {
-    const transition = document.startViewTransition(() => {
-      apply();
-      spawnWave(point, false);
-    });
-    transition.finished.then(release, release);
-  } catch {
-    release();
-    apply();
-    spawnWave(point, true);
-  }
+  window.setTimeout(apply, APPLY_AT_MS);
+  window.setTimeout(() => { if (root.dataset.teamTheme === nextTheme) delete root.dataset.themeSweep; }, WIPE_MS);
 };

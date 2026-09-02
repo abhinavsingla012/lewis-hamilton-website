@@ -346,6 +346,13 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Hotspot focus: 120px halo at .24 (no burst), accent reticle ring, single thin ping; hover previews (mouse/pen only via pointerType), click pins (`is-pinned`, survives leaving), same-dot click or background pointerdown unpins, theme switch clears; theme wash flash .5→.28
 - Verified by testing agent on desktop + touch; no regressions
 
+## Theme Transition Rebuild — Slide-Wipe + Instant Figures — 2026-09-02
+- User rejected the radial View-Transition reveal ("childish", heavy) and reported slow figure appearance
+- Replaced with `lib/themeTransition.js` slide-wipe: one fixed element, two transform-only pseudo-elements (2px accent hairline + 26vw translucent band, 520ms), direction = position on the switcher (mclaren → mercedes → ferrari left→right, wrapping); theme applies at 220ms as the edge crosses centre; `html[data-theme-dir]` recorded; reduced motion = instant, no wipe
+- HeroStage THEME_ORDER aligned to the switcher order so arrows, swipes, figure slide and wipe agree; figure enter/exit no longer animates filter blur (transform + opacity, 550ms); white `hw-wash` flash removed
+- Figures: PNG → WebP q90 (828→117KB etc.), decoded at boot and kept referenced (`lib/boot.js warmImages`), `decoding="sync"` on all plates → new figure is complete on its first frame
+- Switcher shows the pressed state optimistically (instant feedback)
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified

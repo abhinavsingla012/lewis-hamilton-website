@@ -9,7 +9,8 @@ const Counter = ({ value, testId, active = true }) => {
   return <strong data-testid={testId}>{display}</strong>;
 };
 
-const THEME_ORDER = ["ferrari", "mercedes", "mclaren"];
+/* Same left-to-right order as the team switcher, so arrows, swipes and the wipe all agree on direction. */
+const THEME_ORDER = ["mclaren", "mercedes", "ferrari"];
 
 const ERA_STATS = {
   mclaren: { wins: 21, titles: 1, poles: 26, tag: "MCLAREN ERA · 2007—2012" },
@@ -46,7 +47,7 @@ const ERA_CONTENT = {
 
 const LAYOUTS = {
   ferrari: {
-    img: "/images/lewis-ferrari.png",
+    img: "/images/lewis-ferrari.webp",
     ratio: "536 / 1139",
     spots: [
       { id: "head", top: "3%", left: "37%", side: "left", line: [[0, 0], [-52, -26], [-150, -26]] },
@@ -58,7 +59,7 @@ const LAYOUTS = {
     ],
   },
   mclaren: {
-    img: "/images/lewis-mclaren.png",
+    img: "/images/lewis-mclaren.webp",
     ratio: "751 / 1222",
     spots: [
       { id: "head", top: "5%", left: "41%", side: "right", line: [[0, 0], [50, -30], [150, -30]] },
@@ -70,7 +71,7 @@ const LAYOUTS = {
     ],
   },
   mercedes: {
-    img: "/images/lewis-mercedes.png",
+    img: "/images/lewis-mercedes.webp",
     ratio: "538 / 1186",
     spots: [
       { id: "head", top: "3.5%", left: "38%", side: "left", line: [[0, 0], [-52, -26], [-150, -26]] },
@@ -200,24 +201,24 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
           style={{ rotateX, rotateY, aspectRatio: layout.ratio }}
           custom={dir}
           variants={{
-            enter: (direction) => ({ x: direction * 160, opacity: 0, filter: "blur(14px)", scale: 0.96 }),
-            center: { x: 0, opacity: 1, filter: "blur(0px)", scale: 1 },
-            exit: (direction) => ({ x: direction * -160, opacity: 0, filter: "blur(14px)", scale: 0.96 }),
+            enter: (direction) => ({ x: direction * 150, opacity: 0, scale: 0.97 }),
+            center: { x: 0, opacity: 1, scale: 1 },
+            exit: (direction) => ({ x: direction * -150, opacity: 0, scale: 0.97 }),
           }}
           initial="enter"
           animate={revealed ? "center" : "enter"}
           exit="exit"
-          transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           data-testid="hero-lewis-cutout"
         >
           <motion.span className="hw-floor-shadow" style={{ x: shadowX }} aria-hidden="true" />
           <span className="hw-contact-shadow" aria-hidden="true" />
           <div className="hw-body" data-testid="hero-figure-rig">
-            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-cast" aria-hidden="true" draggable="false" />
-            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-reflection" aria-hidden="true" draggable="false" />
-            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-wrap" aria-hidden="true" draggable="false" />
-            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-rim" aria-hidden="true" draggable="false" />
-            <img src={layout.img} alt="Lewis Hamilton in race suit holding his helmet" className="hw-lewis" data-testid="hero-image" draggable="false" />
+            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-cast" aria-hidden="true" draggable="false" decoding="sync" />
+            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-reflection" aria-hidden="true" draggable="false" decoding="sync" />
+            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-wrap" aria-hidden="true" draggable="false" decoding="sync" />
+            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-rim" aria-hidden="true" draggable="false" decoding="sync" />
+            <img src={layout.img} alt="Lewis Hamilton in race suit holding his helmet" className="hw-lewis" data-testid="hero-image" draggable="false" decoding="sync" />
             <span className="hw-lewis-sheen" style={{ "--figure": `url(${layout.img})` }} aria-hidden="true" />
           </div>
           {layout.spots.map((spot, index) => {
@@ -250,10 +251,6 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
         </motion.div>
       </AnimatePresence>
     </div>
-
-    <AnimatePresence>
-      <motion.div key={`wash-${teamTheme}`} className="hw-wash" initial={{ opacity: 0.28 }} animate={{ opacity: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} aria-hidden="true" />
-    </AnimatePresence>
 
     <motion.div className="hw-stats" initial="hidden" animate={revealed ? "show" : "hidden"} variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.75 } } }} data-testid="hero-statistics">
       <div className="hw-stats-era" data-testid="hero-era-tag">{era.tag}</div>

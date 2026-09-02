@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { siFerrari, siMclaren } from "simple-icons/icons";
 
 const BrandMark = ({ team }) => {
@@ -12,20 +13,26 @@ const teams = [
   { key: "ferrari", label: "Ferrari" },
 ];
 
-export const TeamThemeSwitcher = ({ theme, onChange }) => <div className="team-theme-switcher" role="group" aria-label="Choose team color theme" data-testid="team-theme-switcher">
-  {teams.map(({ key, label }) => <button
-    key={key}
-    className="team-theme-button"
-    data-team={key}
-    aria-pressed={theme === key}
-    aria-label={`Use ${label} color theme`}
-    onClick={(event) => {
-      const rect = event.currentTarget.getBoundingClientRect();
-      onChange(key, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
-    }}
-    data-testid={`team-theme-${key}-button`}
-  >
-    <BrandMark team={key} />
-    <span>{label}</span>
-  </button>)}
-</div>;
+export const TeamThemeSwitcher = ({ theme, onChange }) => {
+  /* The pressed state answers instantly; the world follows a beat later behind the slide-wipe. */
+  const [pending, setPending] = useState(null);
+  useEffect(() => { setPending(null); }, [theme]);
+  const shown = pending ?? theme;
+  return <div className="team-theme-switcher" role="group" aria-label="Choose team color theme" data-testid="team-theme-switcher">
+    {teams.map(({ key, label }) => <button
+      key={key}
+      className="team-theme-button"
+      data-team={key}
+      aria-pressed={shown === key}
+      aria-label={`Use ${label} color theme`}
+      onClick={() => {
+        if (key !== theme) setPending(key);
+        onChange(key);
+      }}
+      data-testid={`team-theme-${key}-button`}
+    >
+      <BrandMark team={key} />
+      <span>{label}</span>
+    </button>)}
+  </div>;
+};

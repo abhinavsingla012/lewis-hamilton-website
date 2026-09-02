@@ -1,9 +1,13 @@
-/* Theme paint-sweep: the new colour world grows out of the pressed brand mark. */
-::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
-::view-transition-old(root){z-index:1}
-::view-transition-new(root){z-index:2;animation:theme-sweep .82s cubic-bezier(.22,.8,.2,1) both}
-@keyframes theme-sweep{from{clip-path:circle(0px at var(--sweep-x,50%) var(--sweep-y,50%))}to{clip-path:circle(165vmax at var(--sweep-x,50%) var(--sweep-y,50%))}}
-.theme-sweep-wave{position:fixed;z-index:400;left:var(--sweep-x,50%);top:var(--sweep-y,50%);width:0;height:0;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.95),0 0 46px 16px rgba(var(--accent-rgb),.32),inset 0 0 90px rgba(var(--accent-rgb),.22);animation:theme-wave .82s cubic-bezier(.22,.8,.2,1) both}
-.theme-sweep-wave.is-wash{background:rgba(var(--accent-rgb),.2);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.85),0 0 60px 20px rgba(var(--accent-rgb),.25)}
-@keyframes theme-wave{from{width:0;height:0;opacity:1}72%{opacity:1}to{width:330vmax;height:330vmax;opacity:0}}
-@media(prefers-reduced-motion:reduce){::view-transition-new(root){animation:none}.theme-sweep-wave{display:none}}
+/* Theme slide-wipe: a hairline and a soft band sweep in the direction of travel. Transform-only. */
+.theme-wipe{position:fixed;inset:0;z-index:150;overflow:hidden;pointer-events:none}
+.theme-wipe:before,.theme-wipe:after{content:"";position:absolute;top:-12%;bottom:-12%;left:0;will-change:transform;animation-duration:.52s;animation-timing-function:cubic-bezier(.5,0,.15,1);animation-fill-mode:forwards}
+.theme-wipe:before{width:26vw;opacity:.3}
+.theme-wipe:after{width:2px;background:var(--wipe);box-shadow:0 0 16px 2px var(--wipe),0 0 40px 6px rgba(255,255,255,.18)}
+/* Travelling toward the team on the right: content comes from the right, so the wipe runs right → left. */
+.theme-wipe[data-dir="right"]:before{background:linear-gradient(90deg,var(--wipe),transparent 85%);transform:translateX(120vw) skewX(-10deg);animation-name:themeWipeToLeft}
+.theme-wipe[data-dir="right"]:after{transform:translateX(120vw) skewX(-10deg);animation-name:themeWipeToLeft}
+@keyframes themeWipeToLeft{to{transform:translateX(-45vw) skewX(-10deg)}}
+.theme-wipe[data-dir="left"]:before{background:linear-gradient(-90deg,var(--wipe),transparent 85%);transform:translateX(-45vw) skewX(10deg);animation-name:themeWipeToRight}
+.theme-wipe[data-dir="left"]:after{left:calc(26vw - 2px);transform:translateX(-45vw) skewX(10deg);animation-name:themeWipeToRight}
+@keyframes themeWipeToRight{to{transform:translateX(120vw) skewX(10deg)}}
+@media(prefers-reduced-motion:reduce){.theme-wipe{display:none}}
