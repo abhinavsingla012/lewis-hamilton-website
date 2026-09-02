@@ -185,6 +185,42 @@ frontend:
         agent: "testing"
         comment: "✅ PASS - All wayfinding features working correctly. Hero shows career stat '7× WORLD CHAMPION' (lap counter absent). In chapters: lap counter appears with correct sector index 'SECTOR 03 / 11', sector label 'CARS', exactly 11 ticks present. Cars tick marked as current (is-current=true, aria-current=true), legacy/timeline marked as past. Hover tooltips work ('05 RECORDS' with opacity=1). Click navigation works (gallery tick → data-active='gallery', hash='#route-gallery', sector index updates). Idle cue appears after 7s with correct text 'NEXT · 04 GALLERY' (calls window.__spatialStep(1) as designed). Legacy chapter shows 'SCROLL TO CONTINUE'. EXPLORE menu: all 11 chapter buttons present with numbers/labels/teasers/swatches, menu label correct, Escape closes, navigation works, current chapter marked. Mobile: 11 ticks visible, no horizontal overflow."
 
+  - task: "Hero: hotspot white spray toned down + hover/pin interaction model"
+    implemented: true
+    working: true
+    file: "frontend/src/components/HeroStage.jsx, frontend/src/HeroDepth.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "User reported the white spray on clicking a hotspot was too much. Root causes: .hw-spot-glow was a 190px white(.6) soft-light burst scaling .6->1, and hovering already activated the point so a desktop click toggled it OFF (glow flashed on/off). Now: glow is 120px at .24 alpha with no burst, an accent reticle ring snaps onto the dot, and a single thin ping ring expands once. Interaction: hover previews (hoverSpot), click pins (pinnedSpot, class is-pinned, aria-expanded=true) and stays open after the pointer leaves; clicking the same dot unpins; pointerdown anywhere outside a .hw-spot unpins; theme switch clears both. Theme wash flash reduced from .5 to .28."
+      - working: true
+        agent: "testing"
+        comment: "✅ DESKTOP PASS - All hotspot behaviors verified: (1) Initial state: data-spotlight='off', 6 hotspot buttons found. (2) Hover: is-active without is-pinned ✓, data-spotlight='on' ✓, glow 120px×120px (down from 190px) ✓, ping element exists ✓. (3) Click pins: is-active + is-pinned ✓, aria-expanded='true' ✓, spotlight stays 'on' (USER-REPORTED BUG FIXED - previously toggled off) ✓. (4) Pinned survives moving away: is-active + is-pinned persist ✓, spotlight='on' ✓, card visible (opacity=1) ✓. (5) Second click unpins: is-pinned removed ✓, spotlight='off' after moving away ✓. (6) Background click unpins: spotlight='off' ✓, no pinned spots ✓. (7) Pin priority: pinned hand remains active when hovering heart ✓, heart does NOT get is-active ✓. Minor on MOBILE: Second tap unpins correctly (is-pinned removed ✓), but spotlight remains 'on' until tapping elsewhere due to touch hover state persistence - not critical, core functionality works."
+      - working: "NA"
+        agent: "main"
+        comment: "Fix for mobile touch hover state persistence: onPointerEnter now checks if(event.pointerType !== 'touch') before setting hoverSpot. This ensures touch pointers never trigger hover state, so tapping the same spot twice cleanly toggles pin on/off without needing to tap elsewhere. Desktop hover behavior unchanged."
+      - working: true
+        agent: "testing"
+        comment: "✅ FOCUSED RE-TEST PASS - Both touch and desktop scenarios verified. TOUCH (390x844 iPhone): (1) First tap hero-hotspot-heart → is-active + is-pinned, spotlight 'on' ✓. (2) Second tap SAME spot → is-active + is-pinned BOTH removed, spotlight 'off' WITHOUT tapping elsewhere ✓ FIX VERIFIED - hover is now ignored for touch pointers. (3) Third tap → pins again ✓. (4) Tap empty background → unpins ✓. DESKTOP (1920x1080 mouse): (1) Hover hero-hotspot-hand → is-active (no is-pinned), spotlight 'on' ✓. (2) Move away → is-active removed, spotlight 'off' ✓. (3) Click → is-pinned added ✓. (4) Move away after click → is-pinned persists ✓. Desktop hover regression confirmed working. The fix (event.pointerType !== 'touch' check) successfully prevents touch hover state while preserving mouse hover behavior."
+
+  - task: "Hero: volumetric figure rig (3D feel for the Lewis cutouts)"
+    implemented: true
+    working: true
+    file: "frontend/src/components/HeroStage.jsx, frontend/src/HeroDepth.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Figure is now a layered rig inside .hw-body (data-testid=hero-figure-rig): 5 <img> plates of the same PNG — cast shadow (flipped/skewed/blurred, leans away from the pointer light), floor reflection (compressed, masked), light wrap (blurred halo), rim light (white plate offset toward the light) and the main .hw-lewis (data-testid=hero-image, still the only img with alt text) — plus a .hw-lewis-sheen masked to the figure. Pointer sets CSS vars --lx/--ly on the hero section (motion.section). Hotspots get a small parallax x/y. Body breathes (7.5s) except on mobile/reduced motion; wrap+sheen hidden on <=850px."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - All figure rig requirements verified: (1) Structure: [data-testid='hero-figure-rig'] exists inside [data-testid='hero-lewis-cutout'] ✓, contains exactly 5 <img> elements (hw-lewis-cast, hw-lewis-reflection, hw-lewis-wrap, hw-lewis-rim, hw-lewis with data-testid='hero-image') + one .hw-lewis-sheen span ✓. (2) Alt text: Only main image has non-empty alt='Lewis Hamilton in race suit holding his helmet' ✓, 4 plates have alt='' and aria-hidden='true' ✓. (3) Loading: All 5 imgs share same src ✓, all have naturalWidth=536 (loaded) ✓. (4) CSS variable --lx: Changes with mouse position - right side (1750,300) gives 0.82 (>0.5) ✓, left side (150,300) gives -0.85 (<-0.5) ✓. (5) Transforms: .hw-lewis-rim and .hw-lewis-cast computed transforms change between left/right positions ✓. (6) Theme switch: Clicking McLaren button updates era tag to 'MCLAREN ERA · 2007—2012' ✓, image src changes to 'lewis-mclaren.png' ✓, rig still has 5 imgs all with mclaren src ✓. (7) Arrow key: ArrowRight changes theme ✓. (8) Mobile (390×844): Rig exists ✓, .hw-lewis-wrap display='none' ✓, .hw-lewis-sheen display='none' ✓, .hw-lewis-cast display='block' ✓, .hw-lewis-reflection display='block' ✓. (9) Regression: explore-legacy-button activates circuit viewport within 1s ✓, theme sweep flag clears ✓, no React errors ✓."
+
 metadata:
   created_by: "main_agent"
   version: "1.2"
@@ -206,3 +242,13 @@ agent_communication:
     message: "✅ FOCUSED RE-TEST COMPLETE - Telemetry cursor fix verified and working correctly. Tested three critical scenarios: (1) Mobile touch-only device (390x844, has_touch=True): cursor correctly absent, media queries confirm touch device (pointerFine=false, pointerCoarse=true), touch interactions do not trigger cursor. (2) Desktop mouse device (1920x800): cursor absent before mouse move, appears correctly after first mouse.move() with proper modes (default, link+docked, next+label). (3) Reduced motion preference: cursor correctly absent even with mouse moves, media query confirms reduced motion active. The fix is working as designed - the cursor only mounts after a real mouse/pen pointermove event on pointer-fine devices without reduced motion preferences. All other features remain working. No regressions detected."
   - agent: "testing"
     message: "Iteration 1: mobile Victories fix, Lights-Out cold start, wayfinding instrument + eleven-chapter menu, theme paint-sweep and regressions all PASS. Telemetry cursor initially mounted in touch emulation; main agent gated it on a real mouse pointermove; focused re-test PASS on mobile/touch (absent), desktop (mounts after first mouse move, all modes) and reduced motion (absent)."
+  - agent: "main"
+    message: "Hero pass 2: hotspot glow toned down + hover/pin model, and the layered 3D figure rig. Please verify hotspot behaviour on desktop (hover -> is-active without is-pinned; click -> is-pinned persists after leaving; background click unpins; glow element .hw-spot-glow computed width 120px) and on touch (tap pins, second tap unpins), the rig renders 5 img plates + sheen, the --lx var on .hero-white changes with pointer position, and that the theme switch still swaps the figure and the era tag."
+  - agent: "testing"
+    message: "✅ HERO PASS 2 COMPLETE - Both tasks verified and working. HOTSPOT: Desktop behavior perfect - glow toned down to 120px (from 190px), hover shows is-active without is-pinned, click pins and spotlight stays on (USER BUG FIXED), pinned survives moving away, background click unpins, pin priority works. Mobile: tap pins/unpins correctly, minor issue where spotlight remains 'on' after second tap due to touch hover state persistence (user can tap elsewhere to clear, not critical). FIGURE RIG: All 5 img plates + sheen render correctly with proper alt text, --lx CSS var changes with mouse position (0.82 at right, -0.85 at left), transforms animate, theme switch updates era tag and image src, mobile hides wrap/sheen and shows cast/reflection. Regressions pass. No horizontal overflow. All requirements met."
+  - agent: "main"
+    message: "Hero pass 3: touch hover state fix. onPointerEnter now checks if(event.pointerType !== 'touch') before setting hoverSpot, so touch pointers never trigger hover state. This means tapping the same hotspot twice cleanly toggles pin on/off without needing to tap elsewhere (both is-active and is-pinned removed on second tap, spotlight goes off immediately). Desktop hover behavior unchanged. Please verify: TOUCH (390x844) - tap heart, second tap same spot unpins AND removes spotlight without tapping elsewhere; DESKTOP (1920x1080) - hover hand shows is-active, move away clears, click pins and persists."
+  - agent: "testing"
+    message: "✅ HERO PASS 3 COMPLETE - Touch hover fix verified and working perfectly. TOUCH (390x844 iPhone): First tap hero-hotspot-heart → is-active + is-pinned + spotlight 'on' ✓. Second tap SAME spot → is-active + is-pinned BOTH removed + spotlight 'off' WITHOUT tapping elsewhere ✓ FIX VERIFIED (hover now ignored for touch pointers). Third tap → pins again ✓. Tap empty background → unpins ✓. DESKTOP (1920x1080 mouse): Hover hero-hotspot-hand → is-active (no is-pinned) + spotlight 'on' ✓. Move away → is-active removed + spotlight 'off' ✓. Click → is-pinned added ✓. Move away after click → is-pinned persists ✓. Desktop hover regression confirmed working. The event.pointerType !== 'touch' check successfully prevents touch hover state while preserving mouse hover behavior. All requirements met."
+  - agent: "testing"
+    message: "Hero pass 2 verified: hotspot glow 120px, hover previews / click pins / background click unpins, pinned survives leaving; touch tap pins and second tap cleanly unpins after the pointerType fix; figure rig renders 5 plates + sheen, --lx tracks the pointer (0.82 right / -0.85 left), rim and cast transforms respond, theme switch swaps all plates, mobile hides wrap/sheen; explore CTA and paint-sweep regressions pass."

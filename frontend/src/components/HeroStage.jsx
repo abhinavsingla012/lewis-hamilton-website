@@ -97,7 +97,10 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
   const layout = LAYOUTS[teamTheme] || LAYOUTS.ferrari;
   const content = ERA_CONTENT[teamTheme] || ERA_CONTENT.ferrari;
   const era = ERA_STATS[teamTheme] || ERA_STATS.ferrari;
-  const [activeSpot, setActiveSpot] = useState(null);
+  /* Hover previews a point; click pins it. A pinned point survives the pointer leaving. */
+  const [hoverSpot, setHoverSpot] = useState(null);
+  const [pinnedSpot, setPinnedSpot] = useState(null);
+  const activeSpot = pinnedSpot ?? hoverSpot;
   const touchRef = useRef(null);
   const prevThemeRef = useRef(teamTheme);
 
@@ -115,6 +118,11 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
   const rotateX = useTransform(smoothY, [-0.5, 0.5], [2.5, -2.5]);
   const ghostX = useTransform(smoothX, [-0.5, 0.5], [22, -22]);
   const shadowX = useTransform(smoothX, [-0.5, 0.5], [-16, 16]);
+  /* The pointer is the key light: rim, sheen and cast shadow all derive from this vector. */
+  const lightX = useTransform(smoothX, [-0.5, 0.5], [-1, 1]);
+  const lightY = useTransform(smoothY, [-0.5, 0.5], [-1, 1]);
+  const spotX = useTransform(smoothX, [-0.5, 0.5], [-9, 9]);
+  const spotY = useTransform(smoothY, [-0.5, 0.5], [-6, 6]);
 
   const trackPointer = (event) => {
     pointerX.set(event.clientX / window.innerWidth - 0.5);
@@ -124,7 +132,8 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
   const switchTeam = (step) => {
     if (!setTeamTheme) return;
     setTeamTheme(THEME_ORDER[(themeIndex(teamTheme) + step + THEME_ORDER.length) % THEME_ORDER.length]);
-    setActiveSpot(null);
+    setHoverSpot(null);
+    setPinnedSpot(null);
   };
   const onTouchStart = (event) => {
     const touch = event.touches[0];
@@ -152,7 +161,9 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  return <section id="top" className="hero-white spatial-hero-stage" data-spotlight={activeSpot ? "on" : "off"} onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-testid="hero-section">
+  const unpinOutside = (event) => { if (pinnedSpot && !event.target.closest?.(".hw-spot")) setPinnedSpot(null); };
+
+  return <motion.section id="top" className="hero-white spatial-hero-stage" style={{ "--lx": lightX, "--ly": lightY }} data-spotlight={activeSpot ? "on" : "off"} onPointerMove={trackPointer} onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }} onPointerDown={unpinOutside} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-testid="hero-section">
     <div className="hw-tint" aria-hidden="true" />
     <div className="hw-grain" aria-hidden="true" />
     <div className="hw-particles" aria-hidden="true">{PARTICLES.map((particle, index) => <span key={index} style={{ left: particle.left, width: particle.size, height: particle.size, animationDelay: particle.delay, animationDuration: particle.duration }} />)}</div>
@@ -201,22 +212,30 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
         >
           <motion.span className="hw-floor-shadow" style={{ x: shadowX }} aria-hidden="true" />
           <span className="hw-contact-shadow" aria-hidden="true" />
-          <img src={layout.img} alt="Lewis Hamilton in race suit holding his helmet" className="hw-lewis" data-testid="hero-image" draggable="false" />
+          <div className="hw-body" data-testid="hero-figure-rig">
+            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-cast" aria-hidden="true" draggable="false" />
+            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-reflection" aria-hidden="true" draggable="false" />
+            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-wrap" aria-hidden="true" draggable="false" />
+            <img src={layout.img} alt="" className="hw-lewis-layer hw-lewis-rim" aria-hidden="true" draggable="false" />
+            <img src={layout.img} alt="Lewis Hamilton in race suit holding his helmet" className="hw-lewis" data-testid="hero-image" draggable="false" />
+            <span className="hw-lewis-sheen" style={{ "--figure": `url(${layout.img})` }} aria-hidden="true" />
+          </div>
           {layout.spots.map((spot, index) => {
             const spotContent = content[spot.id];
             const [, elbow, end] = spot.line;
             return <motion.div
               key={spot.id}
-              className={`hw-spot side-${spot.side} ${activeSpot === spot.id ? "is-active" : ""}`}
-              style={{ top: spot.top, left: spot.left }}
+              className={`hw-spot side-${spot.side} ${activeSpot === spot.id ? "is-active" : ""} ${pinnedSpot === spot.id ? "is-pinned" : ""}`}
+              style={{ top: spot.top, left: spot.left, x: spotX, y: spotY }}
               initial={{ opacity: 0 }}
               animate={{ opacity: revealed ? 1 : 0 }}
               transition={{ delay: 0.75 + index * 0.12, duration: 0.5 }}
-              onMouseEnter={() => setActiveSpot(spot.id)}
-              onMouseLeave={() => setActiveSpot((current) => (current === spot.id ? null : current))}
+              onPointerEnter={(event) => { if (event.pointerType !== "touch") setHoverSpot(spot.id); }}
+              onPointerLeave={() => setHoverSpot((current) => (current === spot.id ? null : current))}
             >
               <span className="hw-spot-glow" aria-hidden="true" />
-              <button type="button" className="hw-spot-dot" data-cursor="cross" onClick={() => setActiveSpot((current) => (current === spot.id ? null : spot.id))} aria-label={`${spotContent.title} — details`} aria-expanded={activeSpot === spot.id} data-testid={`hero-hotspot-${spot.id}`}><i /></button>
+              {activeSpot === spot.id && <span key={`${spot.id}-${pinnedSpot === spot.id}`} className="hw-spot-ping" aria-hidden="true" />}
+              <button type="button" className="hw-spot-dot" data-cursor="cross" onClick={() => setPinnedSpot((current) => (current === spot.id ? null : spot.id))} aria-label={`${spotContent.title} — details`} aria-expanded={activeSpot === spot.id} data-testid={`hero-hotspot-${spot.id}`}><i /></button>
               <svg key={revealed ? "drawn" : "held"} className="hw-spot-svg" aria-hidden="true">
                 <polyline points={spot.line.map(([x, y]) => `${x},${y}`).join(" ")} pathLength="1" style={{ animationDelay: `${0.85 + index * 0.12}s` }} />
                 <circle cx={elbow[0]} cy={elbow[1]} r="1.6" />
@@ -233,7 +252,7 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
     </div>
 
     <AnimatePresence>
-      <motion.div key={`wash-${teamTheme}`} className="hw-wash" initial={{ opacity: 0.5 }} animate={{ opacity: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} aria-hidden="true" />
+      <motion.div key={`wash-${teamTheme}`} className="hw-wash" initial={{ opacity: 0.28 }} animate={{ opacity: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} aria-hidden="true" />
     </AnimatePresence>
 
     <motion.div className="hw-stats" initial="hidden" animate={revealed ? "show" : "hidden"} variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.75 } } }} data-testid="hero-statistics">
@@ -246,5 +265,5 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed
     <div className="hw-swipe-hint" aria-hidden="true" data-testid="hero-swipe-hint"><ChevronLeft size={11} /><span>SWIPE TO SWITCH TEAM</span><ChevronRight size={11} /></div>
 
     <div className="hw-telemetry" data-testid="hero-telemetry"><span>HAM / GBR</span><span>← → SWITCH ERA — HOVER THE POINTS</span><span><Crosshair size={11} /> PRECISION / PURPOSE / PACE</span></div>
-  </section>;
+  </motion.section>;
 };

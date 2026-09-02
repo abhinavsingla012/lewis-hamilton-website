@@ -339,6 +339,13 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Bug fix: mobile Victories rows were hiding race/date/circuit via an old `.victory-row>span:not(.win-number)` rule; rows now show number · date · race+circuit · POLE/FL chips at 390px with no overflow
 - Screenshot note: headless WebGL screenshots can return black frames (ReadPixels stall) — verify via DOM state
 
+## Hero Pass 2 — Volumetric Figure Rig + Hotspot Focus — 2026-09-02
+- User: figures "still feel like PNGs"; the white spray on clicking a pointer is too much
+- Root causes: 190px white(.6) soft-light burst glow scaling .6→1; hovering already activated a point so a desktop click toggled it OFF (glow flashed on/off); figure was a single plate with three static drop-shadows
+- Figure rig (`HeroDepth.css`, `.hw-body` in HeroStage): five plates of the same PNG — cast shadow (flipped/skewed/blurred, leans away from the pointer light), polished-floor reflection, light-wrap halo, rim light (white plate offset toward the light), main image — plus a soft-light sheen masked to the silhouette (specular + floor colour bounce + side falloff); pointer sets `--lx/--ly` on the hero `motion.section`; hotspots parallax ±9/6px; body breathes 7.5s; mobile hides wrap/sheen and disables breathing; reduced-motion honoured
+- Hotspot focus: 120px halo at .24 (no burst), accent reticle ring, single thin ping; hover previews (mouse/pen only via pointerType), click pins (`is-pinned`, survives leaving), same-dot click or background pointerdown unpins, theme switch clears; theme wash flash .5→.28
+- Verified by testing agent on desktop + touch; no regressions
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified

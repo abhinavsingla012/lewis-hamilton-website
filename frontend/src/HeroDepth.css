@@ -1,0 +1,57 @@
+/* ------------------------------------------------------------------
+   Hero depth rig. The Lewis cutout is treated as an object standing in the
+   red world, not a PNG on top of it: the pointer is the key light, so the rim
+   light, specular sheen and cast shadow move together; a light-wrap halo
+   bleeds his own colours into the environment; a compressed reflection and
+   the cast shadow plant his feet on a real floor; callouts float in front on
+   their own parallax; the body breathes.
+   ------------------------------------------------------------------ */
+.hero-white{--lx:0;--ly:0}
+
+.hw-body{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 100%;animation:hwBreathe 7.5s ease-in-out infinite alternate}
+@keyframes hwBreathe{from{transform:translateY(0) scale(1)}to{transform:translateY(-3px) scale(1.004)}}
+
+.hw-lewis-layer{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none}
+
+/* Main plate: one honest soft shadow instead of three competing ones, fringe tamed. */
+.hw-body .hw-lewis{position:absolute;inset:0;z-index:3;filter:drop-shadow(0 0 1px rgba(0,0,0,.35)) drop-shadow(0 22px 30px rgba(0,0,0,.34)) contrast(1.05) saturate(1.06)}
+
+/* Cast shadow: a flipped, squashed, blurred silhouette laid on the floor, falling away from the light. */
+.hw-lewis-cast{z-index:0;transform-origin:50% 100%;transform:translateZ(-24px) translateX(calc(var(--lx) * -7%)) skewX(calc(var(--lx) * -24deg)) scaleY(-.36);filter:brightness(0) blur(10px);opacity:.3;-webkit-mask-image:linear-gradient(to top,rgba(0,0,0,1) 0%,rgba(0,0,0,.45) 22%,transparent 58%);mask-image:linear-gradient(to top,rgba(0,0,0,1) 0%,rgba(0,0,0,.45) 22%,transparent 58%)}
+
+/* Reflection: polished-paddock floor, compressed and fading fast. */
+.hw-lewis-reflection{z-index:0;transform-origin:50% 100%;transform:translateZ(-8px) scaleY(-.5);filter:blur(1.6px) saturate(.85) brightness(.92);opacity:.26;-webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.25) 22%,transparent 46%);mask-image:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.25) 22%,transparent 46%)}
+
+/* Light wrap: his own colours bloom softly into the world around the silhouette. */
+.hw-lewis-wrap{z-index:1;transform:translateZ(-4px) scale(1.035);filter:blur(14px) saturate(1.6) brightness(1.15);opacity:.42}
+
+/* Rim light: a white plate offset toward the light, so only the lit edge peeks out. */
+.hw-lewis-rim{z-index:2;transform:translate(calc(var(--lx) * 5px),calc(var(--ly) * 4px)) translateZ(-2px);filter:brightness(0) invert(1) sepia(.25) blur(1.2px);opacity:.5}
+
+/* Sheen: specular highlight, floor-colour bounce and side falloff, clipped to the figure. */
+.hw-lewis-sheen{position:absolute;inset:0;z-index:4;pointer-events:none;mix-blend-mode:soft-light;-webkit-mask-image:var(--figure);mask-image:var(--figure);-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;background:radial-gradient(ellipse 58% 52% at calc(50% + var(--lx) * 42%) calc(34% + var(--ly) * 28%),rgba(255,255,255,.55),transparent 62%),linear-gradient(to top,rgba(var(--accent-rgb),.55) 0%,rgba(var(--accent-rgb),.16) 30%,transparent 56%),linear-gradient(calc(90deg + var(--lx) * 55deg),rgba(0,0,0,.34),transparent 44%,transparent 56%,rgba(0,0,0,.3))}
+
+/* Callouts float in front of the body on their own parallax (set inline by the pointer). */
+.hw-spot{will-change:transform}
+
+/* Hotspot focus: a precise instrument, not a spray. Small halo, accent reticle, one thin ping. */
+.hw-spot-glow{width:120px;height:120px;margin:-60px 0 0 -60px;background:radial-gradient(circle,rgba(255,255,255,.24) 0%,rgba(255,255,255,.07) 40%,transparent 64%);transform:scale(.9)}
+.hw-spot.is-active .hw-spot-glow{transform:scale(1)}
+.hw-spot-dot:before{content:"";position:absolute;inset:-5px;border:1px solid var(--acid);border-radius:50%;opacity:0;transform:scale(1.5);transition:opacity .3s,transform .45s cubic-bezier(.22,1,.36,1)}
+.hw-spot.is-active .hw-spot-dot:before{opacity:1;transform:scale(1)}
+.hw-spot.is-active .hw-spot-dot i{opacity:0;animation-play-state:paused}
+.hw-spot.is-pinned .hw-spot-dot:after{background:var(--acid);box-shadow:0 0 0 1.5px rgba(0,0,0,.55),0 0 10px rgba(var(--accent-rgb),.7)}
+.hw-spot-ping{position:absolute;top:0;left:0;z-index:2;width:22px;height:22px;margin:-11px 0 0 -11px;border:1px solid rgba(255,255,255,.75);border-radius:50%;pointer-events:none;animation:hwPing .9s cubic-bezier(.16,.84,.44,1) forwards}
+@keyframes hwPing{from{opacity:.85;transform:scale(.6)}to{opacity:0;transform:scale(3.2)}}
+
+@media(max-width:850px){
+  .hw-body{animation:none}
+  .hw-lewis-wrap,.hw-lewis-sheen{display:none}
+  .hw-lewis-cast{opacity:.22;filter:brightness(0) blur(7px)}
+  .hw-lewis-reflection{opacity:.16}
+  .hw-body .hw-lewis{filter:drop-shadow(0 14px 20px rgba(0,0,0,.34)) contrast(1.05) saturate(1.05)}
+}
+@media(prefers-reduced-motion:reduce){
+  .hw-body{animation:none}
+  .hw-spot-ping{animation:none;opacity:0}
+}

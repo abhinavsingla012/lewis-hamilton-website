@@ -4,6 +4,7 @@ import "@/Upgrade.css";
 import "@/TimelineV2.css";
 import "@/HeroV3.css";
 import "@/HeroWhite.css";
+import "@/HeroDepth.css";
 import "@/CircuitExperience.css";
 import "@/TeamThemes.css";
 import "@/LegacyChapter.css";
