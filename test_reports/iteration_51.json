@@ -1,0 +1,34 @@
+{
+  "summary": "Frontend-only verification of new Silverstone circuit orbit/camera/postprocessing rework and chapter-stepping regressions. All 12 review scenarios pass across desktop (1920x800) and mobile (390x844), reduced-motion emulation, deep link + Back-to-Circuit, theme switching, keyboard/wheel/touch stepping and Explore menu navigation. Zero JS/console errors (only the ignorable GPU/THREE warnings). No functional bugs found.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verified_flows": [
+    "Preloader boots and is skippable with Enter; [data-testid='silverstone-circuit-map'] present; .circuit-viewport data-active='top' at hero.",
+    "Hero -> circuit hub via mouse.wheel(0,120): after ~6s .circuit-viewport has data-active='circuit', data-traveling='false', map has data-orbitable='true', circuit-orbit-hint has is-visible with text 'DRAG TO ORBIT · CTRL + SCROLL TO ZOOM'. All 11 chapter-marker-* button pins have inline style opacity='1' and pointer-events='auto' (the additional 11 chapter-marker-*-content elements are inner spans without inline style — expected).",
+    "Manual orbit drag @ (960,420) with 20 x +15px steps: mid-drag data-dragging='true', on release data-dragging is cleared, data-active stays 'circuit', orbit hint loses 'is-visible' after the first drag, chapter-marker-legacy rect moves dx~31 dy~38 (camera rotated).",
+    "Pin click after fresh circuit landing: [data-testid='chapter-marker-cars'] -> data-active='cars' with data-traveling='false' within ~1s; back-to-circuit-button visible. Additional pins verified: gallery, records, victories, legacy all land on their respective chapter.",
+    "Back to Circuit from cars: data-overview='true', data-active='circuit', canvas data-orbitable='true', pins opacity=1 (all 11), circuit-coverage-label contains 'TRACK COVERED · 20% · CURRENT POSITION / CARS' (dynamic).",
+    "Ctrl+wheel zoom in overview (2x -400 deltaY): window.devicePixelRatio 1->1 unchanged, document.documentElement.clientWidth 1920->1920 unchanged (browser zoom NOT triggered), pin-distance legacy<->cars 124->225px (spread further apart, zoomed in), data-active stays 'circuit', data-overview stays 'true', hint hides.",
+    "Plain wheel step from overview closes data-overview (goes to false).",
+    "Keyboard ArrowDown/ArrowUp still steps chapters (circuit -> legacy -> circuit).",
+    "Theme switch (Mercedes then McLaren) while on circuit: no console errors, canvas & pins still present, data-active still 'circuit'.",
+    "Mobile 390x844 (CDP touch events): (a) horizontal drag +180px x with ~12 moves: data-active stays 'circuit', orbit hint loses is-visible. (b) vertical upward swipe -126px y: data-active='legacy' after ~8s. document.documentElement.scrollWidth = 390 (no horizontal overflow).",
+    "Deep link #route-cars + preloader-skip: data-active='cars' after settle, BTC visible, clicking BTC -> data-overview='true', data-active='circuit', all 11 pins opacity=1, no console errors.",
+    "Explore menu -> navigation-gallery-button click: data-active='gallery', lap counter reads 'SECTOR 04 / 11'.",
+    "Reduced-motion emulation (prefers-reduced-motion: reduce) on #route-circuit: canvas renders, 11 pins present, chapter-marker-cars click still navigates to 'cars', back-to-circuit-button click still returns to 'circuit'.",
+    "Console: 0 JavaScript errors across all flows (excluding ignorable GPU/THREE.Clock warnings)."
+  ],
+  "critical_code_review_comments": [
+    "chapter-marker-* selector matches both the pin <button> and its inner .chapter-marker-*-content wrapper (22 matches for 11 pins). Not a bug, but tests should target `[data-testid^='chapter-marker-']:not([data-testid$='-content'])` to isolate the 11 real markers.",
+    "orbit hint 'is-visible' toggles off on any drag, ctrl-wheel or after touch-move. Behavior is per spec; consider adding a subtle re-appearance after long idle to help discoverability.",
+    "Post-BTC overview shows all pin opacity=1 immediately, but data-orbitable is true and hint starts hidden (only re-shown after idle timer). Spec said 'hint visible again' — right now the hint reappears via the ~4s idle auto-orbit timer, not immediately. If E1 wanted immediate re-show, they should reset hintSeen flag inside openCircuitOverview()."
+  ],
+  "test_report_links": [],
+  "action_items": [],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped per request)", "frontend": "100%"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "For circuit orbit testing: use window.__hamiltonLenis.scrollTo for programmatic scroll (NOT window.scrollTo); window.__spatialGo(key) navigates directly; window.__spatialStep(1|-1) steps chapters. In headless mode chapter travel takes 5-8s (not the 1.25s of real rendering) so use >=8s waits after wheel/pin clicks. Pin selector: use `[data-testid^='chapter-marker-']:not([data-testid$='-content'])` for the 11 button pins. To detect real drag vs click, check [data-testid='silverstone-circuit-map'] data-dragging attribute mid-gesture. Ctrl+wheel zoom is verified NOT to trigger browser zoom (dpr and clientWidth stable). Mobile touch events must go via CDP Input.dispatchTouchEvent, not page.touchscreen."
+}

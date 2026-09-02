@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unknown-property -- react-three-fiber scene graph props */
 import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { MoveHorizontal } from "lucide-react";
 import * as THREE from "three";
 import { CIRCUIT_CHAPTERS } from "../data/circuitRoute";
 import {
@@ -16,35 +17,59 @@ import {
   kerbTexture,
   startLineTexture,
 } from "../three/circuitCurve";
+import { UP, clamp, easeInOut, glow, moveToward, quadBezier } from "../three/circuitMath";
+import { createOrbit, resetOrbit, stepOrbit } from "../three/circuitOrbit";
+import { CircuitEffects } from "./circuit/CircuitEffects";
+import { CarTrail, FloodFlicker, GateCascade, Motes } from "./circuit/CircuitLife";
+import { useOrbitGestures } from "./circuit/useOrbitGestures";
 
-const UP = new THREE.Vector3(0, 1, 0);
-const easeInOut = (value) => (value < 0.5 ? 2 * value * value : 1 - Math.pow(-2 * value + 2, 2) / 2);
+const FOLLOW_DURATION = 1.2;
 
 const SkyDome = ({ accent }) => {
   const material = useMemo(() => new THREE.ShaderMaterial({
     side: THREE.BackSide,
     depthWrite: false,
-    uniforms: { uAccent: { value: new THREE.Color(accent) } },
+    uniforms: { uAccent: { value: new THREE.Color(accent) }, uTime: { value: 0 } },
     vertexShader: "varying vec3 vPos; void main(){ vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
     fragmentShader: `
       varying vec3 vPos;
       uniform vec3 uAccent;
+      uniform float uTime;
       void main() {
-        float height = normalize(vPos).y;
+        vec3 dir = normalize(vPos);
+        float height = dir.y;
         vec3 top = vec3(0.016, 0.021, 0.043);
         vec3 horizon = mix(vec3(0.055, 0.07, 0.12), uAccent * 0.26, 0.22);
         vec3 bottom = vec3(0.01, 0.011, 0.017);
         vec3 color = mix(horizon, top, smoothstep(0.0, 0.55, height));
         color = mix(bottom, color, smoothstep(-0.35, 0.02, height));
+        float angle = atan(dir.x, dir.z);
+        float band = pow(0.5 + 0.5 * cos(angle - uTime * 0.055), 6.0);
+        float cool = pow(0.5 + 0.5 * cos(angle - uTime * 0.055 + 3.1416), 9.0);
+        float low = smoothstep(0.42, 0.0, height) * smoothstep(-0.1, 0.03, height);
+        color += uAccent * band * low * 0.12 + vec3(0.25, 0.4, 0.75) * cool * low * 0.05;
         gl_FragColor = vec4(color, 1.0);
       }`,
-  }), [accent]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- accent is live-updated through the uniform
+  }), []);
+  useEffect(() => { material.uniforms.uAccent.value.set(accent); }, [accent, material]);
+  useFrame((state) => { material.uniforms.uTime.value = state.clock.elapsedTime; });
   useEffect(() => () => material.dispose(), [material]);
   return <mesh material={material} frustumCulled={false}><sphereGeometry args={[3400, 32, 16]} /></mesh>;
 };
 
-const Gate = ({ position, quaternion, accent, isActive }) => (
-  <group position={position} quaternion={quaternion}>
+const Gate = ({ position, quaternion, index, registry }) => {
+  const bar = useRef(null);
+  const lamp = useRef(null);
+  const floor = useRef(null);
+  const light = useRef(null);
+  useEffect(() => {
+    const list = registry.current;
+    list[index] = { bar: bar.current, lamp: lamp.current, floor: floor.current, light: light.current };
+    return () => { delete list[index]; };
+  }, [index, registry]);
+
+  return <group position={position} quaternion={quaternion}>
     <mesh position={[-(ROAD_WIDTH / 2 + 5.4), 9.5, 0]}>
       <boxGeometry args={[1.4, 19, 1.4]} />
       <meshStandardMaterial color="#1a1c22" metalness={0.75} roughness={0.4} />
@@ -59,19 +84,19 @@ const Gate = ({ position, quaternion, accent, isActive }) => (
     </mesh>
     <mesh position={[0, 17.9, 1.0]}>
       <boxGeometry args={[ROAD_WIDTH + 11.6, 0.6, 0.12]} />
-      <meshBasicMaterial color={accent} toneMapped={false} />
+      <meshBasicMaterial ref={bar} toneMapped={false} />
     </mesh>
     <mesh position={[0, 19.4, -1.0]}>
       <boxGeometry args={[6, 1.6, 0.1]} />
-      <meshBasicMaterial color={isActive ? accent : "#3a3d45"} toneMapped={false} />
+      <meshBasicMaterial ref={lamp} toneMapped={false} />
     </mesh>
-    <pointLight position={[0, 15, 0]} distance={70} intensity={isActive ? 130 : 55} color={accent} />
+    <pointLight ref={light} position={[0, 15, 0]} distance={70} intensity={55} />
     <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[ROAD_WIDTH, 2.6]} />
-      <meshBasicMaterial color={accent} transparent opacity={isActive ? 0.85 : 0.35} toneMapped={false} />
+      <meshBasicMaterial ref={floor} transparent opacity={0.35} depthWrite={false} toneMapped={false} />
     </mesh>
-  </group>
-);
+  </group>;
+};
 
 const RaceCar = ({ innerRef, accent }) => (
   <group ref={innerRef} scale={2.6}>
@@ -111,7 +136,11 @@ const RaceCar = ({ innerRef, accent }) => (
     ))}
     <mesh position={[0, 0.55, -1.65]}>
       <boxGeometry args={[0.22, 0.12, 0.05]} />
-      <meshBasicMaterial color="#ff2d1a" toneMapped={false} />
+      <meshBasicMaterial color={glow("#ff2d1a", 1.4)} toneMapped={false} />
+    </mesh>
+    <mesh position={[0, 0.36, 2.55]}>
+      <boxGeometry args={[1.6, 0.05, 0.04]} />
+      <meshBasicMaterial color={glow("#dfe9ff", 1.5)} toneMapped={false} />
     </mesh>
     <pointLight position={[0, 2.4, 0]} distance={150} intensity={900} color="#e8f0ff" />
     <pointLight position={[0, 1.4, 14]} distance={120} intensity={620} color="#dfe9ff" />
@@ -122,12 +151,36 @@ const RaceCar = ({ innerRef, accent }) => (
     </mesh>
     <mesh position={[0, 0.05, 0.2]} rotation={[-Math.PI / 2, 0, 0]}>
       <circleGeometry args={[3.4, 24]} />
-      <meshBasicMaterial color={accent} transparent opacity={0.22} depthWrite={false} toneMapped={false} />
+      <meshBasicMaterial color={glow(accent, 0.7)} transparent opacity={0.22} depthWrite={false} toneMapped={false} />
     </mesh>
   </group>
 );
 
-const Scenery = ({ curve, accent }) => {
+const FloodLight = ({ position, index, registry, withLight }) => {
+  const head = useRef(null);
+  const light = useRef(null);
+  useEffect(() => {
+    const list = registry.current;
+    list[index] = { head: head.current, light: light.current, seed: index * 1.37 };
+    return () => { delete list[index]; };
+  }, [index, registry]);
+
+  return <group position={position}>
+    <mesh position={[0, 15, 0]}><cylinderGeometry args={[0.45, 0.75, 30, 6]} /><meshStandardMaterial color="#191a1f" metalness={0.6} roughness={0.5} /></mesh>
+    <mesh position={[0, 30.6, 0]}><boxGeometry args={[6, 1.6, 1]} /><meshBasicMaterial ref={head} toneMapped={false} /></mesh>
+    <mesh position={[0, 16, 0]} rotation={[Math.PI, 0, 0]}>
+      <coneGeometry args={[20, 31, 20, 1, true]} />
+      <meshBasicMaterial color="#a9c4ff" transparent opacity={0.045} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
+    </mesh>
+    <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <circleGeometry args={[42, 28]} />
+      <meshBasicMaterial color="#a8c4ff" transparent opacity={0.3} depthWrite={false} toneMapped={false} />
+    </mesh>
+    {withLight && <pointLight ref={light} position={[0, 27, 0]} distance={190} intensity={420} color="#cfe0ff" />}
+  </group>;
+};
+
+const Scenery = ({ curve, accent, lampRegistry }) => {
   const props = useMemo(() => {
     const stands = [];
     const lights = [];
@@ -161,31 +214,26 @@ const Scenery = ({ curve, accent }) => {
     return { stands, lights };
   }, [curve]);
 
+  const ledStrip = useMemo(() => glow(accent, 1.0), [accent]);
+
   return <group>
     {props.stands.map(({ key, position, rotation }) => <group key={key} position={position} rotation={rotation}>
       <mesh><boxGeometry args={[118, 18, 32]} /><meshStandardMaterial color="#191b21" roughness={0.85} /></mesh>
       <mesh position={[0, 11, 0]}><boxGeometry args={[122, 2.4, 36]} /><meshStandardMaterial color="#101218" roughness={0.9} /></mesh>
-      <mesh position={[0, 2.8, 16.4]}><boxGeometry args={[112, 8, 0.4]} /><meshBasicMaterial color={accent} transparent opacity={0.16} toneMapped={false} /></mesh>
+      <mesh position={[0, 2.8, 16.4]}><boxGeometry args={[112, 8, 0.4]} /><meshBasicMaterial color={accent} transparent opacity={0.12} toneMapped={false} /></mesh>
+      <mesh position={[0, 12.4, 18.2]}><boxGeometry args={[116, 0.35, 0.2]} /><meshBasicMaterial color={ledStrip} toneMapped={false} /></mesh>
     </group>)}
-    {props.lights.map(({ key, position }, index) => <group key={key} position={position}>
-      <mesh position={[0, 15, 0]}><cylinderGeometry args={[0.45, 0.75, 30, 6]} /><meshStandardMaterial color="#191a1f" metalness={0.6} roughness={0.5} /></mesh>
-      <mesh position={[0, 30.6, 0]}><boxGeometry args={[6, 1.6, 1]} /><meshBasicMaterial color="#eef3ff" toneMapped={false} /></mesh>
-      <mesh position={[0, 16, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[20, 31, 20, 1, true]} />
-        <meshBasicMaterial color="#a9c4ff" transparent opacity={0.045} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
-      </mesh>
-      <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[42, 28]} />
-        <meshBasicMaterial color="#a8c4ff" transparent opacity={0.3} depthWrite={false} toneMapped={false} />
-      </mesh>
-      {index % 2 === 0 && <pointLight position={[0, 27, 0]} distance={190} intensity={420} color="#cfe0ff" />}
-    </group>)}
+    {props.lights.map(({ key, position }, index) => <FloodLight key={key} position={position} index={index} registry={lampRegistry} withLight={index % 2 === 0} />)}
   </group>;
 };
 
-const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial }) => {
+/**
+ * Camera director. Overview = manual/idle orbit around the track centre; chase = behind the car with
+ * speed lag, acceleration dip and banking. The two are joined by a bezier swoop rather than a straight lerp.
+ */
+const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial, orbitRef, lifeRef }) => {
   const { camera, size } = useThree();
-  const smooth = useRef({ progress: 0, follow: 0 });
+  const smooth = useRef({ progress: 0, follow: 0, speed: 0, accel: 0, prevProgress: 0, overviewToken: 0 });
   const scratch = useMemo(() => ({
     point: new THREE.Vector3(),
     tangent: new THREE.Vector3(),
@@ -194,38 +242,84 @@ const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial }) =>
     chasePos: new THREE.Vector3(),
     chaseLook: new THREE.Vector3(),
     overviewPos: new THREE.Vector3(),
-    overviewLook: new THREE.Vector3(),
+    control: new THREE.Vector3(),
+    controlLook: new THREE.Vector3(),
     look: new THREE.Vector3(),
     marker: new THREE.Vector3(),
     carLook: new THREE.Vector3(),
+    delta: new THREE.Vector3(),
   }), []);
+  const base = useMemo(() => {
+    const fit = (radius * 0.82) / Math.tan(THREE.MathUtils.degToRad(18));
+    const look = new THREE.Vector3(0, radius * 0.02, -radius * 0.05);
+    const offset = new THREE.Vector3(0, fit * 0.5, fit * 0.88).sub(look);
+    const dist = offset.length();
+    return { look, dist, el: Math.asin(offset.y / dist) };
+  }, [radius]);
 
-  useFrame((state, delta) => {
+  useFrame((state, rawDelta) => {
+    const delta = Math.min(rawDelta, 0.05);
     const travel = window.__spatialDebug || travelRef.current;
-    const step = Math.min(1, delta * 7);
-    smooth.current.progress += (travel.progress - smooth.current.progress) * step;
-    smooth.current.follow += (travel.follow - smooth.current.follow) * Math.min(1, delta * 3.4);
-    const t = THREE.MathUtils.clamp(smooth.current.progress, 0, 0.9999);
-    const follow = easeInOut(THREE.MathUtils.clamp(smooth.current.follow, 0, 1));
+    const orbit = orbitRef.current;
+    const life = lifeRef.current;
+    const time = state.clock.elapsedTime;
+    const s = smooth.current;
+
+    const resumed = rawDelta > 0.25;
+    if (travel.overviewToken !== s.overviewToken) {
+      s.overviewToken = travel.overviewToken;
+      if (resumed) s.follow = 1;
+      curve.getPointAt(clamp(travel.progress, 0, 0.9999), scratch.point);
+      resetOrbit(orbit, Math.atan2(scratch.point.x - base.look.x, scratch.point.z - base.look.z), 0);
+    } else if (resumed) {
+      s.follow = travel.follow;
+    }
+    if (!travel.visible) resetOrbit(orbit, 0, Infinity);
+
+    s.progress += (travel.progress - s.progress) * Math.min(1, delta * 7);
+    s.follow = moveToward(s.follow, travel.follow, delta / FOLLOW_DURATION);
+    const t = clamp(s.progress, 0, 0.9999);
+    const follow = easeInOut(clamp(s.follow, 0, 1));
+
+    const instantSpeed = (s.progress - s.prevProgress) / Math.max(delta, 1e-4);
+    s.prevProgress = s.progress;
+    const previousSpeed = s.speed;
+    s.speed += (instantSpeed - s.speed) * Math.min(1, delta * 6);
+    s.accel += ((s.speed - previousSpeed) / Math.max(delta, 1e-4) - s.accel) * Math.min(1, delta * 4);
+    const speedNorm = clamp(Math.abs(s.speed) * 9, 0, 1);
 
     curve.getPointAt(t, scratch.point);
     curve.getTangentAt(t, scratch.tangent).normalize();
     curve.getTangentAt(Math.min(0.9999, t + 0.006), scratch.ahead).normalize();
     scratch.side.crossVectors(scratch.tangent, UP).normalize();
-    const bank = THREE.MathUtils.clamp(scratch.ahead.clone().sub(scratch.tangent).dot(scratch.side) * 9, -0.24, 0.24);
+    const bank = clamp(scratch.delta.copy(scratch.ahead).sub(scratch.tangent).dot(scratch.side) * 9, -0.24, 0.24);
 
-    scratch.chasePos.copy(scratch.point).addScaledVector(scratch.tangent, -22).addScaledVector(UP, 7.2).addScaledVector(scratch.side, bank * 5);
+    const lag = 22 + speedNorm * 8;
+    const dip = clamp(-s.accel * 5, -1.5, 1.2);
+    scratch.chasePos.copy(scratch.point).addScaledVector(scratch.tangent, -lag).addScaledVector(UP, 7.2 + dip).addScaledVector(scratch.side, bank * 5.5);
     scratch.chaseLook.copy(scratch.point).addScaledVector(scratch.tangent, 34).addScaledVector(UP, 2.2);
-    const drift = state.clock.elapsedTime * 0.05;
-    const fit = (radius * 0.82) / Math.tan(THREE.MathUtils.degToRad(18));
-    scratch.overviewPos.set(Math.sin(drift) * radius * 0.12, fit * 0.5, fit * 0.88 + Math.cos(drift) * radius * 0.05);
-    scratch.overviewLook.set(0, radius * 0.02, -radius * 0.05);
 
-    camera.position.lerpVectors(scratch.overviewPos, scratch.chasePos, follow);
-    scratch.look.lerpVectors(scratch.overviewLook, scratch.chaseLook, follow);
+    const framing = stepOrbit(orbit, delta, time, base.el, !life.reduced);
+    const portrait = Math.max(1, Math.pow(size.height / Math.max(1, size.width), 0.75));
+    const dist = base.dist * framing.zoom * portrait;
+    const flat = Math.cos(framing.el) * dist;
+    scratch.overviewPos.set(base.look.x + Math.sin(framing.az) * flat, base.look.y + Math.sin(framing.el) * dist, base.look.z + Math.cos(framing.az) * flat);
+
+    const sideSign = Math.sign(scratch.delta.copy(scratch.overviewPos).sub(scratch.chasePos).dot(scratch.side)) || 1;
+    const span = scratch.overviewPos.distanceTo(scratch.chasePos);
+    scratch.control.lerpVectors(scratch.overviewPos, scratch.chasePos, 0.5).addScaledVector(scratch.side, -sideSign * Math.min(radius * 0.3, span * 0.35));
+    scratch.control.y = scratch.chasePos.y + (scratch.overviewPos.y - scratch.chasePos.y) * 0.22;
+    scratch.controlLook.copy(scratch.point).addScaledVector(UP, 2.5);
+
+    quadBezier(camera.position, scratch.overviewPos, scratch.control, scratch.chasePos, follow);
+    quadBezier(scratch.look, base.look, scratch.controlLook, scratch.chaseLook, follow);
+    if (!life.reduced && follow > 0) {
+      const shake = speedNorm * 0.35 * follow;
+      camera.position.addScaledVector(scratch.side, Math.sin(time * 17.3) * shake).addScaledVector(UP, Math.sin(time * 23.1) * shake * 0.6);
+    }
     camera.lookAt(scratch.look);
-    camera.rotation.z += bank * 0.55 * follow;
-    const fov = THREE.MathUtils.lerp(36, 64, follow);
+    camera.rotation.z += bank * 0.55 * follow - Math.sin(follow * Math.PI) * 0.09 * sideSign;
+    const fov = THREE.MathUtils.lerp(36, 64, follow) + Math.sin(follow * Math.PI) * 6;
     if (Math.abs(camera.fov - fov) > 0.02) {
       camera.fov = fov;
       camera.updateProjectionMatrix();
@@ -241,8 +335,12 @@ const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial }) =>
 
     if (racingMaterial) {
       racingMaterial.uniforms.uProgress.value = travel.coverage;
-      racingMaterial.uniforms.uTime.value = state.clock.elapsedTime;
+      racingMaterial.uniforms.uTime.value = time;
     }
+
+    life.follow = follow;
+    life.speed = speedNorm;
+    life.t = t;
 
     const labels = labelRefs.current;
     for (let index = 0; index < CIRCUIT_CHAPTERS.length; index += 1) {
@@ -262,8 +360,10 @@ const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial }) =>
   return null;
 };
 
-const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, worldRef }) => {
+const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, orbitRef, lifeRef, quality }) => {
   const carRef = useRef(null);
+  const gateRegistry = useRef([]);
+  const lampRegistry = useRef([]);
   const world = useMemo(() => {
     const { curve, radius } = buildCircuit();
     return {
@@ -280,7 +380,6 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, worldRef }) => 
       barrierRight: buildWall(curve, { offset: RUNOFF_WIDTH / 2 + 4, height: 3.4 }),
     };
   }, []);
-  worldRef.current = world;
 
   const textures = useMemo(() => ({
     asphalt: asphaltTexture(),
@@ -295,7 +394,7 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, worldRef }) => 
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
-    uniforms: { uProgress: { value: 0 }, uTime: { value: 0 }, uColor: { value: new THREE.Color(accent) } },
+    uniforms: { uProgress: { value: 0 }, uTime: { value: 0 }, uColor: { value: glow(accent, 0.55) } },
     vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
     fragmentShader: `
       varying vec2 vUv;
@@ -305,15 +404,20 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, worldRef }) => 
       void main() {
         float reveal = smoothstep(uProgress + 0.003, uProgress - 0.012, vUv.y);
         float core = 1.0 - smoothstep(0.12, 0.95, abs(vUv.x - 0.5) * 2.0);
-        float pulse = 0.78 + 0.22 * sin(vUv.y * 420.0 - uTime * 2.4);
-        float alpha = (0.16 + 0.84 * reveal) * core * pulse;
+        float pulse = 0.82 + 0.18 * sin(vUv.y * 420.0 - uTime * 2.4);
+        float head = fract(uTime * 0.045);
+        float packet = exp(-fract(head - vUv.y) * 70.0) + 0.6 * exp(-fract(head + 0.5 - vUv.y) * 70.0);
+        packet *= 0.25 + 0.75 * reveal;
+        float alpha = (0.16 + 0.84 * reveal) * core * pulse + packet * core * 0.9;
         if (alpha < 0.015) discard;
-        gl_FragColor = vec4(uColor * (0.9 + 0.95 * reveal), alpha);
+        vec3 color = uColor * (0.9 + 1.1 * reveal) + uColor * packet * 4.0;
+        gl_FragColor = vec4(color, min(alpha, 1.0));
       }`,
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- accent is live-updated through the uniform
   }), []);
 
   useEffect(() => {
-    racingMaterial.uniforms.uColor.value.set(accent);
+    racingMaterial.uniforms.uColor.value.copy(glow(accent, 0.55));
   }, [accent, racingMaterial]);
 
   useEffect(() => () => {
@@ -341,6 +445,8 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, worldRef }) => 
     const quaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), tangent.clone().normalize());
     return { position: point.clone().setY(point.y + 0.08), quaternion };
   }, [world]);
+
+  const activeIndex = CIRCUIT_CHAPTERS.findIndex((chapter) => chapter.key === activeKey);
 
   return <>
     <color attach="background" args={["#05060b"]} />
@@ -377,10 +483,15 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, worldRef }) => 
       </mesh>
     </group>
 
-    <Scenery curve={world.curve} accent={accent} />
-    {gates.map((gate) => <Gate key={gate.key} position={gate.position} quaternion={gate.quaternion} accent={accent} isActive={activeKey === gate.key} />)}
+    <Scenery curve={world.curve} accent={accent} lampRegistry={lampRegistry} />
+    {gates.map((gate, index) => <Gate key={gate.key} position={gate.position} quaternion={gate.quaternion} index={index} registry={gateRegistry} />)}
     <RaceCar innerRef={carRef} accent={accent} />
-    <Rig curve={world.curve} radius={world.radius} travelRef={travelRef} labelRefs={labelRefs} carRef={carRef} racingMaterial={racingMaterial} />
+    <Rig curve={world.curve} radius={world.radius} travelRef={travelRef} labelRefs={labelRefs} carRef={carRef} racingMaterial={racingMaterial} orbitRef={orbitRef} lifeRef={lifeRef} />
+    <GateCascade registry={gateRegistry} accent={accent} activeIndex={activeIndex} />
+    <FloodFlicker registry={lampRegistry} />
+    {!quality.reduced && <Motes curve={world.curve} accent={accent} count={quality.motes} />}
+    {!quality.reduced && <CarTrail curve={world.curve} accent={accent} lifeRef={lifeRef} />}
+    {quality.effects && <CircuitEffects lifeRef={lifeRef} quality={quality} />}
   </>;
 };
 
@@ -395,7 +506,7 @@ const WarmUp = ({ onReady }) => {
     const frame = requestAnimationFrame(() => {
       try {
         gl.compile(scene, camera);
-        advance(performance.now());
+        advance(performance.now() / 1000);
       } catch { /* best effort: readiness still reported */ }
       if (!cancelled) onReady?.();
     });
@@ -405,19 +516,48 @@ const WarmUp = ({ onReady }) => {
   return null;
 };
 
-export const CircuitStage = ({ accent = "#e10600", activeKey, onSelect, paused, travelRef, onReady }) => {
-  const labelRefs = useRef([]);
-  const worldRef = useRef(null);
+const detectQuality = () => {
+  const mobile = window.matchMedia("(max-width: 850px), (pointer: coarse)").matches;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return {
+    mobile,
+    reduced,
+    effects: !reduced,
+    msaa: mobile ? 2 : 4,
+    bloomScale: mobile ? 0.5 : 0.75,
+    levels: mobile ? 4 : 6,
+    aberration: !mobile,
+    motes: mobile ? 220 : 520,
+    dpr: mobile ? [1, 1.25] : [1, 1.6],
+  };
+};
 
-  return <div className="circuit-3d" data-testid="silverstone-circuit-map">
+export const CircuitStage = ({ accent = "#e10600", activeKey, onSelect, paused, travelRef, onReady, orbitable = false }) => {
+  const labelRefs = useRef([]);
+  const wrapperRef = useRef(null);
+  const orbitRef = useRef(createOrbit());
+  const enabledRef = useRef(orbitable);
+  const quality = useMemo(detectQuality, []);
+  const lifeRef = useRef({ follow: 0, speed: 0, t: 0, reduced: quality.reduced });
+  enabledRef.current = orbitable;
+  const { touched, handlers } = useOrbitGestures({ orbitRef, travelRef, enabledRef, wrapperRef });
+
+  return <div
+    ref={wrapperRef}
+    className="circuit-3d"
+    data-testid="silverstone-circuit-map"
+    data-orbitable={orbitable ? "true" : "false"}
+    data-cursor={orbitable ? "drag" : "none"}
+    {...handlers}
+  >
     <Canvas
       className="circuit-3d-canvas"
       frameloop={paused ? "never" : "always"}
-      dpr={[1, 1.6]}
-      gl={{ antialias: true, powerPreference: "high-performance", alpha: false, toneMapping: THREE.NoToneMapping }}
+      dpr={quality.dpr}
+      gl={{ antialias: !quality.effects, powerPreference: "high-performance", alpha: false, toneMapping: THREE.NoToneMapping }}
       camera={{ fov: 36, near: 1, far: 6000, position: [0, 900, 900] }}
     >
-      <CircuitWorld accent={accent} activeKey={activeKey} travelRef={travelRef} labelRefs={labelRefs} worldRef={worldRef} />
+      <CircuitWorld accent={accent} activeKey={activeKey} travelRef={travelRef} labelRefs={labelRefs} orbitRef={orbitRef} lifeRef={lifeRef} quality={quality} />
       <WarmUp onReady={onReady} />
     </Canvas>
     <div className="circuit-3d-labels" aria-hidden={paused ? "true" : "false"}>
@@ -436,6 +576,10 @@ export const CircuitStage = ({ accent = "#e10600", activeKey, onSelect, paused, 
         </span>
         <i className="circuit-pin-stem" aria-hidden="true" />
       </button>)}
+    </div>
+    <div className={`circuit-orbit-hint ${orbitable && !touched ? "is-visible" : ""}`} data-testid="circuit-orbit-hint" aria-hidden="true">
+      <MoveHorizontal size={13} strokeWidth={1.6} />
+      <span>{quality.mobile ? "DRAG TO ORBIT · PINCH TO ZOOM" : "DRAG TO ORBIT · CTRL + SCROLL TO ZOOM"}</span>
     </div>
   </div>;
 };

@@ -51,7 +51,7 @@ const nearestRoute = (value) => SPATIAL_ROUTE.reduce((nearest, route) => (
 
 export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme, onRouteChange, onCircuitReady, revealed = true }) => {
   const runway = useRef(null);
-  const travelRef = useRef({ progress: 0, follow: 0, coverage: 0 });
+  const travelRef = useRef({ progress: 0, follow: 0, coverage: 0, visible: false, dragging: false, overviewToken: 0 });
 
   const activeRef = useRef("top");
   const overviewRef = useRef(false);
@@ -89,6 +89,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
     travel.progress = getPathProgress(value);
     travel.follow = overviewRef.current ? 0 : clamp((value - CIRCUIT_HUB.stop) / 0.05, 0, 1);
     travel.coverage = value <= CIRCUIT_HUB.stop ? 0 : clamp(getPathProgress(value) / finalPathPosition, 0, 1);
+    travel.visible = value > 0.09;
   }, []);
 
   const mountChapter = useCallback((key) => {
@@ -289,6 +290,10 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
     const onTouchMove = (event) => {
       const touch = event.touches[0];
       if (touchStart === null || !touch) return;
+      if (travelRef.current.dragging) {
+        event.preventDefault();
+        return;
+      }
       const delta = touchStart.y - touch.clientY;
       const horizontal = Math.abs(touch.clientX - touchStart.x);
       if (event.target?.closest?.(".menu-panel")) return;
@@ -346,6 +351,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   };
   const openCircuitOverview = () => {
     overviewRef.current = true;
+    travelRef.current.overviewToken += 1;
     setIsCircuitOverview(true);
     updateCamera(scrollYProgress.get());
   };
@@ -357,6 +363,8 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   const chapterMarker = chapterMarkers[activeKey];
   const showJourneyHud = isCircuitOverview || isTraveling || activeKey === "circuit";
   const isSceneIdle = !isTraveling && !isCircuitOverview && activeKey !== "circuit";
+  const circuitPaused = isSceneIdle || (activeKey === "top" && !isTraveling);
+  const orbitable = isCircuitOverview || (activeKey === "circuit" && !isTraveling);
 
   return <section ref={runway} className="circuit-runway" data-testid="unified-spatial-experience">
     <div
@@ -368,7 +376,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       data-testid="circuit-spatial-viewport"
     >
       <motion.div className="circuit-map-layer" style={{ opacity: mapOpacity }} data-testid="circuit-map-layer">
-        <CircuitStage accent={TEAM_ACCENTS[teamTheme] || TEAM_ACCENTS.ferrari} activeKey={displayKey} onSelect={navigate} paused={isSceneIdle} travelRef={travelRef} onReady={onCircuitReady} />
+        <CircuitStage accent={TEAM_ACCENTS[teamTheme] || TEAM_ACCENTS.ferrari} activeKey={displayKey} onSelect={navigate} paused={circuitPaused} travelRef={travelRef} onReady={onCircuitReady} orbitable={orbitable} />
         <motion.div className="circuit-hub-copy" style={{ opacity: isCircuitOverview ? 1 : hubCopyOpacity }} data-testid="circuit-hub-copy">
           <span>THE HOME CIRCUIT / 52.0786° N</span>
           <h2>SILVERSTONE</h2>
