@@ -1,0 +1,9 @@
+/* Theme paint-sweep: the new colour world grows out of the pressed brand mark. */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+::view-transition-old(root){z-index:1}
+::view-transition-new(root){z-index:2;animation:theme-sweep .82s cubic-bezier(.22,.8,.2,1) both}
+@keyframes theme-sweep{from{clip-path:circle(0px at var(--sweep-x,50%) var(--sweep-y,50%))}to{clip-path:circle(165vmax at var(--sweep-x,50%) var(--sweep-y,50%))}}
+.theme-sweep-wave{position:fixed;z-index:400;left:var(--sweep-x,50%);top:var(--sweep-y,50%);width:0;height:0;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.95),0 0 46px 16px rgba(var(--accent-rgb),.32),inset 0 0 90px rgba(var(--accent-rgb),.22);animation:theme-wave .82s cubic-bezier(.22,.8,.2,1) both}
+.theme-sweep-wave.is-wash{background:rgba(var(--accent-rgb),.2);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.85),0 0 60px 20px rgba(var(--accent-rgb),.25)}
+@keyframes theme-wave{from{width:0;height:0;opacity:1}72%{opacity:1}to{width:330vmax;height:330vmax;opacity:0}}
+@media(prefers-reduced-motion:reduce){::view-transition-new(root){animation:none}.theme-sweep-wave{display:none}}

@@ -329,6 +329,16 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Iteration 44 passed all core interaction, value, route, accessibility, reduced-motion, and mobile checks; fixed its only reported issue with a dedicated 851–1200px layout that prevents dial/specification overlap at 1024x768
 - JavaScript lint and production build pass; no APIs or flows are mocked
 
+## Connective-Tissue Design Batch — Lights-Out, Cursor, Paint-Sweep, Wayfinding — 2026-09-02
+- Workspace recovery: the working tree was found empty (415 files staged as deleted); restored from git HEAD, recreated the git-ignored frontend/backend .env files (preview URL from supervisor config, local Mongo), reinstalled deps
+- Design audit verdict: set-piece chapters are master-level; the gaps were the connective tissue (cold start, cursor, theme gesture, wayfinding) and four flat chapters (Milestones, Tracks, Voices, Victories) — user picked the connective-tissue batch first
+- A · Lights-Out cold start (`components/LightsOut.jsx`, `lib/boot.js`): five-column F1 start gantry, each column tied to a real readiness signal (typefaces via document.fonts, hero PNG decode, archive fetch capped 2.6s, WebGL circuit first-frame/compile via `WarmUp` in CircuitStage, systems beat) with a 430ms minimum cadence measured from the previous light; randomised 300–1100ms hold; lights out; black stage lifts with a team-colour curtain lagging 100ms; hero entrance animations gated by `revealed`; scroll steps blocked while `html[data-booting]`; once per session (sessionStorage `hamilton-booted`), then a ~0.5s micro fade; reduced motion = plain fade; any key/pointer skips
+- B · Telemetry cursor (`components/TelemetryCursor.jsx`): 6px team dot + spring-lagged hairline ring; docks onto small interactive elements as a rounded frame; modes drag (vault canvas, reactor dial), prev/next (gallery halves), cross (hero hotspots), chip with chapter number (circuit pins); re-reads context every 450ms so travel under a still pointer stays correct; pointer-fine only, hidden for touch/reduced motion; root flag is `data-cursor-mode` (not `data-cursor`, which is the hook attribute)
+- C · Theme paint-sweep (`lib/themeTransition.js`): View Transitions API clip-path circle from the pressed brand mark (old world outside, new inside) + a shockwave ring element; translucent wash fallback; reduced motion = instant; all theme changes (switcher, hero arrows/swipe) route through `changeTeamTheme` in App
+- D · Wayfinding instrument (`components/LapCounter.jsx`, `Nav.jsx`, `lib/wayfinding.js`): nav right slot morphs from 7× WORLD CHAMPION (hero) to SECTOR xx / 11 with eleven ticks (hover names, click travels, sweep + target while travelling); idle 6s cue "NEXT · 04 GALLERY" (or "SCROLL TO CONTINUE" on gallery/legacy) that retires after 3 learned gesture steps (localStorage `hamilton-wayfinding-steps`); EXPLORE menu now lists all 11 chapters in a 2-column editorial grid with number, teaser, colour-world swatch, current marker, Escape to close; SpatialExperience publishes `{activeKey,targetKey,isTraveling,isCircuitOverview}` via `onRouteChange` and exposes `window.__spatialStep`
+- Bug fix: mobile Victories rows were hiding race/date/circuit via an old `.victory-row>span:not(.win-number)` rule; rows now show number · date · race+circuit · POLE/FL chips at 390px with no overflow
+- Screenshot note: headless WebGL screenshots can return black frames (ReadPixels stall) — verify via DOM state
+
 ## Prioritized Backlog
 ### P0
 - None; the Timeline crowding, incomplete season detail, PC lag, and reduced-motion deep-link race are resolved and verified
@@ -348,7 +358,8 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Add image attribution and editorial source notes page
 
 ## Next Tasks
-1. Select the next chapter for page-by-page monumental redesign
+1. Remaining master-level design proposals (user-approved list): E synthesized opt-in sound layer; F chapter elevations — F1 Milestones "Lap Chart", F2 Tracks "Atlas" with real circuit geometry, F3 Voices "Team Radio", F4 Victories "Timing Tower"; G typographic floor (10px minimum for mono labels)
+2. Select the next chapter for page-by-page monumental redesign
 2. Multi-minute Silverstone camera soak test and performance profiling
 3. Modularize the circuit camera calculations without altering the verified path
 4. Complete remaining authentic season-photo mappings

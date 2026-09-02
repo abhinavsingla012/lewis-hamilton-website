@@ -384,7 +384,28 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, worldRef }) => 
   </>;
 };
 
-export const CircuitStage = ({ accent = "#e10600", activeKey, onSelect, paused, travelRef }) => {
+/**
+ * Boot warm-up: compiles every shader program and draws one frame while the start lights are
+ * still on, so the first camera travel never stutters on lazy compilation.
+ */
+const WarmUp = ({ onReady }) => {
+  const { gl, scene, camera, advance } = useThree();
+  useEffect(() => {
+    let cancelled = false;
+    const frame = requestAnimationFrame(() => {
+      try {
+        gl.compile(scene, camera);
+        advance(performance.now());
+      } catch { /* best effort: readiness still reported */ }
+      if (!cancelled) onReady?.();
+    });
+    return () => { cancelled = true; cancelAnimationFrame(frame); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+};
+
+export const CircuitStage = ({ accent = "#e10600", activeKey, onSelect, paused, travelRef, onReady }) => {
   const labelRefs = useRef([]);
   const worldRef = useRef(null);
 
@@ -397,6 +418,7 @@ export const CircuitStage = ({ accent = "#e10600", activeKey, onSelect, paused, 
       camera={{ fov: 36, near: 1, far: 6000, position: [0, 900, 900] }}
     >
       <CircuitWorld accent={accent} activeKey={activeKey} travelRef={travelRef} labelRefs={labelRefs} worldRef={worldRef} />
+      <WarmUp onReady={onReady} />
     </Canvas>
     <div className="circuit-3d-labels" aria-hidden={paused ? "true" : "false"}>
       {CIRCUIT_CHAPTERS.map((chapter, index) => <button

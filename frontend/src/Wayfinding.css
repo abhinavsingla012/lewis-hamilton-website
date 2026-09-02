@@ -1,0 +1,51 @@
+/* Wayfinding instrument: nav lap counter + eleven-chapter EXPLORE menu. */
+.nav-instrument-slot{display:flex;align-items:center;justify-content:flex-end;min-height:38px;pointer-events:auto}
+.lap-counter{display:flex;align-items:center;gap:14px;height:38px;padding:0 15px 0 16px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(10,10,11,.66);backdrop-filter:blur(16px);color:#e9e9e4;font:10px "Space Mono";letter-spacing:.12em;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.lc-sector{color:rgba(255,255,255,.55);font-variant-numeric:tabular-nums}
+.lc-ticks{position:relative;display:flex;align-items:flex-end;gap:5px;height:16px}
+.lc-tick{position:relative;display:flex;align-items:flex-end;justify-content:center;width:9px;height:16px;padding:0;border:0;background:none;cursor:pointer}
+.lc-tick i{display:block;width:2px;height:8px;border-radius:1px;background:rgba(255,255,255,.2);transition:height .3s,background-color .3s,box-shadow .3s}
+.lc-tick.is-past i{background:rgba(255,255,255,.5)}
+.lc-tick.is-current i{height:16px;background:var(--acid);box-shadow:0 0 10px rgba(var(--accent-rgb),.85)}
+.lc-tick.is-target i{height:14px;background:var(--acid);animation:lcBlink .55s ease-in-out infinite alternate}
+.lc-tick:hover i,.lc-tick:focus-visible i{height:14px;background:#fff}
+.lc-tick:focus-visible{outline:1px solid var(--acid);outline-offset:3px;border-radius:2px}
+.lc-tip{position:absolute;top:calc(100% + 12px);left:50%;transform:translate(-50%,-4px);padding:5px 8px;border:1px solid rgba(255,255,255,.14);border-radius:4px;background:#0d0d0e;color:#fff;font:9px "Space Mono";letter-spacing:.1em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.lc-tick:hover .lc-tip,.lc-tick:focus-visible .lc-tip{opacity:1;transform:translate(-50%,0)}
+.lc-label{min-width:96px;color:#fff;text-align:left}
+.lc-cue{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--acid);font:inherit;letter-spacing:inherit;cursor:pointer;animation:lcPulse 1.7s ease-in-out infinite}
+.lc-cue svg{animation:lcNudge 1.2s ease-in-out infinite}
+.lap-counter.is-traveling .lc-ticks:after{content:"";position:absolute;inset:-4px -6px;border-radius:6px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.42),transparent) no-repeat;background-size:45% 100%;animation:lcSweep .85s linear infinite;pointer-events:none}
+.lap-counter.is-traveling .lc-label{color:var(--acid)}
+@keyframes lcSweep{from{background-position:-60% 0}to{background-position:160% 0}}
+@keyframes lcBlink{from{opacity:.3}to{opacity:1}}
+@keyframes lcPulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes lcNudge{0%,100%{transform:translateY(-1px)}50%{transform:translateY(2px)}}
+
+/* EXPLORE — all eleven chapters. */
+.menu-panel{overflow:auto}
+.menu-panel nav.menu-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:5vw;row-gap:0;align-content:start}
+.menu-panel nav.menu-grid a{display:grid;grid-template-columns:34px minmax(0,1fr) 12px;grid-template-areas:"num title swatch" "num teaser swatch";align-items:center;column-gap:16px;row-gap:6px;padding:clamp(9px,1.4vh,15px) 0;border-bottom:1px solid color-mix(in srgb,var(--accent-ink) 22%,transparent);font-size:clamp(24px,2.9vw,50px);line-height:1;letter-spacing:-.06em;opacity:0;transform:translateY(14px);animation:menuIn .55s cubic-bezier(.22,1,.36,1) forwards;animation-delay:calc(var(--i) * 40ms);transition:padding-left .3s}
+.menu-panel nav.menu-grid a:hover,.menu-panel nav.menu-grid a:focus-visible,.menu-panel nav.menu-grid a.is-current{padding-left:14px}
+.menu-panel nav.menu-grid a span{grid-area:num;align-self:start;margin-top:.35em;font:700 10px "Space Mono";letter-spacing:.1em;opacity:.72}
+.menu-panel nav.menu-grid a.is-current span:after{content:" ●"}
+.menu-panel nav.menu-grid a strong{grid-area:title;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+.menu-panel nav.menu-grid a small{grid-area:teaser;font:9px "Space Mono";letter-spacing:.14em;text-transform:uppercase;opacity:.68}
+.menu-swatch{grid-area:swatch;align-self:center;width:10px;height:10px;border:1px solid color-mix(in srgb,var(--accent-ink) 35%,transparent);border-radius:50%;background:var(--world)}
+@keyframes menuIn{to{opacity:1;transform:none}}
+
+@media(max-width:1100px){.lc-label{display:none}}
+@media(max-width:850px){
+  .nav-instrument-slot{min-height:32px}
+  .lap-counter{height:30px;padding:0 8px;gap:0;border-color:rgba(255,255,255,.14)}
+  .lc-sector,.lc-label{display:none}
+  .lc-ticks{gap:3px}
+  .lc-tick{width:7px;height:14px}
+  .lc-tick.is-current i{height:14px}
+  .lc-tip{display:none}
+  .menu-panel nav.menu-grid{grid-template-columns:1fr}
+  .menu-panel nav.menu-grid a{grid-template-columns:28px minmax(0,1fr) 10px;font-size:7.6vw;padding:8px 0;row-gap:4px}
+  .menu-panel nav.menu-grid a strong{white-space:normal;line-height:.95}
+  .menu-panel nav.menu-grid a small{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){.lc-tick.is-target i,.lc-cue,.lc-cue svg,.lap-counter.is-traveling .lc-ticks:after{animation:none}.menu-panel nav.menu-grid a{animation:none;opacity:1;transform:none}}

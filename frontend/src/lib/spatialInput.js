@@ -24,6 +24,9 @@ export const consumeChapterStep = (key, direction) => {
   }
 };
 
+/** True when the active chapter owns its own scroll steps (e.g. Gallery slides, Legacy vault). */
+export const hasChapterStep = (key) => stepHandlers.has(key);
+
 export const useChapterStep = (key, isActive, handler) => {
   useEffect(() => {
     if (!isActive) return undefined;

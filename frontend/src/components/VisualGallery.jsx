@@ -58,7 +58,7 @@ export const VisualGallery = ({ isActive, direction: enterDirection = 1 }) => {
   }, [isActive, setGalleryIndex]);
 
   return <section className="gallery-section gallery-v3" style={{ "--issue-bg": activeItem.palette.bg, "--issue-ink": activeItem.palette.ink, "--issue-accent": activeItem.palette.accent }} data-active-mode={activeItem.id} data-gallery-active={isActive ? "true" : "false"} data-testid="visual-gallery-section">
-    <div className="gallery-v3-stage" data-testid="gallery-scroll-container">
+    <div className="gallery-v3-stage" data-cursor="split" data-testid="gallery-scroll-container">
       <div className="gallery-v3-status" aria-live="polite">
         <span data-testid="gallery-collection-label">44 — THE STYLE ARCHIVE</span>
         <span data-testid="gallery-active-category">{activeItem.category}</span>

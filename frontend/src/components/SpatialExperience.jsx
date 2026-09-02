@@ -8,6 +8,7 @@ import { ChapterMarker } from "./ChapterMarker";
 import { ChapterFlair } from "./ChapterFlair";
 import { CIRCUIT_CHAPTERS, CIRCUIT_HUB, SILVERSTONE_PATH, SPATIAL_ROUTE } from "../data/circuitRoute";
 import { canElementScroll, consumeChapterStep } from "../lib/spatialInput";
+import { noteWayfindingStep } from "../lib/wayfinding";
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const chapterKeys = new Set(CIRCUIT_CHAPTERS.map(({ key }) => key));
@@ -48,7 +49,7 @@ const nearestRoute = (value) => SPATIAL_ROUTE.reduce((nearest, route) => (
   Math.abs(route.stop - value) < Math.abs(nearest.stop - value) ? route : nearest
 ), SPATIAL_ROUTE[0]);
 
-export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme }) => {
+export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme, onRouteChange, onCircuitReady, revealed = true }) => {
   const runway = useRef(null);
   const travelRef = useRef({ progress: 0, follow: 0, coverage: 0 });
 
@@ -63,11 +64,17 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   const stepRef = useRef(null);
 
   const [activeKey, setActiveKey] = useState("top");
+  const [targetKey, setTargetKey] = useState("top");
   const [mounted, setMounted] = useState([]);
   const [direction, setDirection] = useState(1);
   const [isTraveling, setIsTraveling] = useState(false);
   const [isCircuitOverview, setIsCircuitOverview] = useState(false);
   const [coverage, setCoverage] = useState(0);
+
+  /** Publishes the route state to the shell (nav lap counter, cursor, sound). */
+  useEffect(() => {
+    onRouteChange?.({ activeKey, targetKey, isTraveling, isCircuitOverview });
+  }, [activeKey, targetKey, isTraveling, isCircuitOverview, onRouteChange]);
 
   const { scrollYProgress } = useScroll({ target: runway, offset: ["start start", "end end"] });
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1]);
@@ -108,6 +115,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
     setDirection(toIndex >= fromIndex ? 1 : -1);
     mountChapter(key);
     targetRef.current = { key, stop: item.stop, top };
+    setTargetKey(key);
 
     const token = tokenRef.current + 1;
     tokenRef.current = token;
@@ -220,6 +228,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   useEffect(() => {
     const step = (dir) => {
       if (travelingRef.current) return;
+      if (document.documentElement.dataset.booting === "true") return;
       if (overviewRef.current) {
         overviewRef.current = false;
         setIsCircuitOverview(false);
@@ -230,10 +239,12 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       const index = ROUTE_INDEX.get(activeRef.current) ?? 0;
       const next = SPATIAL_ROUTE[index + dir];
       if (!next) return;
+      noteWayfindingStep();
       window.history.replaceState(null, "", `#route-${next.key}`);
       goTo(next.key);
     };
     stepRef.current = step;
+    window.__spatialStep = step;
 
     let wheelTotal = 0;
     let wheelReset = 0;
@@ -313,6 +324,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
     window.addEventListener("keydown", onKeyDown);
     return () => {
       window.clearTimeout(wheelReset);
+      if (window.__spatialStep === step) delete window.__spatialStep;
       window.removeEventListener("wheel", onWheel, { capture: true });
       window.removeEventListener("touchstart", onTouchStart, { capture: true });
       window.removeEventListener("touchmove", onTouchMove, { capture: true });
@@ -356,7 +368,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       data-testid="circuit-spatial-viewport"
     >
       <motion.div className="circuit-map-layer" style={{ opacity: mapOpacity }} data-testid="circuit-map-layer">
-        <CircuitStage accent={TEAM_ACCENTS[teamTheme] || TEAM_ACCENTS.ferrari} activeKey={displayKey} onSelect={navigate} paused={isSceneIdle} travelRef={travelRef} />
+        <CircuitStage accent={TEAM_ACCENTS[teamTheme] || TEAM_ACCENTS.ferrari} activeKey={displayKey} onSelect={navigate} paused={isSceneIdle} travelRef={travelRef} onReady={onCircuitReady} />
         <motion.div className="circuit-hub-copy" style={{ opacity: isCircuitOverview ? 1 : hubCopyOpacity }} data-testid="circuit-hub-copy">
           <span>THE HOME CIRCUIT / 52.0786° N</span>
           <h2>SILVERSTONE</h2>
@@ -365,7 +377,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
         <a className="circuit-attribution" href="https://github.com/julesr0y/f1-circuits-svg" target="_blank" rel="noreferrer" data-testid="circuit-map-attribution-link">Circuit geometry: Jules Roy / CC BY 4.0 · adapted</a>
       </motion.div>
 
-      <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} teamTheme={teamTheme} setTeamTheme={setTeamTheme} /></motion.div>
+      <motion.div className="circuit-hero-shell" style={{ scale: heroScale, opacity: heroOpacity }}><HeroStage stats={archive?.stats} teamTheme={teamTheme} setTeamTheme={setTeamTheme} revealed={revealed} /></motion.div>
 
       <motion.div className="circuit-ground-bridge" style={{ opacity: bridgeOpacity }} aria-hidden="true" data-testid="circuit-ground-bridge">
         <div className="cgb-pos">

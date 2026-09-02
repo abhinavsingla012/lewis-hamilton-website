@@ -19,7 +19,10 @@ export const TeamThemeSwitcher = ({ theme, onChange }) => <div className="team-t
     data-team={key}
     aria-pressed={theme === key}
     aria-label={`Use ${label} color theme`}
-    onClick={() => onChange(key)}
+    onClick={(event) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      onChange(key, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+    }}
     data-testid={`team-theme-${key}-button`}
   >
     <BrandMark team={key} />

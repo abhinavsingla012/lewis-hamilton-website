@@ -53,7 +53,7 @@ export const RecordsMonument = ({ isActive }) => {
     <div className="reactor-top-plate" data-testid="reactor-system-label"><b>UNIT // 44</b><span>FIA ALL-TIME REGISTER</span><i>SYS.ACTIVE</i></div>
     <div className="reactor-live-status" aria-live="polite" data-testid="reactor-live-status">{record.value} — {record.title}. {record.status}. {record.detail}</div>
 
-    <div className="record-reactor-core" ref={reactorRef} tabIndex={0} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} data-testid="reactor-dial" aria-label="Twelve-position record selector">
+    <div className="record-reactor-core" ref={reactorRef} tabIndex={0} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} data-testid="reactor-dial" data-cursor="drag" aria-label="Twelve-position record selector">
       <motion.div className="reactor-gear-ring" animate={{ rotate: activeIndex * -30 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 50, damping: 20 }}/>
       <div className="reactor-bolt-ring" aria-hidden="true">{Array.from({ length: 24 }, (_, index) => <i style={{ "--bolt-angle": `${index * 15}deg` }} key={index}/>)}</div>
       <motion.div className="reactor-selector-arm" animate={{ rotate: activeIndex * 30 + 180 }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 58, damping: 18 }} aria-hidden="true"><span/></motion.div>

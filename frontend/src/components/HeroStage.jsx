@@ -3,9 +3,9 @@ import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from
 import { ArrowDownRight, ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
 import { SILVERSTONE_PATH } from "../data/circuitRoute";
 
-const Counter = ({ value, testId }) => {
+const Counter = ({ value, testId, active = true }) => {
   const [display, setDisplay] = useState(0);
-  useEffect(() => { let frame; const start = performance.now(); const from = 0; const tick = (time) => { const p = Math.min(1, (time - start) / 1200); setDisplay(Math.round(from + (value - from) * (1 - Math.pow(1 - p, 3)))); if (p < 1) frame = requestAnimationFrame(tick); }; frame = requestAnimationFrame(tick); return () => cancelAnimationFrame(frame); }, [value]);
+  useEffect(() => { if (!active) { setDisplay(0); return undefined; } let frame; const start = performance.now(); const from = 0; const tick = (time) => { const p = Math.min(1, (time - start) / 1200); setDisplay(Math.round(from + (value - from) * (1 - Math.pow(1 - p, 3)))); if (p < 1) frame = requestAnimationFrame(tick); }; frame = requestAnimationFrame(tick); return () => cancelAnimationFrame(frame); }, [value, active]);
   return <strong data-testid={testId}>{display}</strong>;
 };
 
@@ -92,7 +92,8 @@ const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
 
 const themeIndex = (theme) => Math.max(0, THEME_ORDER.indexOf(theme));
 
-export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
+/** `revealed` gates every entrance animation until the Lights-Out cold start hands over. */
+export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme, revealed = true }) => {
   const layout = LAYOUTS[teamTheme] || LAYOUTS.ferrari;
   const content = ERA_CONTENT[teamTheme] || ERA_CONTENT.ferrari;
   const era = ERA_STATS[teamTheme] || ERA_STATS.ferrari;
@@ -164,9 +165,9 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
     </motion.div>
 
     <div className="hw-title" data-testid="hero-title">
-      <motion.small initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }}>THE DEFINITIVE FAN ARCHIVE / 2007—2025</motion.small>
-      <motion.span initial={{ x: -70, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}>STILL</motion.span>
-      <motion.span initial={{ x: -70, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.85, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}><i>WE</i> RISE</motion.span>
+      <motion.small initial={{ opacity: 0, y: 14 }} animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }} transition={{ delay: 0.2, duration: 0.6 }}>THE DEFINITIVE FAN ARCHIVE / 2007—2025</motion.small>
+      <motion.span initial={{ x: -70, opacity: 0 }} animate={revealed ? { x: 0, opacity: 1 } : { x: -70, opacity: 0 }} transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}>STILL</motion.span>
+      <motion.span initial={{ x: -70, opacity: 0 }} animate={revealed ? { x: 0, opacity: 1 } : { x: -70, opacity: 0 }} transition={{ duration: 0.85, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}><i>WE</i> RISE</motion.span>
     </div>
 
     <div className="hw-side-meta" aria-hidden="true"><span>LH44</span><i /><span>GBR / STEVENAGE</span><i /><span>51.5072° N</span></div>
@@ -193,7 +194,7 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
             exit: (direction) => ({ x: direction * -160, opacity: 0, filter: "blur(14px)", scale: 0.96 }),
           }}
           initial="enter"
-          animate="center"
+          animate={revealed ? "center" : "enter"}
           exit="exit"
           transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
           data-testid="hero-lewis-cutout"
@@ -209,14 +210,14 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
               className={`hw-spot side-${spot.side} ${activeSpot === spot.id ? "is-active" : ""}`}
               style={{ top: spot.top, left: spot.left }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: revealed ? 1 : 0 }}
               transition={{ delay: 0.75 + index * 0.12, duration: 0.5 }}
               onMouseEnter={() => setActiveSpot(spot.id)}
               onMouseLeave={() => setActiveSpot((current) => (current === spot.id ? null : current))}
             >
               <span className="hw-spot-glow" aria-hidden="true" />
-              <button type="button" className="hw-spot-dot" onClick={() => setActiveSpot((current) => (current === spot.id ? null : spot.id))} aria-label={`${spotContent.title} — details`} aria-expanded={activeSpot === spot.id} data-testid={`hero-hotspot-${spot.id}`}><i /></button>
-              <svg className="hw-spot-svg" aria-hidden="true">
+              <button type="button" className="hw-spot-dot" data-cursor="cross" onClick={() => setActiveSpot((current) => (current === spot.id ? null : spot.id))} aria-label={`${spotContent.title} — details`} aria-expanded={activeSpot === spot.id} data-testid={`hero-hotspot-${spot.id}`}><i /></button>
+              <svg key={revealed ? "drawn" : "held"} className="hw-spot-svg" aria-hidden="true">
                 <polyline points={spot.line.map(([x, y]) => `${x},${y}`).join(" ")} pathLength="1" style={{ animationDelay: `${0.85 + index * 0.12}s` }} />
                 <circle cx={elbow[0]} cy={elbow[1]} r="1.6" />
               </svg>
@@ -235,12 +236,12 @@ export const HeroStage = ({ stats, teamTheme = "ferrari", setTeamTheme }) => {
       <motion.div key={`wash-${teamTheme}`} className="hw-wash" initial={{ opacity: 0.5 }} animate={{ opacity: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} aria-hidden="true" />
     </AnimatePresence>
 
-    <motion.div className="hw-stats" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.75 } } }} data-testid="hero-statistics">
+    <motion.div className="hw-stats" initial="hidden" animate={revealed ? "show" : "hidden"} variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.75 } } }} data-testid="hero-statistics">
       <div className="hw-stats-era" data-testid="hero-era-tag">{era.tag}</div>
-      {[[era.wins ?? stats?.wins ?? 105, "GRAND PRIX WINS", "hero-wins-stat"], [era.titles ?? stats?.titles ?? 7, "WORLD TITLES", "hero-titles-stat"], [era.poles ?? stats?.poles ?? 104, "POLE POSITIONS", "hero-poles-stat"]].map(([value, label, testId], index) => <motion.div key={label} variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } }}><span>0{index + 1}</span><Counter value={value} testId={testId} /><small>{label}</small></motion.div>)}
+      {[[era.wins ?? stats?.wins ?? 105, "GRAND PRIX WINS", "hero-wins-stat"], [era.titles ?? stats?.titles ?? 7, "WORLD TITLES", "hero-titles-stat"], [era.poles ?? stats?.poles ?? 104, "POLE POSITIONS", "hero-poles-stat"]].map(([value, label, testId], index) => <motion.div key={label} variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } }}><span>0{index + 1}</span><Counter value={value} testId={testId} active={revealed} /><small>{label}</small></motion.div>)}
     </motion.div>
 
-    <motion.button className="hw-cta" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.6 }} whileHover={{ y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => window.__spatialGo?.("circuit")} data-testid="explore-legacy-button"><span><ArrowDownRight /></span><div><small>ENTER THE SPATIAL ARCHIVE</small><strong>EXPLORE THE LEGACY</strong></div></motion.button>
+    <motion.button className="hw-cta" initial={{ opacity: 0, y: 20 }} animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }} transition={{ delay: 1, duration: 0.6 }} whileHover={{ y: -4 }} whileTap={{ scale: 0.96 }} onClick={() => window.__spatialGo?.("circuit")} data-testid="explore-legacy-button"><span><ArrowDownRight /></span><div><small>ENTER THE SPATIAL ARCHIVE</small><strong>EXPLORE THE LEGACY</strong></div></motion.button>
 
     <div className="hw-swipe-hint" aria-hidden="true" data-testid="hero-swipe-hint"><ChevronLeft size={11} /><span>SWIPE TO SWITCH TEAM</span><ChevronRight size={11} /></div>
 

@@ -101,3 +101,108 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+user_problem_statement: "Still We Rise — Lewis Hamilton fan archive. Current pass: master-level design refinement batch — (A) Lights-Out cold start preloader, (B) Telemetry cursor, (C) Theme paint-sweep, (D) Wayfinding instrument (nav lap counter + eleven-chapter EXPLORE menu + idle NEXT cue) — plus a fix for the mobile Victories rows that showed only number/grid/flag."
+
+frontend:
+  - task: "Mobile Victories rows show race name, circuit, date and POLE/FL chips"
+    implemented: true
+    working: true
+    file: "frontend/src/App.css, frontend/src/Upgrade.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Old rule `.victory-row>span:not(.win-number){display:none}` hid .victory-date/.victory-race at <=850px. Now only .victory-team is hidden; expanded rows use a 42px/56px/1fr/88px grid (number, date, race+circuit, flags). Verify at 390x844 in the Victories chapter (window.__spatialGo('victories',{immediate:true}))."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Tested at 390x844 mobile viewport. All 12 victory rows display correctly: win number visible (#105, #104, etc.), victory date visible with proper width (56px), victory race visible with race names (Belgian, British, Saudi Arabian), victory flags visible. No horizontal overflow (scrollWidth=390, innerWidth=390). Grid layout working perfectly. First row shows: '#105 2024-07-28 Belgian Circuit de Spa-Francorchamps, Belgium Mercedes 344 25'."
+
+  - task: "Lights-Out cold start (preloader gated on real readiness)"
+    implemented: true
+    working: true
+    file: "frontend/src/components/LightsOut.jsx, frontend/src/LightsOut.css, frontend/src/lib/boot.js, frontend/src/App.js, frontend/src/components/HeroStage.jsx, frontend/src/components/CircuitStage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "data-testid=lights-out overlay; five columns (lights-out-light-1..5) light sequentially (~430ms cadence) tied to fonts/imagery/archive/circuit/systems signals; phases boot -> hold -> out -> reveal, then unmounts and sessionStorage hamilton-booted=1 (later loads show a ~0.5s micro fade with no gantry). Skip via lights-out-skip button or any key/pointerdown. Hero entrance animations gated on reveal. Wheel/keys steps are ignored while html[data-booting=true]."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Progressive lighting works correctly (observed intermediate lit counts: 0,1,2,3,4,5 - not all at once). Phase progression observed: boot → hold → out → reveal. Overlay detaches properly. Post-boot state correct: dataset.booting=undefined, sessionStorage='1', data-booted='true', hero title opacity=1, wins stat shows '105'. Micro mode works on reload (gantry absent, quick detach <3s). Skip functionality works (Space key triggers fast detach <3s). Minor: Test encountered a timeout on second reload attempt but functionality is working correctly."
+
+  - task: "Telemetry cursor (pointer-fine only)"
+    implemented: true
+    working: true
+    file: "frontend/src/components/TelemetryCursor.jsx, frontend/src/TelemetryCursor.css"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "data-testid=telemetry-cursor with data-mode default|link|drag|prev|next|cross|chip and data-docked. html[data-cursor-mode=custom] hides the OS cursor. Hooks: gallery stage data-cursor=split, vault canvas + reactor dial data-cursor=drag, hero hotspots data-cursor=cross, circuit pins -> chip with number. Not rendered on touch / reduced motion."
+      - working: "NA"
+        agent: "main"
+        comment: "Fix for testing-agent finding (cursor mounted in 390x844 touch emulation): the component now mounts only after a real mouse/pen pointermove AND (pointer:fine) AND (hover:hover) AND no reduced motion. Touch-only pointermoves never enable it. Expect: before any mouse move dataset.cursorMode is undefined and the element is absent; on desktop it appears after the first mouse move."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE - Telemetry cursor is rendering on MOBILE (touch devices) when it should be hidden. On mobile 390x844: dataset.cursorMode='custom' and telemetry-cursor element exists, but both should be undefined/absent on touch devices. Desktop modes work correctly: default, link (docked), cross, prev, next, chip all function properly with correct labels. Minor: Reactor dial shows 'link' mode instead of 'drag' (may be hovering over child button instead of main dial area)."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Focused re-test of the fix. All three critical scenarios verified: (1) MOBILE (390x844, has_touch=True, is_mobile=True): Cursor correctly absent - dataset.cursorMode=undefined, cursor element=null, media queries confirm pointerFine=false, pointerCoarse=true, hoverHover=false. Touch interactions (tap, touch pointermove) do not trigger cursor. (2) DESKTOP (1920x800): Before mouse move cursor absent (dataset.cursorMode=undefined, element=null). After mouse.move() cursor appears correctly with dataset.cursorMode='custom', data-mode='default', data-hidden='false'. Hover interactions work: menu-toggle-button shows mode='link' docked='true', gallery shows mode='next' with label='NEXT'. (3) REDUCED MOTION (reduced_motion='reduce'): Cursor correctly absent after mouse moves - dataset.cursorMode=undefined, cursor element=null, media query confirms prefers-reduced-motion=true. The fix is working as designed - cursor only mounts after real mouse/pen pointermove on pointer-fine devices without reduced motion."
+
+  - task: "Theme paint-sweep on team switch"
+    implemented: true
+    working: true
+    file: "frontend/src/lib/themeTransition.js, frontend/src/ThemeSweep.css, frontend/src/components/TeamThemeSwitcher.jsx, frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Uses document.startViewTransition with a clip-path circle from the pressed button (fallback: translucent wash). html[data-theme-sweep] is set during the transition and removed after; a .theme-sweep-wave element is appended then removed. Theme still persists to localStorage hamilton-team-theme and hero arrow keys still switch."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Theme paint-sweep animation working. Sweep flag (dataset.themeSweep='true') detected during transition and clears after 1.5s. Wave elements properly removed. localStorage persists correctly ('hamilton-team-theme'='mclaren'). Hero era tag updates correctly ('MCLAREN ERA · 2007—2012'). Arrow key switching works. Minor: Test timing showed theme as 'ferrari' immediately after clicking McLaren button (likely due to animation state or test timing), but localStorage and era tag confirmed correct final state."
+
+  - task: "Wayfinding instrument: nav lap counter, eleven-chapter EXPLORE menu, idle NEXT cue"
+    implemented: true
+    working: true
+    file: "frontend/src/components/LapCounter.jsx, frontend/src/components/Nav.jsx, frontend/src/Wayfinding.css, frontend/src/lib/wayfinding.js, frontend/src/components/SpatialExperience.jsx, frontend/src/lib/spatialInput.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "At hero the nav shows navigation-career-stat (7x WORLD CHAMPION). Inside the archive it shows nav-lap-counter with nav-sector-index (SECTOR 03 / 11), 11 ticks nav-sector-tick-{key} (click travels, hover tooltip), nav-sector-label; while travelling it shows the target. After ~6s idle on a chapter (until 3 gesture steps are learned in localStorage hamilton-wayfinding-steps) nav-next-cue appears (NEXT · 04 GALLERY, or SCROLL TO CONTINUE on gallery/legacy). EXPLORE menu lists all 11 chapters as navigation-{key}-button; Escape closes."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - All wayfinding features working correctly. Hero shows career stat '7× WORLD CHAMPION' (lap counter absent). In chapters: lap counter appears with correct sector index 'SECTOR 03 / 11', sector label 'CARS', exactly 11 ticks present. Cars tick marked as current (is-current=true, aria-current=true), legacy/timeline marked as past. Hover tooltips work ('05 RECORDS' with opacity=1). Click navigation works (gallery tick → data-active='gallery', hash='#route-gallery', sector index updates). Idle cue appears after 7s with correct text 'NEXT · 04 GALLERY' (calls window.__spatialStep(1) as designed). Legacy chapter shows 'SCROLL TO CONTINUE'. EXPLORE menu: all 11 chapter buttons present with numbers/labels/teasers/swatches, menu label correct, Escape closes, navigation works, current chapter marked. Mobile: 11 ticks visible, no horizontal overflow."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.2"
+  test_sequence: 2
+  run_ui: true
+
+test_plan:
+  current_focus: []
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Frontend-only pass; backend untouched. Note for testing: the app boots behind the Lights-Out overlay (~3-4.5s on first load per session) — wait for [data-testid=lights-out] to appear AND then detach before interacting, or click lights-out-skip. window.__spatialGo(key,{immediate:true}) jumps chapters; window.__spatialStep(1) steps. Headless WebGL screenshots can come back black (ReadPixels stall) — not an app bug; rely on DOM state."
+  - agent: "testing"
+    message: "Comprehensive testing completed. CRITICAL ISSUE FOUND: Telemetry cursor is rendering on mobile (touch devices) when it should be hidden. The cursor checks for (pointer: fine) media query but Playwright's mobile emulation may not properly emulate touch-only devices. The component should not render at all on touch devices. Desktop cursor works perfectly. All other features (Mobile Victories, Lights-Out, Wayfinding, Theme paint-sweep) are working correctly. Regression tests pass (wheel scroll, back button work). See detailed test results in status_history for each task."
+  - agent: "testing"
+    message: "✅ FOCUSED RE-TEST COMPLETE - Telemetry cursor fix verified and working correctly. Tested three critical scenarios: (1) Mobile touch-only device (390x844, has_touch=True): cursor correctly absent, media queries confirm touch device (pointerFine=false, pointerCoarse=true), touch interactions do not trigger cursor. (2) Desktop mouse device (1920x800): cursor absent before mouse move, appears correctly after first mouse.move() with proper modes (default, link+docked, next+label). (3) Reduced motion preference: cursor correctly absent even with mouse moves, media query confirms reduced motion active. The fix is working as designed - the cursor only mounts after a real mouse/pen pointermove event on pointer-fine devices without reduced motion preferences. All other features remain working. No regressions detected."
+  - agent: "testing"
+    message: "Iteration 1: mobile Victories fix, Lights-Out cold start, wayfinding instrument + eleven-chapter menu, theme paint-sweep and regressions all PASS. Telemetry cursor initially mounted in touch emulation; main agent gated it on a real mouse pointermove; focused re-test PASS on mobile/touch (absent), desktop (mounts after first mouse move, all modes) and reduced motion (absent)."

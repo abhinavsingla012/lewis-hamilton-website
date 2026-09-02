@@ -614,7 +614,7 @@ export const LegacyVault = ({ isActive, teamTheme = "ferrari" }) => {
 
   return <section id="legacy" className="legacy-section legacy-vault" data-phase={phase} aria-labelledby="legacy-vault-title" data-testid="legacy-section">
     <div className="lv-bg" aria-hidden="true" />
-    <div className="lv-canvas" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={endDrag} onPointerLeave={endDrag} data-testid="legacy-canvas-wrap">
+    <div className="lv-canvas" data-cursor="drag" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={endDrag} onPointerLeave={endDrag} data-testid="legacy-canvas-wrap">
       <Canvas
         camera={{ fov: 42, position: [0, 0, 11], near: 0.1, far: 140 }}
         dpr={[1, 1.6]}
