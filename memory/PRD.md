@@ -516,3 +516,9 @@ Build a modern, dynamic Lewis Hamilton fan website inspired by the supplied Land
 - Pins → `goTo(key, { park: 1 })` (animated dive + park); keyboard uses the same intents with animated travel; menu / deep links / hero CTA open pages directly; chapter-owned steps (Gallery slides, Legacy vault) are consumed first; `land()` now syncs the hash for non-park arrivals
 - `data-driving` on `.circuit-viewport`; chapters hidden while 'moving'/'parked'; ChapterFlair plays when the page opens; lap counter treats parked/moving as in-transit
 - Iteration 53 (testing agent): 100% — scroll-proportional motion with no drift/snap, gate clamping + parking + hint, open on next scroll, reverse parking, pin park-without-open, keyboard open/drive-back, hero handoff, touch drive/park/open, Legacy vault + Gallery slide consumption, overview isolation, menu, drag-orbit, zero console errors
+
+## Gate Approach Cue — 2026-09-03
+- Rig tracks the gate the car is heading to (direction from progress velocity; `APPROACH_RANGE` 0.03 path units) and publishes `life.near` / `life.gateIndex`; parked = fully hot
+- Racing line shader (`uGate`, `uNear`): glowing zone around the gate + run-in bars marching toward it (bloom-bright); GateCascade brightens the target gate's bar/lamp/floor with a beat that quickens as the car closes; RaceCar rain light + rear glow brighten like brake lights
+- Journey HUD: "APPROACHING · <gate>" with an accent proximity meter (framer motion value fed from the drive engine), shown while moving/parked
+- Self-tested via screenshots/DOM (meter fill 0.71 mid-drive, parked state hot); no state-machine changes

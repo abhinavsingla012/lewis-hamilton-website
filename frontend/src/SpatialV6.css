@@ -42,6 +42,28 @@
   transition: opacity .26s ease, transform .4s ease, visibility 0s linear .26s !important;
 }
 
+/* Approach meter: fills as the car closes on the next gate. */
+.circuit-hud .circuit-approach {
+  grid-column: 2;
+  display: block;
+  width: 132px;
+  height: 2px;
+  margin-top: 4px;
+  background: rgba(255, 255, 255, .12);
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.circuit-hud .circuit-approach b {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(var(--accent-rgb), .55), var(--acid));
+  transform-origin: left;
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), .6);
+}
+.circuit-viewport[data-driving="moving"] .circuit-hud .circuit-approach,
+.circuit-viewport[data-driving="parked"] .circuit-hud .circuit-approach { opacity: 1; }
+
 /* Parked at a gate: the car waits for one deliberate scroll before the chapter opens. */
 .circuit-park-hint {
   position: absolute;

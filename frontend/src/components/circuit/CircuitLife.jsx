@@ -155,11 +155,12 @@ export const CarTrail = ({ curve, accent, lifeRef }) => {
 };
 
 /** Start-light cascade running along the gates toward the active chapter, plus the active beacon. */
-export const GateCascade = ({ registry, accent, activeIndex }) => {
+export const GateCascade = ({ registry, accent, activeIndex, lifeRef }) => {
   const palette = useMemo(() => ({ hot: glow(accent, 1.25), dim: new THREE.Color("#3a3d45") }), [accent]);
 
   useFrame((state) => {
     const time = state.clock.elapsedTime;
+    const life = lifeRef.current;
     const last = activeIndex >= 0 ? activeIndex : CIRCUIT_CHAPTERS.length - 1;
     const period = last * CASCADE_GAP + 2.6;
     const phase = time % period;
@@ -169,15 +170,16 @@ export const GateCascade = ({ registry, accent, activeIndex }) => {
       const local = phase - index * CASCADE_GAP;
       const pulse = index <= last && local > 0 ? Math.exp(-local * 3.2) : 0;
       const isActive = index === activeIndex;
-      gate.bar.color.copy(palette.hot).multiplyScalar(0.55 + pulse * 1.2 + (isActive ? 0.6 : 0));
+      const approach = index === life.gateIndex ? life.near : 0;
+      const beat = 0.5 + 0.5 * Math.sin(time * (2.6 + approach * 9));
+      gate.bar.color.copy(palette.hot).multiplyScalar(0.55 + pulse * 1.2 + (isActive ? 0.6 : 0) + approach * (0.6 + beat * 1.2));
       if (isActive) {
-        const beat = 0.5 + 0.5 * Math.sin(time * 4.2);
         gate.lamp.color.copy(palette.hot).multiplyScalar(0.9 + beat * 0.8);
       } else {
-        gate.lamp.color.copy(palette.dim).lerp(palette.hot, pulse);
+        gate.lamp.color.copy(palette.dim).lerp(palette.hot, Math.max(pulse, approach * (0.55 + beat * 0.45)));
       }
-      gate.floor.color.copy(palette.hot).multiplyScalar(0.5);
-      gate.floor.opacity = (isActive ? 0.85 : 0.3) + pulse * 0.45;
+      gate.floor.color.copy(palette.hot).multiplyScalar(0.5 + approach * 0.5);
+      gate.floor.opacity = (isActive ? 0.85 : 0.3) + pulse * 0.45 + approach * (0.18 + beat * 0.2);
     }
   });
 

@@ -25,6 +25,7 @@ import { RaceCar } from "./circuit/RaceCar";
 import { useOrbitGestures } from "./circuit/useOrbitGestures";
 
 const FOLLOW_DURATION = 1.2;
+const APPROACH_RANGE = 0.03;
 
 const SkyDome = ({ accent }) => {
   const material = useMemo(() => new THREE.ShaderMaterial({
@@ -174,7 +175,7 @@ const Scenery = ({ curve, accent, lampRegistry }) => {
  */
 const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial, orbitRef, lifeRef }) => {
   const { camera, size } = useThree();
-  const smooth = useRef({ progress: 0, follow: 0, speed: 0, accel: 0, prevProgress: 0, overviewToken: 0 });
+  const smooth = useRef({ progress: 0, follow: 0, speed: 0, accel: 0, prevProgress: 0, overviewToken: 0, dir: 1, near: 0 });
   const scratch = useMemo(() => ({
     point: new THREE.Vector3(),
     tangent: new THREE.Vector3(),
@@ -275,15 +276,32 @@ const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial, orbi
       car.rotateZ(-bank * 0.55);
     }
 
+    if (Math.abs(s.speed) > 0.002) s.dir = Math.sign(s.speed);
+    let gateIndex = -1;
+    let gateDistance = Infinity;
+    for (let index = 0; index < CIRCUIT_CHAPTERS.length; index += 1) {
+      const ahead = (CIRCUIT_CHAPTERS[index].path - t) * s.dir;
+      if (ahead >= -0.004 && ahead < gateDistance) {
+        gateDistance = ahead;
+        gateIndex = index;
+      }
+    }
+    const nearTarget = gateIndex >= 0 && follow > 0.5 ? clamp(1 - Math.max(0, gateDistance) / APPROACH_RANGE, 0, 1) : 0;
+    s.near += (nearTarget - s.near) * Math.min(1, delta * 8);
+
     if (racingMaterial) {
       racingMaterial.uniforms.uProgress.value = travel.coverage;
       racingMaterial.uniforms.uTime.value = time;
+      racingMaterial.uniforms.uGate.value = gateIndex >= 0 ? CIRCUIT_CHAPTERS[gateIndex].path : -1;
+      racingMaterial.uniforms.uNear.value = s.near;
     }
 
     life.follow = follow;
     life.speed = speedNorm;
     life.velocity = Math.abs(s.speed) * curveLength;
     life.bank = bank;
+    life.near = s.near;
+    life.gateIndex = gateIndex;
     life.t = t;
 
     const labels = labelRefs.current;
@@ -338,12 +356,14 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, orbitRef, lifeR
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
-    uniforms: { uProgress: { value: 0 }, uTime: { value: 0 }, uColor: { value: glow(accent, 0.55) } },
+    uniforms: { uProgress: { value: 0 }, uTime: { value: 0 }, uGate: { value: -1 }, uNear: { value: 0 }, uColor: { value: glow(accent, 0.55) } },
     vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
     fragmentShader: `
       varying vec2 vUv;
       uniform float uProgress;
       uniform float uTime;
+      uniform float uGate;
+      uniform float uNear;
       uniform vec3 uColor;
       void main() {
         float reveal = smoothstep(uProgress + 0.003, uProgress - 0.012, vUv.y);
@@ -352,9 +372,13 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, orbitRef, lifeR
         float head = fract(uTime * 0.045);
         float packet = exp(-fract(head - vUv.y) * 70.0) + 0.6 * exp(-fract(head + 0.5 - vUv.y) * 70.0);
         packet *= 0.25 + 0.75 * reveal;
-        float alpha = (0.16 + 0.84 * reveal) * core * pulse + packet * core * 0.9;
+        float toGate = abs(uGate - vUv.y);
+        float zone = uNear * exp(-pow(toGate * 60.0, 2.0));
+        float runIn = uNear * smoothstep(0.04, 0.004, toGate);
+        float bars = smoothstep(0.42, 0.62, 0.5 + 0.5 * sin((toGate * 150.0 + uTime * 1.6) * 6.2831));
+        float alpha = (0.16 + 0.84 * reveal) * core * pulse + packet * core * 0.9 + (zone + bars * runIn * 0.7) * core;
         if (alpha < 0.015) discard;
-        vec3 color = uColor * (0.9 + 1.1 * reveal) + uColor * packet * 4.0;
+        vec3 color = uColor * (0.9 + 1.1 * reveal) + uColor * packet * 4.0 + uColor * (zone * 3.0 + bars * runIn * 2.2);
         gl_FragColor = vec4(color, min(alpha, 1.0));
       }`,
   // eslint-disable-next-line react-hooks/exhaustive-deps -- accent is live-updated through the uniform
@@ -431,7 +455,7 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, orbitRef, lifeR
     {gates.map((gate, index) => <Gate key={gate.key} position={gate.position} quaternion={gate.quaternion} index={index} registry={gateRegistry} />)}
     <RaceCar innerRef={carRef} accent={accent} lifeRef={lifeRef} />
     <Rig curve={world.curve} radius={world.radius} travelRef={travelRef} labelRefs={labelRefs} carRef={carRef} racingMaterial={racingMaterial} orbitRef={orbitRef} lifeRef={lifeRef} />
-    <GateCascade registry={gateRegistry} accent={accent} activeIndex={activeIndex} />
+    <GateCascade registry={gateRegistry} accent={accent} activeIndex={activeIndex} lifeRef={lifeRef} />
     <FloodFlicker registry={lampRegistry} />
     {!quality.reduced && <Motes curve={world.curve} accent={accent} count={quality.motes} />}
     {!quality.reduced && <CarTrail curve={world.curve} accent={accent} lifeRef={lifeRef} />}
@@ -482,7 +506,7 @@ export const CircuitStage = ({ accent = "#e10600", activeKey, onSelect, paused, 
   const orbitRef = useRef(createOrbit());
   const enabledRef = useRef(orbitable);
   const quality = useMemo(detectQuality, []);
-  const lifeRef = useRef({ follow: 0, speed: 0, velocity: 0, bank: 0, t: 0, reduced: quality.reduced });
+  const lifeRef = useRef({ follow: 0, speed: 0, velocity: 0, bank: 0, near: 0, gateIndex: -1, t: 0, reduced: quality.reduced });
   enabledRef.current = orbitable;
   const { touched, handlers } = useOrbitGestures({ orbitRef, travelRef, enabledRef, wrapperRef });
 

@@ -69,6 +69,8 @@ const Wheel = ({ position, width, steer, registry, index }) => {
  */
 export const RaceCar = ({ innerRef, accent, lifeRef }) => {
   const wheels = useRef([]);
+  const rainLight = useRef(null);
+  const rearGlow = useRef(null);
   const decal = useMemo(numberTexture, []);
   useEffect(() => () => decal.dispose(), [decal]);
   const body = { color: accent, metalness: 0.25, roughness: 0.34 };
@@ -78,6 +80,9 @@ export const RaceCar = ({ innerRef, accent, lifeRef }) => {
     const delta = Math.min(rawDelta, 0.05);
     const angular = (life.velocity / (WHEEL_RADIUS * 2.4)) * delta;
     const steer = clamp(-life.bank * 1.3, -0.32, 0.32);
+    const braking = 1 + life.near * 1.8;
+    if (rainLight.current) rainLight.current.color.copy(RAIN_LIGHT).multiplyScalar(braking);
+    if (rearGlow.current) rearGlow.current.intensity = 180 * (1 + life.near * 2.2);
     wheels.current.forEach((wheel) => {
       if (!wheel?.spin) return;
       wheel.spin.rotation.x += angular;
@@ -122,7 +127,7 @@ export const RaceCar = ({ innerRef, accent, lifeRef }) => {
     <mesh position={[0, 0.98, -1.55]} rotation={[0.5, 0, 0]}><boxGeometry args={[1.0, 0.03, 0.18]} /><meshStandardMaterial {...CARBON} /></mesh>
     <mesh position={[0, 0.5, -1.4]}><boxGeometry args={[0.9, 0.03, 0.16]} /><meshStandardMaterial {...CARBON} /></mesh>
     <mesh position={[0, 0.16, -1.35]} rotation={[-0.3, 0, 0]}><boxGeometry args={[1.0, 0.12, 0.3]} /><meshStandardMaterial {...CARBON} /></mesh>
-    <mesh position={[0, 0.4, -1.62]}><boxGeometry args={[0.16, 0.1, 0.04]} /><meshBasicMaterial color={RAIN_LIGHT} toneMapped={false} /></mesh>
+    <mesh position={[0, 0.4, -1.62]}><boxGeometry args={[0.16, 0.1, 0.04]} /><meshBasicMaterial ref={rainLight} color={RAIN_LIGHT} toneMapped={false} /></mesh>
 
     <Wheel position={[-0.72, WHEEL_RADIUS, 1.28]} width={0.36} steer registry={wheels} index={0} />
     <Wheel position={[0.72, WHEEL_RADIUS, 1.28]} width={0.36} steer registry={wheels} index={1} />
@@ -131,7 +136,7 @@ export const RaceCar = ({ innerRef, accent, lifeRef }) => {
 
     <pointLight position={[0, 2.4, 0]} distance={150} intensity={900} color="#e8f0ff" />
     <pointLight position={[0, 1.4, 14]} distance={120} intensity={620} color="#dfe9ff" />
-    <pointLight position={[0, 1.6, -10]} distance={70} intensity={180} color="#ff3a22" />
+    <pointLight ref={rearGlow} position={[0, 1.6, -10]} distance={70} intensity={180} color="#ff3a22" />
     <mesh position={[0, 0.02, 0.2]} rotation={[-Math.PI / 2, 0, 0]}>
       <circleGeometry args={[2.2, 20]} />
       <meshBasicMaterial color="#000000" transparent opacity={0.4} />

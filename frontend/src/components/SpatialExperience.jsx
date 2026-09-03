@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { BackToCircuitButton } from "./BackToCircuitButton";
 import { HeroStage } from "./HeroStage";
@@ -97,6 +97,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   }, [activeKey, targetKey, isTraveling, driveState, isCircuitOverview, onRouteChange]);
 
   const { scrollYProgress } = useScroll({ target: runway, offset: ["start start", "end end"] });
+  const approach = useMotionValue(0);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.045, 0.125], [1, 1, 0]);
   const mapOpacity = useTransform(scrollYProgress, [0.1, 0.16], [0, 1]);
@@ -252,6 +253,13 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       setCoverage(nextCoverage);
     }
     updateCamera(value);
+    const drive = driveRef.current;
+    if (drive.moving && drive.upper && drive.lower) {
+      const gate = drive.dir > 0 ? drive.upper : drive.lower;
+      approach.set(clamp(1 - Math.abs(gate.stop - value) / (CHAPTER_GAP * 0.38), 0, 1));
+    } else {
+      approach.set(drivingRef.current ? 1 : 0);
+    }
     if (travelingRef.current || overviewRef.current || drivingRef.current) return;
     const target = targetRef.current;
     if (Math.abs(value - target.stop) < 0.004) return;
@@ -556,7 +564,8 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   const isSceneIdle = !isTraveling && !isCircuitOverview && driveState === "none" && activeKey !== "circuit";
   const circuitPaused = isSceneIdle || (activeKey === "top" && !isTraveling);
   const orbitable = isCircuitOverview || (activeKey === "circuit" && !isTraveling && driveState === "none");
-  const hudHint = displayKey === "circuit" ? `CURRENT POSITION · ${currentLabel}` : isParked ? `SCROLL ${parkedDir > 0 ? "DOWN" : "UP"} TO OPEN · ${currentLabel}` : "FOLLOW THE RACING LINE";
+  const targetLabel = SPATIAL_ROUTE.find(({ key }) => key === targetKey)?.label || currentLabel;
+  const hudHint = displayKey === "circuit" ? `CURRENT POSITION · ${currentLabel}` : isParked ? `SCROLL ${parkedDir > 0 ? "DOWN" : "UP"} TO OPEN · ${currentLabel}` : driveState === "moving" ? `APPROACHING · ${targetLabel}` : "FOLLOW THE RACING LINE";
 
   return <section ref={runway} className="circuit-runway" data-testid="unified-spatial-experience">
     <div
@@ -620,6 +629,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
           <span>{String(routeIndex + 1).padStart(2, "0")} / {String(SPATIAL_ROUTE.length).padStart(2, "0")}</span>
           <strong>{hudLabel}</strong>
           <small>{hudHint}</small>
+          <i className="circuit-approach" data-testid="circuit-approach-meter" aria-hidden="true"><motion.b style={{ scaleX: approach }} /></i>
         </div>
         <div className="circuit-progress" data-testid="circuit-journey-progress"><motion.span style={{ scaleX: scrollYProgress }} /></div>
       </>}
