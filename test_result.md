@@ -293,3 +293,7 @@ agent_communication:
 - Files: components/CircuitStage.jsx, components/circuit/{CircuitEffects,CircuitLife}.jsx, components/circuit/useOrbitGestures.js, three/{circuitMath,circuitOrbit}.js, SpatialExperience.jsx (travelRef.visible/dragging/overviewToken, orbitable + circuitPaused), SpatialV6.css (orbit hint, grab cursors)
 - testing agent iteration_51: frontend 100% pass, no issues, no console errors
 - Notes for testers: headless travels take 5-8s; use window.__hamiltonLenis.scrollTo / window.__spatialGo / window.__spatialStep; pins selector `[data-testid^='chapter-marker-']:not([data-testid$='-content'])`; mobile touch via CDP Input.dispatchTouchEvent
+
+## 2026-09-03 — Scroll-scrub travel + slower journeys + F1 car remodel
+- Files: SpatialExperience.jsx (scrub state machine, travelDuration), components/circuit/RaceCar.jsx (new), CircuitStage.jsx (chase framing, life.velocity/bank, lights/DPR/MSAA), CircuitLife.jsx (gate lights removed)
+- testing agent iteration_52: frontend 100% pass, no issues

@@ -156,7 +156,7 @@ export const CarTrail = ({ curve, accent, lifeRef }) => {
 
 /** Start-light cascade running along the gates toward the active chapter, plus the active beacon. */
 export const GateCascade = ({ registry, accent, activeIndex }) => {
-  const palette = useMemo(() => ({ hot: glow(accent, 1.25), base: new THREE.Color(accent), dim: new THREE.Color("#3a3d45") }), [accent]);
+  const palette = useMemo(() => ({ hot: glow(accent, 1.25), dim: new THREE.Color("#3a3d45") }), [accent]);
 
   useFrame((state) => {
     const time = state.clock.elapsedTime;
@@ -178,8 +178,6 @@ export const GateCascade = ({ registry, accent, activeIndex }) => {
       }
       gate.floor.color.copy(palette.hot).multiplyScalar(0.5);
       gate.floor.opacity = (isActive ? 0.85 : 0.3) + pulse * 0.45;
-      gate.light.color.copy(palette.base);
-      gate.light.intensity = (isActive ? 150 : 55) * (1 + pulse * 1.6);
     }
   });
 

@@ -21,6 +21,7 @@ import { UP, clamp, easeInOut, glow, moveToward, quadBezier } from "../three/cir
 import { createOrbit, resetOrbit, stepOrbit } from "../three/circuitOrbit";
 import { CircuitEffects } from "./circuit/CircuitEffects";
 import { CarTrail, FloodFlicker, GateCascade, Motes } from "./circuit/CircuitLife";
+import { RaceCar } from "./circuit/RaceCar";
 import { useOrbitGestures } from "./circuit/useOrbitGestures";
 
 const FOLLOW_DURATION = 1.2;
@@ -62,10 +63,9 @@ const Gate = ({ position, quaternion, index, registry }) => {
   const bar = useRef(null);
   const lamp = useRef(null);
   const floor = useRef(null);
-  const light = useRef(null);
   useEffect(() => {
     const list = registry.current;
-    list[index] = { bar: bar.current, lamp: lamp.current, floor: floor.current, light: light.current };
+    list[index] = { bar: bar.current, lamp: lamp.current, floor: floor.current };
     return () => { delete list[index]; };
   }, [index, registry]);
 
@@ -90,71 +90,12 @@ const Gate = ({ position, quaternion, index, registry }) => {
       <boxGeometry args={[6, 1.6, 0.1]} />
       <meshBasicMaterial ref={lamp} toneMapped={false} />
     </mesh>
-    <pointLight ref={light} position={[0, 15, 0]} distance={70} intensity={55} />
     <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[ROAD_WIDTH, 2.6]} />
       <meshBasicMaterial ref={floor} transparent opacity={0.35} depthWrite={false} toneMapped={false} />
     </mesh>
   </group>;
 };
-
-const RaceCar = ({ innerRef, accent }) => (
-  <group ref={innerRef} scale={2.6}>
-    <mesh position={[0, 0.34, 0.15]} castShadow>
-      <boxGeometry args={[1.15, 0.34, 3.1]} />
-      <meshStandardMaterial color={accent} metalness={0.55} roughness={0.32} />
-    </mesh>
-    <mesh position={[0, 0.28, 1.95]}>
-      <boxGeometry args={[0.55, 0.2, 1.1]} />
-      <meshStandardMaterial color={accent} metalness={0.5} roughness={0.35} />
-    </mesh>
-    <mesh position={[0, 0.16, 2.5]}>
-      <boxGeometry args={[2.05, 0.09, 0.62]} />
-      <meshStandardMaterial color="#0d0d10" metalness={0.4} roughness={0.5} />
-    </mesh>
-    <mesh position={[0, 0.95, -1.45]}>
-      <boxGeometry args={[1.75, 0.42, 0.12]} />
-      <meshStandardMaterial color="#0d0d10" metalness={0.4} roughness={0.5} />
-    </mesh>
-    <mesh position={[0, 0.62, -1.45]}>
-      <boxGeometry args={[0.1, 0.68, 0.4]} />
-      <meshStandardMaterial color="#141418" />
-    </mesh>
-    <mesh position={[0, 0.68, 0.5]}>
-      <boxGeometry args={[0.62, 0.3, 0.7]} />
-      <meshStandardMaterial color="#101014" metalness={0.3} roughness={0.6} />
-    </mesh>
-    <mesh position={[0, 0.9, 0.95]} rotation={[Math.PI / 2, 0, 0]}>
-      <torusGeometry args={[0.42, 0.06, 8, 20]} />
-      <meshStandardMaterial color="#16171c" metalness={0.6} roughness={0.4} />
-    </mesh>
-    {[[-0.92, 1.35], [0.92, 1.35], [-0.95, -1.05], [0.95, -1.05]].map(([x, z]) => (
-      <mesh key={`${x}-${z}`} position={[x, 0.38, z]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.38, 0.38, 0.36, 16]} />
-        <meshStandardMaterial color="#0b0b0d" roughness={0.92} />
-      </mesh>
-    ))}
-    <mesh position={[0, 0.55, -1.65]}>
-      <boxGeometry args={[0.22, 0.12, 0.05]} />
-      <meshBasicMaterial color={glow("#ff2d1a", 1.4)} toneMapped={false} />
-    </mesh>
-    <mesh position={[0, 0.36, 2.55]}>
-      <boxGeometry args={[1.6, 0.05, 0.04]} />
-      <meshBasicMaterial color={glow("#dfe9ff", 1.5)} toneMapped={false} />
-    </mesh>
-    <pointLight position={[0, 2.4, 0]} distance={150} intensity={900} color="#e8f0ff" />
-    <pointLight position={[0, 1.4, 14]} distance={120} intensity={620} color="#dfe9ff" />
-    <pointLight position={[0, 1.6, -10]} distance={70} intensity={180} color="#ff3a22" />
-    <mesh position={[0, 0.02, 0.2]} rotation={[-Math.PI / 2, 0, 0]}>
-      <circleGeometry args={[2.2, 20]} />
-      <meshBasicMaterial color="#000000" transparent opacity={0.4} />
-    </mesh>
-    <mesh position={[0, 0.05, 0.2]} rotation={[-Math.PI / 2, 0, 0]}>
-      <circleGeometry args={[3.4, 24]} />
-      <meshBasicMaterial color={glow(accent, 0.7)} transparent opacity={0.22} depthWrite={false} toneMapped={false} />
-    </mesh>
-  </group>
-);
 
 const FloodLight = ({ position, index, registry, withLight }) => {
   const head = useRef(null);
@@ -249,6 +190,7 @@ const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial, orbi
     carLook: new THREE.Vector3(),
     delta: new THREE.Vector3(),
   }), []);
+  const curveLength = useMemo(() => curve.getLength(), [curve]);
   const base = useMemo(() => {
     const fit = (radius * 0.82) / Math.tan(THREE.MathUtils.degToRad(18));
     const look = new THREE.Vector3(0, radius * 0.02, -radius * 0.05);
@@ -294,10 +236,10 @@ const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial, orbi
     scratch.side.crossVectors(scratch.tangent, UP).normalize();
     const bank = clamp(scratch.delta.copy(scratch.ahead).sub(scratch.tangent).dot(scratch.side) * 9, -0.24, 0.24);
 
-    const lag = 22 + speedNorm * 8;
-    const dip = clamp(-s.accel * 5, -1.5, 1.2);
-    scratch.chasePos.copy(scratch.point).addScaledVector(scratch.tangent, -lag).addScaledVector(UP, 7.2 + dip).addScaledVector(scratch.side, bank * 5.5);
-    scratch.chaseLook.copy(scratch.point).addScaledVector(scratch.tangent, 34).addScaledVector(UP, 2.2);
+    const lag = 15.5 + speedNorm * 6;
+    const dip = clamp(-s.accel * 5, -1.2, 1.0);
+    scratch.chasePos.copy(scratch.point).addScaledVector(scratch.tangent, -lag).addScaledVector(UP, 6 + dip).addScaledVector(scratch.side, bank * 4.5);
+    scratch.chaseLook.copy(scratch.point).addScaledVector(scratch.tangent, 22).addScaledVector(UP, 1.2);
 
     const framing = stepOrbit(orbit, delta, time, base.el, !life.reduced);
     const portrait = Math.max(1, Math.pow(size.height / Math.max(1, size.width), 0.75));
@@ -340,6 +282,8 @@ const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial, orbi
 
     life.follow = follow;
     life.speed = speedNorm;
+    life.velocity = Math.abs(s.speed) * curveLength;
+    life.bank = bank;
     life.t = t;
 
     const labels = labelRefs.current;
@@ -485,7 +429,7 @@ const CircuitWorld = ({ accent, activeKey, travelRef, labelRefs, orbitRef, lifeR
 
     <Scenery curve={world.curve} accent={accent} lampRegistry={lampRegistry} />
     {gates.map((gate, index) => <Gate key={gate.key} position={gate.position} quaternion={gate.quaternion} index={index} registry={gateRegistry} />)}
-    <RaceCar innerRef={carRef} accent={accent} />
+    <RaceCar innerRef={carRef} accent={accent} lifeRef={lifeRef} />
     <Rig curve={world.curve} radius={world.radius} travelRef={travelRef} labelRefs={labelRefs} carRef={carRef} racingMaterial={racingMaterial} orbitRef={orbitRef} lifeRef={lifeRef} />
     <GateCascade registry={gateRegistry} accent={accent} activeIndex={activeIndex} />
     <FloodFlicker registry={lampRegistry} />
@@ -523,12 +467,12 @@ const detectQuality = () => {
     mobile,
     reduced,
     effects: !reduced,
-    msaa: mobile ? 2 : 4,
+    msaa: 2,
     bloomScale: mobile ? 0.5 : 0.75,
     levels: mobile ? 4 : 6,
     aberration: !mobile,
     motes: mobile ? 220 : 520,
-    dpr: mobile ? [1, 1.25] : [1, 1.6],
+    dpr: mobile ? [1, 1.25] : [1, 1.4],
   };
 };
 
@@ -538,7 +482,7 @@ export const CircuitStage = ({ accent = "#e10600", activeKey, onSelect, paused, 
   const orbitRef = useRef(createOrbit());
   const enabledRef = useRef(orbitable);
   const quality = useMemo(detectQuality, []);
-  const lifeRef = useRef({ follow: 0, speed: 0, t: 0, reduced: quality.reduced });
+  const lifeRef = useRef({ follow: 0, speed: 0, velocity: 0, bank: 0, t: 0, reduced: quality.reduced });
   enabledRef.current = orbitable;
   const { touched, handlers } = useOrbitGestures({ orbitRef, travelRef, enabledRef, wrapperRef });
 
