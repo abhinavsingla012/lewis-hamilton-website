@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import { BackToCircuitButton } from "./BackToCircuitButton";
 import { HeroStage } from "./HeroStage";
 import { CircuitStage } from "./CircuitStage";
@@ -16,13 +17,12 @@ const finalPathPosition = CIRCUIT_CHAPTERS.at(-1).path;
 const ROUTE_INDEX = new Map(SPATIAL_ROUTE.map((route, index) => [route.key, index]));
 const WHEEL_THRESHOLD = 46;
 const CHAPTER_GAP = 0.065;
-const SCRUB_GAIN = 1.5;
-const TOUCH_SCRUB_GAIN = 2.2;
-const SCRUB_IDLE_MS = 150;
-const SCRUB_LERP = 9;
+const SCROLL_GAIN = 2;
+const TOUCH_GAIN = 2.2;
+const DRIVE_LERP = 12;
 const TEAM_ACCENTS = { ferrari: "#e10600", mercedes: "#00d2be", mclaren: "#ff6200" };
 
-/** Slow, distance-aware camera travel: one chapter ≈ 2.1s, capped for cross-circuit jumps. */
+/** Distance-aware camera travel for explicit navigation (pins, menu, keyboard). */
 const travelDuration = (fromStop, toStop) => {
   if (fromStop === 0 || toStop === 0) return 1.6;
   return clamp(0.6 + (Math.abs(toStop - fromStop) / CHAPTER_GAP) * 1.5, 0.6, 3.6);
@@ -59,6 +59,12 @@ const nearestRoute = (value) => SPATIAL_ROUTE.reduce((nearest, route) => (
   Math.abs(route.stop - value) < Math.abs(nearest.stop - value) ? route : nearest
 ), SPATIAL_ROUTE[0]);
 
+/** The gate next to `key` in `dir`; the hero is never a gate. */
+const neighbourGate = (key, dir) => {
+  const next = SPATIAL_ROUTE[(ROUTE_INDEX.get(key) ?? 0) + dir];
+  return next && next.key !== "top" ? next : null;
+};
+
 export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme, onRouteChange, onCircuitReady, revealed = true }) => {
   const runway = useRef(null);
   const travelRef = useRef({ progress: 0, follow: 0, coverage: 0, visible: false, dragging: false, overviewToken: 0 });
@@ -66,13 +72,14 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   const activeRef = useRef("top");
   const overviewRef = useRef(false);
   const travelingRef = useRef(false);
+  const drivingRef = useRef(false);
+  const parkedDirRef = useRef(1);
   const coverageRef = useRef(0);
   const targetRef = useRef({ key: "top", stop: 0, top: 0 });
   const tokenRef = useRef(0);
-  const timersRef = useRef({ fallback: 0, prune: 0, resync: 0 });
+  const timersRef = useRef({ fallback: 0, prune: 0, resync: 0, watchdog: 0 });
   const cooldownRef = useRef(0);
-  const stepRef = useRef(null);
-  const scrubRef = useRef({ active: false, held: false, pos: 0, target: 0, min: 0, max: 0, dir: 1, frame: 0, lastInput: 0, lastTick: 0, offsetTop: 0, denominator: 1, touchBase: 0, touchOffset: 0 });
+  const driveRef = useRef({ moving: false, running: false, pos: 0, target: 0, dir: 1, frame: 0, lastTick: 0, offsetTop: 0, denominator: 1, lower: null, upper: null, lowerPx: 0, upperPx: 0, touchBase: 0, touchAnchor: 0 });
 
   const [activeKey, setActiveKey] = useState("top");
   const [targetKey, setTargetKey] = useState("top");
@@ -80,12 +87,14 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   const [direction, setDirection] = useState(1);
   const [isTraveling, setIsTraveling] = useState(false);
   const [isCircuitOverview, setIsCircuitOverview] = useState(false);
+  const [driveState, setDriveState] = useState("none");
+  const [parkedDir, setParkedDir] = useState(1);
   const [coverage, setCoverage] = useState(0);
 
   /** Publishes the route state to the shell (nav lap counter, cursor, sound). */
   useEffect(() => {
-    onRouteChange?.({ activeKey, targetKey, isTraveling, isCircuitOverview });
-  }, [activeKey, targetKey, isTraveling, isCircuitOverview, onRouteChange]);
+    onRouteChange?.({ activeKey, targetKey, isTraveling: isTraveling || driveState !== "none", isCircuitOverview });
+  }, [activeKey, targetKey, isTraveling, driveState, isCircuitOverview, onRouteChange]);
 
   const { scrollYProgress } = useScroll({ target: runway, offset: ["start start", "end end"] });
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1]);
@@ -108,22 +117,53 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
     setMounted((current) => (current.includes(key) ? current : [...current, key]));
   }, []);
 
-  /** Single owner of every scroll movement in the experience. */
+  const measureRunway = useCallback(() => {
+    const runwayEl = runway.current;
+    const drive = driveRef.current;
+    drive.denominator = Math.max(1, runwayEl.offsetHeight - window.innerHeight);
+    drive.offsetTop = runwayEl.offsetTop;
+    return (stop) => Math.round(drive.offsetTop + stop * drive.denominator);
+  }, []);
+
+  /** The car has reached a gate: it waits there, page closed, until one more scroll in `dir`. */
+  const park = useCallback((item, dir) => {
+    const drive = driveRef.current;
+    drive.moving = false;
+    drive.running = false;
+    cancelAnimationFrame(drive.frame);
+    const toPx = measureRunway();
+    activeRef.current = item.key;
+    targetRef.current = { key: item.key, stop: item.stop, top: toPx(item.stop) };
+    parkedDirRef.current = dir;
+    const gate = item.key !== "circuit";
+    drivingRef.current = gate;
+    setActiveKey(item.key);
+    setTargetKey(item.key);
+    setParkedDir(dir);
+    setDriveState(gate ? "parked" : "none");
+    mountChapter(item.key);
+    window.history.replaceState(null, "", `#route-${item.key}`);
+    cooldownRef.current = performance.now() + 450;
+    requestAnimationFrame(() => updateCamera(item.stop));
+  }, [measureRunway, mountChapter, updateCamera]);
+
+  /** Single owner of every animated scroll movement (pins, menu, keyboard, deep links). */
   const goTo = useCallback((key, options = {}) => {
     const item = SPATIAL_ROUTE.find((route) => route.key === key);
     const runwayEl = runway.current;
     if (!item || !runwayEl) return;
-    if (scrubRef.current.active) {
-      scrubRef.current.active = false;
-      cancelAnimationFrame(scrubRef.current.frame);
-    }
-    const denominator = Math.max(1, runwayEl.offsetHeight - window.innerHeight);
-    const top = Math.round(runwayEl.offsetTop + item.stop * denominator);
+    const drive = driveRef.current;
+    drive.moving = false;
+    drive.running = false;
+    cancelAnimationFrame(drive.frame);
+    const toPx = measureRunway();
+    const top = toPx(item.stop);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const immediate = Boolean(options.immediate) || reduced;
     const fromIndex = ROUTE_INDEX.get(activeRef.current) ?? 0;
     const toIndex = ROUTE_INDEX.get(key) ?? 0;
     const duration = options.duration ?? travelDuration(SPATIAL_ROUTE[fromIndex]?.stop ?? 0, item.stop);
+    const parkDir = options.park && key !== "circuit" && key !== "top" ? options.park : 0;
 
     if (overviewRef.current) {
       overviewRef.current = false;
@@ -139,25 +179,35 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
     window.clearTimeout(timersRef.current.fallback);
     window.clearTimeout(timersRef.current.prune);
     window.clearTimeout(timersRef.current.resync);
+    window.clearTimeout(timersRef.current.watchdog);
+
+    const land = () => {
+      const lenis = window.__hamiltonLenis;
+      if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
+      else window.scrollTo(0, top);
+      travelingRef.current = false;
+      setIsTraveling(false);
+      if (parkDir) {
+        park(item, parkDir);
+        return;
+      }
+      drivingRef.current = false;
+      activeRef.current = key;
+      setActiveKey(key);
+      setDriveState("none");
+      if (window.location.hash !== `#route-${key}`) window.history.replaceState(null, "", `#route-${key}`);
+      cooldownRef.current = performance.now() + 240;
+      requestAnimationFrame(() => updateCamera(item.stop));
+    };
 
     const distance = Math.abs(window.scrollY - top);
     const animated = !immediate && distance > 6;
     if (animated) {
       travelingRef.current = true;
       setIsTraveling(true);
-      window.clearTimeout(timersRef.current.watchdog);
       timersRef.current.watchdog = window.setTimeout(() => {
-        if (!travelingRef.current) return;
-        const target = targetRef.current;
-        const lenisNow = window.__hamiltonLenis;
-        if (lenisNow) lenisNow.scrollTo(target.top, { immediate: true, force: true });
-        else window.scrollTo(0, target.top);
-        travelingRef.current = false;
-        activeRef.current = target.key;
-        setIsTraveling(false);
-        setActiveKey(target.key);
-        cooldownRef.current = performance.now() + 240;
-        requestAnimationFrame(() => updateCamera(target.stop));
+        if (!travelingRef.current || tokenRef.current !== token) return;
+        land();
       }, duration * 1000 + 1100);
     }
 
@@ -165,15 +215,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       if (tokenRef.current !== token) return;
       window.clearTimeout(timersRef.current.fallback);
       window.clearTimeout(timersRef.current.watchdog);
-      const lenis = window.__hamiltonLenis;
-      if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
-      else window.scrollTo(0, top);
-      travelingRef.current = false;
-      activeRef.current = key;
-      setIsTraveling(false);
-      setActiveKey(key);
-      cooldownRef.current = performance.now() + 240;
-      requestAnimationFrame(() => updateCamera(item.stop));
+      land();
       timersRef.current.prune = window.setTimeout(() => {
         if (tokenRef.current !== token) return;
         setMounted((current) => (current.length <= 1 && current[0] === key ? current : current.filter((entry) => entry === key)));
@@ -200,7 +242,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       window.scrollTo({ top, behavior: "smooth" });
       timersRef.current.fallback = window.setTimeout(arrive, 760);
     }
-  }, [mountChapter, updateCamera]);
+  }, [measureRunway, mountChapter, park, updateCamera]);
 
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     const covered = value <= CIRCUIT_HUB.stop ? 0 : clamp(getPathProgress(value) / finalPathPosition, 0, 1);
@@ -210,12 +252,12 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       setCoverage(nextCoverage);
     }
     updateCamera(value);
-    if (travelingRef.current || overviewRef.current) return;
+    if (travelingRef.current || overviewRef.current || drivingRef.current) return;
     const target = targetRef.current;
     if (Math.abs(value - target.stop) < 0.004) return;
     window.clearTimeout(timersRef.current.resync);
     timersRef.current.resync = window.setTimeout(() => {
-      if (travelingRef.current || overviewRef.current) return;
+      if (travelingRef.current || overviewRef.current || drivingRef.current) return;
       const current = scrollYProgress.get();
       if (Math.abs(current - targetRef.current.stop) < 0.004) return;
       goTo(nearestRoute(current).key, { immediate: true });
@@ -239,78 +281,81 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   }, [goTo, scrollYProgress, updateCamera]);
 
   /**
-   * Gesture navigation. Wheel and touch scrub the camera along the racing line in real time so
-   * the car moves with the scroll; when the gesture rests, the journey eases onto the nearest
-   * chapter. Keyboard, the hero handoff and chapter-owned steps (gallery, vault) stay quantised.
+   * Gesture navigation. The car is bound to the scroll: wheel and touch drive it along the racing
+   * line between two gates and it stops wherever the scroll stops. Reaching a gate parks the car;
+   * one more scroll in the same direction opens that chapter, scrolling on from a page drives away.
+   * Keyboard uses the same intents with an animated drive. Chapter-owned steps (gallery slides,
+   * the Legacy vault) are consumed first, as before.
    */
   useEffect(() => {
-    const scrub = scrubRef.current;
-
-    const scrubTo = (target) => {
-      const next = clamp(target, scrub.min, scrub.max);
-      if (next !== scrub.target) scrub.dir = next > scrub.target ? 1 : -1;
-      scrub.target = next;
-      scrub.lastInput = performance.now();
-    };
-    const scrubBy = (px) => scrubTo(scrub.target + px);
-
-    const finishScrub = () => {
-      scrub.active = false;
-      cancelAnimationFrame(scrub.frame);
-      const value = (scrub.pos - scrub.offsetTop) / scrub.denominator;
-      const biased = clamp(value + scrub.dir * CHAPTER_GAP * 0.32, CIRCUIT_HUB.stop, 1);
-      const route = nearestRoute(biased).key === "top" ? SPATIAL_ROUTE[1] : nearestRoute(biased);
-      travelingRef.current = false;
-      if (route.key !== activeRef.current) {
-        noteWayfindingStep();
-        window.history.replaceState(null, "", `#route-${route.key}`);
-      }
-      goTo(route.key, { duration: travelDuration(value, route.stop) });
-    };
+    const drive = driveRef.current;
 
     const tick = () => {
-      if (!scrub.active) return;
+      if (!drive.running) return;
       const now = performance.now();
-      const dt = Math.min(0.05, (now - scrub.lastTick) / 1000);
-      scrub.lastTick = now;
-      scrub.pos += (scrub.target - scrub.pos) * Math.min(1, dt * SCRUB_LERP);
-      if (Math.abs(scrub.target - scrub.pos) < 0.5) scrub.pos = scrub.target;
+      const dt = Math.min(0.05, (now - drive.lastTick) / 1000);
+      drive.lastTick = now;
+      drive.pos += (drive.target - drive.pos) * Math.min(1, dt * DRIVE_LERP);
+      if (Math.abs(drive.target - drive.pos) < 0.5) drive.pos = drive.target;
       const lenis = window.__hamiltonLenis;
-      if (lenis) lenis.scrollTo(scrub.pos, { immediate: true, force: true });
-      else window.scrollTo(0, scrub.pos);
-      const settled = scrub.pos === scrub.target && now - scrub.lastInput > SCRUB_IDLE_MS;
-      if (settled && !scrub.held) {
-        finishScrub();
+      if (lenis) lenis.scrollTo(drive.pos, { immediate: true, force: true });
+      else window.scrollTo(0, drive.pos);
+      if (drive.pos === drive.target) {
+        drive.running = false;
+        if (!drive.moving) return;
+        if (drive.pos === drive.lowerPx) park(drive.lower, -1);
+        else if (drive.pos === drive.upperPx) park(drive.upper, 1);
         return;
       }
-      scrub.frame = requestAnimationFrame(tick);
+      drive.frame = requestAnimationFrame(tick);
     };
+    const run = () => {
+      if (drive.running) return;
+      drive.running = true;
+      drive.lastTick = performance.now();
+      drive.frame = requestAnimationFrame(tick);
+    };
+    const driveTo = (target) => {
+      if (!drive.moving) return;
+      const next = clamp(target, drive.lowerPx, drive.upperPx);
+      if (next !== drive.target) drive.dir = next > drive.target ? 1 : -1;
+      drive.target = next;
+      run();
+    };
+    const driveBy = (px) => driveTo(drive.target + px);
 
-    const beginScrub = (dir) => {
-      const runwayEl = runway.current;
+    /** Leaves the current gate (or page) and hands the car to the scroll. */
+    const beginDrive = (dir) => {
       const key = activeRef.current;
-      if (!runwayEl || key === "top" || (key === "circuit" && dir < 0)) return false;
-      scrub.denominator = Math.max(1, runwayEl.offsetHeight - window.innerHeight);
-      scrub.offsetTop = runwayEl.offsetTop;
-      scrub.min = Math.round(scrub.offsetTop + CIRCUIT_HUB.stop * scrub.denominator);
-      scrub.max = Math.round(scrub.offsetTop + SPATIAL_ROUTE.at(-1).stop * scrub.denominator);
-      scrub.pos = window.scrollY;
-      scrub.target = scrub.pos;
-      scrub.dir = dir;
-      scrub.held = false;
-      scrub.lastInput = performance.now();
-      scrub.lastTick = scrub.lastInput;
-      scrub.active = true;
-      travelingRef.current = true;
-      const next = SPATIAL_ROUTE[(ROUTE_INDEX.get(key) ?? 0) + dir];
-      if (next) setTargetKey(next.key);
-      setIsTraveling(true);
-      scrub.frame = requestAnimationFrame(tick);
+      const here = SPATIAL_ROUTE.find((route) => route.key === key);
+      const ahead = neighbourGate(key, dir);
+      if (!here || !ahead) return false;
+      const toPx = measureRunway();
+      drive.lower = dir > 0 ? here : ahead;
+      drive.upper = dir > 0 ? ahead : here;
+      drive.lowerPx = toPx(drive.lower.stop);
+      drive.upperPx = toPx(drive.upper.stop);
+      drive.pos = window.scrollY;
+      drive.target = drive.pos;
+      drive.dir = dir;
+      drive.moving = true;
+      drivingRef.current = true;
+      setDriveState("moving");
+      setTargetKey(ahead.key);
+      setDirection(dir);
       return true;
     };
 
-    const step = (dir, allowScrub = false) => {
-      if (travelingRef.current || scrub.active) return false;
+    const openPage = () => {
+      drivingRef.current = false;
+      drive.moving = false;
+      setDriveState("none");
+      noteWayfindingStep();
+      cooldownRef.current = performance.now() + 520;
+    };
+
+    const intent = (dir, animated = false) => {
+      if (travelingRef.current || drive.moving) return false;
       if (document.documentElement.dataset.booting === "true") return false;
       if (overviewRef.current) {
         overviewRef.current = false;
@@ -318,25 +363,46 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
         requestAnimationFrame(() => updateCamera(scrollYProgress.get()));
         return true;
       }
-      if (consumeChapterStep(activeRef.current, dir)) return true;
-      if (allowScrub && beginScrub(dir)) return "scrub";
-      const index = ROUTE_INDEX.get(activeRef.current) ?? 0;
-      const next = SPATIAL_ROUTE[index + dir];
-      if (!next) return false;
+      const key = activeRef.current;
+      if (key === "top") {
+        if (dir < 0) return false;
+        noteWayfindingStep();
+        window.history.replaceState(null, "", "#route-circuit");
+        goTo("circuit");
+        return true;
+      }
+      if (key === "circuit" && dir < 0) {
+        window.history.replaceState(null, "", "#route-top");
+        goTo("top");
+        return true;
+      }
+      if (drivingRef.current) {
+        if (dir === parkedDirRef.current) {
+          openPage();
+          return true;
+        }
+      } else if (key !== "circuit" && consumeChapterStep(key, dir)) {
+        return true;
+      }
+      const ahead = neighbourGate(key, dir);
+      if (!ahead) return false;
       noteWayfindingStep();
-      window.history.replaceState(null, "", `#route-${next.key}`);
-      goTo(next.key);
-      return true;
+      if (animated) {
+        drivingRef.current = true;
+        setDriveState("moving");
+        goTo(ahead.key, { park: dir });
+        return true;
+      }
+      return beginDrive(dir) ? "drive" : false;
     };
-    const quantisedStep = (dir) => step(dir);
-    stepRef.current = quantisedStep;
-    window.__spatialStep = quantisedStep;
+    const keyboardStep = (dir) => intent(dir, true);
+    window.__spatialStep = keyboardStep;
 
     let wheelTotal = 0;
     let wheelReset = 0;
     let touchStart = null;
     let touchHandled = false;
-    let touchScrubbing = false;
+    let touchDriving = false;
 
     const isEditable = (target) => Boolean(target?.closest?.("input, textarea, select, [contenteditable='true']"));
     const nativeScrollTarget = (target, delta) => {
@@ -355,8 +421,8 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       event.stopPropagation();
       const now = performance.now();
       const px = event.deltaY * (event.deltaMode === 1 ? 16 : 1);
-      if (scrub.active) {
-        scrubBy(px * SCRUB_GAIN);
+      if (drive.moving) {
+        driveBy(px * SCROLL_GAIN);
         return;
       }
       if (travelingRef.current || now < cooldownRef.current) {
@@ -368,8 +434,9 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       wheelReset = window.setTimeout(() => { wheelTotal = 0; }, 220);
       if (Math.abs(wheelTotal) < WHEEL_THRESHOLD) return;
       const dir = wheelTotal > 0 ? 1 : -1;
+      const accumulated = wheelTotal;
       wheelTotal = 0;
-      if (step(dir, true) === "scrub") scrubBy(dir * CHAPTER_GAP * scrub.denominator * 0.2);
+      if (intent(dir) === "drive") driveBy(accumulated * SCROLL_GAIN);
       else cooldownRef.current = now + 520;
     };
 
@@ -377,6 +444,12 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       const touch = event.touches[0];
       touchStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
       touchHandled = false;
+      touchDriving = false;
+      if (drive.moving && touch) {
+        touchDriving = true;
+        drive.touchBase = drive.target;
+        drive.touchAnchor = touch.clientY;
+      }
     };
     const onTouchMove = (event) => {
       const touch = event.touches[0];
@@ -393,9 +466,14 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
         return;
       }
       event.preventDefault();
-      if (touchScrubbing) {
+      if (touchDriving) {
         event.stopPropagation();
-        scrubTo(scrub.touchBase + (delta - scrub.touchOffset) * TOUCH_SCRUB_GAIN);
+        if (!drive.moving) {
+          touchDriving = false;
+          touchHandled = true;
+          return;
+        }
+        driveTo(drive.touchBase + (drive.touchAnchor - touch.clientY) * TOUCH_GAIN);
         return;
       }
       if (horizontal > Math.abs(delta)) return;
@@ -403,12 +481,10 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       if (touchHandled || travelingRef.current || performance.now() < cooldownRef.current) return;
       if (Math.abs(delta) < 52) return;
       const dir = delta > 0 ? 1 : -1;
-      if (step(dir, true) === "scrub") {
-        touchScrubbing = true;
-        scrub.held = true;
-        scrub.touchBase = scrub.pos;
-        scrub.touchOffset = delta - dir * 26;
-        scrubTo(scrub.touchBase + dir * 26 * TOUCH_SCRUB_GAIN);
+      if (intent(dir) === "drive") {
+        touchDriving = true;
+        drive.touchBase = drive.pos;
+        drive.touchAnchor = touch.clientY;
         return;
       }
       touchHandled = true;
@@ -416,11 +492,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
     };
     const onTouchEnd = () => {
       touchStart = null;
-      if (touchScrubbing) {
-        touchScrubbing = false;
-        scrub.held = false;
-        scrub.lastInput = performance.now();
-      }
+      touchDriving = false;
     };
 
     const onKeyDown = (event) => {
@@ -430,7 +502,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       if (!down && !up) return;
       if (nativeScrollTarget(event.target, down ? 1 : -1)) return;
       event.preventDefault();
-      step(down ? 1 : -1);
+      keyboardStep(down ? 1 : -1);
     };
 
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });
@@ -441,9 +513,9 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
     window.addEventListener("keydown", onKeyDown);
     return () => {
       window.clearTimeout(wheelReset);
-      cancelAnimationFrame(scrub.frame);
-      scrub.active = false;
-      if (window.__spatialStep === quantisedStep) delete window.__spatialStep;
+      drive.running = false;
+      cancelAnimationFrame(drive.frame);
+      if (window.__spatialStep === keyboardStep) delete window.__spatialStep;
       window.removeEventListener("wheel", onWheel, { capture: true });
       window.removeEventListener("touchstart", onTouchStart, { capture: true });
       window.removeEventListener("touchmove", onTouchMove, { capture: true });
@@ -451,18 +523,20 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       window.removeEventListener("touchcancel", onTouchEnd, { capture: true });
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [goTo, scrollYProgress, updateCamera]);
+  }, [goTo, measureRunway, park, scrollYProgress, updateCamera]);
 
   useEffect(() => () => {
     const timers = timersRef.current;
     window.clearTimeout(timers.fallback);
     window.clearTimeout(timers.prune);
     window.clearTimeout(timers.resync);
+    window.clearTimeout(timers.watchdog);
   }, []);
 
+  /** Pin click: the camera dives to the car and drives to that gate, then waits for one scroll. */
   const navigate = (key) => {
     window.history.replaceState(null, "", `#route-${key}`);
-    goTo(key);
+    goTo(key, { park: 1 });
   };
   const openCircuitOverview = () => {
     overviewRef.current = true;
@@ -476,10 +550,13 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
   const currentLabel = SPATIAL_ROUTE[routeIndex]?.label || "RACING LINE";
   const hudLabel = isCircuitOverview ? `${coverage}% COMPLETE` : currentLabel;
   const chapterMarker = chapterMarkers[activeKey];
-  const showJourneyHud = isCircuitOverview || isTraveling || activeKey === "circuit";
-  const isSceneIdle = !isTraveling && !isCircuitOverview && activeKey !== "circuit";
+  const isParked = driveState === "parked" && !isTraveling && !isCircuitOverview;
+  const pageOpen = driveState === "none" && !isTraveling && !isCircuitOverview;
+  const showJourneyHud = isCircuitOverview || isTraveling || driveState !== "none" || activeKey === "circuit";
+  const isSceneIdle = !isTraveling && !isCircuitOverview && driveState === "none" && activeKey !== "circuit";
   const circuitPaused = isSceneIdle || (activeKey === "top" && !isTraveling);
-  const orbitable = isCircuitOverview || (activeKey === "circuit" && !isTraveling);
+  const orbitable = isCircuitOverview || (activeKey === "circuit" && !isTraveling && driveState === "none");
+  const hudHint = displayKey === "circuit" ? `CURRENT POSITION · ${currentLabel}` : isParked ? `SCROLL ${parkedDir > 0 ? "DOWN" : "UP"} TO OPEN · ${currentLabel}` : "FOLLOW THE RACING LINE";
 
   return <section ref={runway} className="circuit-runway" data-testid="unified-spatial-experience">
     <div
@@ -487,6 +564,7 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
       data-active={displayKey}
       data-overview={isCircuitOverview ? "true" : "false"}
       data-traveling={isTraveling ? "true" : "false"}
+      data-driving={driveState}
       data-scene-idle={isSceneIdle ? "true" : "false"}
       data-testid="circuit-spatial-viewport"
     >
@@ -521,22 +599,27 @@ export const SpatialExperience = ({ archive, teamTheme = "ferrari", setTeamTheme
           archive={archive}
           direction={direction}
           teamTheme={teamTheme}
-          isActive={key === activeKey && !isTraveling && !isCircuitOverview}
+          isActive={key === activeKey && pageOpen}
         />)}
       </div>
 
-      <ChapterFlair activeKey={displayKey} traveling={isTraveling} />
+      <ChapterFlair activeKey={displayKey} traveling={isTraveling || driveState !== "none"} />
 
-      {chapterKeys.has(activeKey) && !isCircuitOverview && !isTraveling && <div className="chapter-sweep" key={`sweep-${activeKey}`} aria-hidden="true">
+      {chapterKeys.has(activeKey) && pageOpen && <div className="chapter-sweep" key={`sweep-${activeKey}`} aria-hidden="true">
         <motion.i initial={{ y: "-40vh", opacity: 0 }} animate={{ y: "110vh", opacity: [0, .85, 0] }} transition={{ duration: .95, ease: [0.22, 1, 0.36, 1] }} />
       </div>}
-      {chapterKeys.has(activeKey) && !isCircuitOverview && !isTraveling && <BackToCircuitButton onClick={openCircuitOverview} />}
-      {chapterMarker && !isCircuitOverview && !isTraveling && <ChapterMarker {...chapterMarker} className="global-chapter-marker" />}
+      {chapterKeys.has(activeKey) && !isCircuitOverview && !isTraveling && driveState !== "moving" && <BackToCircuitButton onClick={openCircuitOverview} />}
+      {chapterMarker && pageOpen && <ChapterMarker {...chapterMarker} className="global-chapter-marker" />}
+      {isParked && <div className={`circuit-park-hint ${parkedDir > 0 ? "" : "is-up"}`} data-testid="circuit-park-hint" aria-live="polite">
+        <span className="cph-gate">{chapterMarker ? `${chapterMarker.number} · ` : ""}{currentLabel}</span>
+        <ChevronDown size={14} strokeWidth={1.8} />
+        <span>SCROLL {parkedDir > 0 ? "DOWN" : "UP"} TO OPEN</span>
+      </div>}
       {showJourneyHud && <>
         <div className="circuit-hud" data-testid="circuit-journey-hud">
           <span>{String(routeIndex + 1).padStart(2, "0")} / {String(SPATIAL_ROUTE.length).padStart(2, "0")}</span>
           <strong>{hudLabel}</strong>
-          <small>{displayKey === "circuit" ? `CURRENT POSITION · ${currentLabel}` : "FOLLOW THE RACING LINE"}</small>
+          <small>{hudHint}</small>
         </div>
         <div className="circuit-progress" data-testid="circuit-journey-progress"><motion.span style={{ scaleX: scrollYProgress }} /></div>
       </>}

@@ -297,3 +297,7 @@ agent_communication:
 ## 2026-09-03 — Scroll-scrub travel + slower journeys + F1 car remodel
 - Files: SpatialExperience.jsx (scrub state machine, travelDuration), components/circuit/RaceCar.jsx (new), CircuitStage.jsx (chase framing, life.velocity/bank, lights/DPR/MSAA), CircuitLife.jsx (gate lights removed)
 - testing agent iteration_52: frontend 100% pass, no issues
+
+## 2026-09-03 — Scroll-bound car (drive → park → open)
+- Files: SpatialExperience.jsx (drive engine rewrite, park/goTo park option, intents), SpatialV6.css (data-driving rules, .circuit-park-hint), CircuitStage.jsx (progress smoothing delta*10)
+- testing agent iteration_53: frontend 100% pass; post-test fix: hash sync in non-park land(), park cooldown 450ms

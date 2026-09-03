@@ -218,7 +218,7 @@ const Rig = ({ curve, radius, travelRef, labelRefs, carRef, racingMaterial, orbi
     }
     if (!travel.visible) resetOrbit(orbit, 0, Infinity);
 
-    s.progress += (travel.progress - s.progress) * Math.min(1, delta * 7);
+    s.progress += (travel.progress - s.progress) * Math.min(1, delta * 10);
     s.follow = moveToward(s.follow, travel.follow, delta / FOLLOW_DURATION);
     const t = clamp(s.progress, 0, 0.9999);
     const follow = easeInOut(clamp(s.follow, 0, 1));

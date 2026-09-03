@@ -32,12 +32,55 @@
   transition: opacity .5s ease, transform .9s cubic-bezier(.16, 1, .3, 1), visibility 0s linear 0s;
 }
 
-.circuit-viewport[data-traveling="true"] .circuit-chapters > :is(section, footer) {
+.circuit-viewport[data-traveling="true"] .circuit-chapters > :is(section, footer),
+.circuit-viewport[data-driving="moving"] .circuit-chapters > :is(section, footer),
+.circuit-viewport[data-driving="parked"] .circuit-chapters > :is(section, footer) {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
   transform: translate3d(0, 2vh, 0) scale(.982) !important;
   transition: opacity .26s ease, transform .4s ease, visibility 0s linear .26s !important;
+}
+
+/* Parked at a gate: the car waits for one deliberate scroll before the chapter opens. */
+.circuit-park-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 15vh;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+  color: #e8e8ec;
+  font: 9px "Space Mono";
+  letter-spacing: .18em;
+  text-align: center;
+  pointer-events: none;
+  animation: parkHintIn .6s cubic-bezier(.16, 1, .3, 1) both;
+}
+.circuit-park-hint .cph-gate,
+.circuit-park-hint > span:last-child {
+  padding: 7px 14px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 999px;
+  background: rgba(7, 7, 9, .58);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 10px;
+}
+.circuit-park-hint > span:last-child { font-size: 8px; color: rgba(232, 232, 236, .82); }
+.circuit-park-hint svg { color: var(--acid); filter: drop-shadow(0 0 6px rgba(0, 0, 0, .8)); animation: parkChevron 1.6s ease-in-out infinite; }
+.circuit-park-hint.is-up svg { transform: rotate(180deg); animation-name: parkChevronUp; }
+@keyframes parkHintIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes parkChevron { 0%, 100% { transform: translateY(-3px); opacity: .6; } 50% { transform: translateY(3px); opacity: 1; } }
+@keyframes parkChevronUp { 0%, 100% { transform: rotate(180deg) translateY(-3px); opacity: .6; } 50% { transform: rotate(180deg) translateY(3px); opacity: 1; } }
+@media (max-width: 850px) {
+  .circuit-park-hint { bottom: 18vh; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .circuit-park-hint, .circuit-park-hint svg { animation: none; }
 }
 
 /* Cinematic arrival sweep — a single cheap element instead of a full-screen clip-path animation. */
